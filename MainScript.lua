@@ -2,6 +2,8 @@
 --DO NOT COPY AND CLAIM AS OWN, if you are using some of the script for your own, 
 --credit (especially of original author) is highly appreciated! 
 
+local function CreateGui()
+
 local Energize = Instance.new("ScreenGui") -- The actual GUI
 local SideFrame = Instance.new("Frame") -- Visible when GUI is closed
 local OpenGUI = Instance.new("TextButton") -- Part of SideFrame
@@ -1624,6 +1626,15 @@ FlingArms.MouseButton1Click:connect(function()
 	end
 end)
 
+end
+
+local GuiActive = true
+
+CreateGui()
+
 game.Players.LocalPlayer.CharacterAdded:connect(function()
-	Energize:Destroy()
+	if GuiActive then
+		Energize:Destroy()
+		CreateGui()	
+	end
 end)
