@@ -1,17 +1,21 @@
+--Original by illremember, edited by Fixel656
+--DO NOT COPY AND CLAIM AS OWN, if you are using some of the script for your own, 
+--credit (especially of original author) is highly appreciated! 
+
 local Energize = Instance.new("ScreenGui") -- The actual GUI
 local SideFrame = Instance.new("Frame") -- Visible when GUI is closed
 local OpenGUI = Instance.new("TextButton") -- Part of SideFrame
 local SideFrameTitle = Instance.new("TextLabel") -- Part of SideFrame
 local MainFrame = Instance.new("Frame") -- All of the stuff on the main frame
 
-local SpeedFrame = Instance.new("Frame") -- The actual GUI
+local SpeedFrame = Instance.new("Frame") -- Frame of Speed Changer
 local SFLayout = Instance.new("UIGridLayout")
 
 local ScrollingFrame = Instance.new("ScrollingFrame") -- The scrolling frame of animations
-local CheckR = Instance.new("TextLabel") -- Check if R15 or R6
 local ScrollingFrameR15 = Instance.new("ScrollingFrame") -- The scrolling frame of R15 animations
+local CheckR = Instance.new("TextLabel") -- Check if R15 or R6, currently invisible
 
-local SpeedNum
+local SpeedNum --Value, adding to default speed of animation
 
 local CrazySlash = Instance.new("TextButton")--COMPLETE
 local Open = Instance.new("TextButton")--COMPLETE
