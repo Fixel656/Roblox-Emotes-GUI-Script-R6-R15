@@ -1620,6 +1620,6 @@ FlingArms.MouseButton1Click:connect(function()
 	end
 end)
 
-game.Players.LocalPlayer.Character.Humanoid.Died:connect(function()
+game.Players.LocalPlayer.CharacterAdded:connect(function()
 	Energize:Destroy()
 end)
