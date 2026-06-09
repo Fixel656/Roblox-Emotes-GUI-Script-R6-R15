@@ -16,6 +16,7 @@ What I planning to add/change:
 It will be manually, so it will be a few games. I will type available ones in README.
 -Button to delete Gui
 -Activating Anims by pressing keys (will also be configurable after I learn how to save data on device)
+- Ability to use animation by entering its ID (maybe will make "Saved Anims" Section) 
 -More
 
 I made this script for myself, so it won't be fully suitable for you, especially on section with separate Places. you can change it if you want, Moreover, I am not the original author of the script,
