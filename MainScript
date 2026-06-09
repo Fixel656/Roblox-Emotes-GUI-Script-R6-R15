@@ -1619,3 +1619,7 @@ FlingArms.MouseButton1Click:connect(function()
 		CurSpeedText.Text = "CurrentSpeed: -"
 	end
 end)
+
+game.Players.LocalPlayer.Character.Humanoid.Died:connect(function()
+	Energize:Destroy()
+end)
