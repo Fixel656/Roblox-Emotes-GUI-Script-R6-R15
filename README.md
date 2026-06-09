@@ -10,15 +10,15 @@ and if summary is 0,animation will stuck on first frames.
 
 What I planning to add/change:
 - add other color themes and make style more modern
-- saveable settings and position (If I will understand how to save data to the device)
+- saveable settings and position (If I'll learn how to save data to the device)
 - more R6/R15 animations
-- section with Animations for some games specifically. It will be places with emotes available in these places specifically.
+- section with Animations for some separate games. It will be places with emotes available in these places specifically.
 It will be manually, so it will be a few games. I will type available ones in README.
 -Button to delete Gui
--Activating Anims by pressing keys (will also be configurable after I learn how to save files on device)
+-Activating Anims by pressing keys (will also be configurable after I learn how to save data on device)
 -More
 
-I made this script for myself, so you can change it if you want, Moreover, I am not the original author of the script,
+I made this script for myself, so it won't be fully suitable for you, especially on section with separate Places. you can change it if you want, Moreover, I am not the original author of the script,
 But it would be cool if you will credit me as well :) 
 
 Hope you like it! 
