@@ -1,7 +1,7 @@
 This is an edit of Energize Emote Gui originally made by illremember. Original: https://github.com/IlikeyocutgHAH12/FEEGGEG/blob/main/%5BFE%5D%20Energize%20Animation%20Gui.txt
 
 Script: 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/MainScript.lua",true))()
+`loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/MainScript.lua",true))()`
 
 What I changed/added:
 - Added abibily to change animation speed. The number you write in the window is adding to the default speed, 
