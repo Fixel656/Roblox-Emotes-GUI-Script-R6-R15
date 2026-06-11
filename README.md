@@ -4,7 +4,8 @@ Script:
 
 `loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/MainScript.lua",true))()`
 
-<img width="496" height="313" alt="image" src="https://github.com/user-attachments/assets/a75b7240-6be1-42a7-a603-951ce0b505ea" />
+<img width="486" height="308" alt="image" src="https://github.com/user-attachments/assets/73bb695d-a1b0-48f1-8aba-e0814569db6b" />
+
 
 What I changed/added:
 - Added abibily to change animation speed. The number you write in the window is adding to the default speed, 
@@ -12,6 +13,7 @@ if you type negative number, it will make animation slower, but if summary speed
 and if summary is 0,animation will stuck on first frames. 
 - Changed how Gui looks
 - Gui will reappear on Player.CharacterAdded so it prevents Gui to disappear or stop working on death
+- Button to Destroy Gui
 - Added, edited and deleted some R6 animations
 - changed Frame dragging from Frame.Draggable to using UiDragDetector (Now the Frame won't stop dragging even if you move mouse very quick) 
 
