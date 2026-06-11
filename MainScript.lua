@@ -1,14 +1,17 @@
+--V1
 --Original by illremember, edited by Fixel656
 --DO NOT COPY AND CLAIM AS OWN, if you are using some of the script for your own, 
 --credit (especially of original author) is highly appreciated! 
 
 -- TO ADD dances = {"27789359", 35154961, "45834924", "33796059", "28488254", 
 
+local GuiActive = true
+
 local function CreateGui()
 
 	Energize = Instance.new("ScreenGui") -- The actual GUI
 	local SideFrame = Instance.new("Frame") -- Visible when GUI is closed
-	local OpenGUI = Instance.new("TextButton") -- Part of SideFrame
+	local OpenGUI = Instance.new("ImageButton") -- Part of SideFrame
 	local SideFrameTitle = Instance.new("TextLabel") -- Part of SideFrame
 	local MainFrame = Instance.new("Frame") -- All of the stuff on the main frame
 
@@ -18,6 +21,12 @@ local function CreateGui()
 	local ScrollingFrame = Instance.new("ScrollingFrame") -- The scrolling frame of animations
 	local CheckR = Instance.new("TextLabel") -- Check if R15 or R6, currently invisible
 	local ScrollingFrameR15 = Instance.new("ScrollingFrame") -- The scrolling frame of R15 animations
+	
+	local GuiTopFrame = Instance.new("Frame") -- Top of the main frame
+	local DestroyGUI = Instance.new("TextButton") -- To Destroy the GUI
+	local SFDestroyGUI = Instance.new("TextButton") -- To Destroy the GUI in SideFrame
+	local CloseGUI = Instance.new("ImageButton") -- To close the GUI
+	local Title = Instance.new("TextLabel") -- Actual title of GUI, Energize
 
 	local SpeedNum --Value, adding to default speed of animation
 
@@ -65,10 +74,6 @@ local function CreateGui()
 	local BarrelRoll = Instance.new("TextButton")--COMPLETE
 	local LoopSlam = Instance.new("TextButton")--COMPLETE
 
-	local GuiTopFrame = Instance.new("Frame") -- Top of the main frame
-	local CloseGUI = Instance.new("TextButton") -- To close the GUI
-	local Title = Instance.new("TextLabel") -- Actual title of GUI, Energize
-
 	-- Properties
 
 	Energize.Name = "Energize"
@@ -79,35 +84,41 @@ local function CreateGui()
 	SideFrame.Active = true
 	SideFrame.BackgroundColor3 = Color3.new(0.541176, 0.647059, 1)
 	SideFrame.Position = UDim2.new(0, 10, 0, 10)
-	SideFrame.Size = UDim2.new(0, 460, 0, 32)
+	SideFrame.Size = UDim2.new(0, 225, 0, 32)
 	SideFrame.Visible = false
 
 	OpenGUI.Name = "OpenGUI"
 	OpenGUI.Parent = SideFrame
-	OpenGUI.AnchorPoint = Vector2.new(1, 0.5)
-	OpenGUI.BackgroundColor3 = Color3.new(1, 1, 1)
+	OpenGUI.AnchorPoint = Vector2.new(0, 0.5)
 	OpenGUI.BackgroundTransparency = 1
-	OpenGUI.Position = UDim2.new(1, 0, 0.5, 0)
+	OpenGUI.Position = UDim2.new(0, 0, 0.5, 0)
 	OpenGUI.Size = UDim2.new(0, 32, 0, 32)
-	OpenGUI.Font = Enum.Font.FredokaOne
-	OpenGUI.FontSize = Enum.FontSize.Size48
-	OpenGUI.Text = "X"
-	OpenGUI.TextColor3 = Color3.new(0, 0, 0)
-	OpenGUI.TextSize = 34
-	OpenGUI.TextWrapped = true
-
+	OpenGUI.Image = "rbxassetid://129394195458921"
+	
 	SideFrameTitle.Name = "SideFrameTitle"
 	SideFrameTitle.Parent = SideFrame
+	SideFrameTitle.AnchorPoint = Vector2.new(0.5, 0.5)
 	SideFrameTitle.BackgroundColor3 = Color3.new(1, 1, 1)
 	SideFrameTitle.BackgroundTransparency = 1
-	SideFrameTitle.Position = UDim2.new(0, 170, 0, 0)
+	SideFrameTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
 	SideFrameTitle.Size = UDim2.new(0, 119, 0, 31)
-	SideFrameTitle.Font = Enum.Font.Arial
-	SideFrameTitle.FontSize = Enum.FontSize.Size24
+	SideFrameTitle.Font = Enum.Font.SourceSansBold
+	SideFrameTitle.TextStrokeColor3 = Color3.new(1, 1, 1)
 	SideFrameTitle.Text = "Emote GUI"
-	SideFrameTitle.TextSize = 21
-	SideFrameTitle.TextStrokeColor3 = Color3.new(0.27451, 0.92549, 0.905882)
-	SideFrameTitle.TextStrokeTransparency = 0.69999998807907
+	SideFrameTitle.TextSize = 24
+	SideFrameTitle.TextStrokeTransparency = 0
+	
+	SFDestroyGUI.Name = "DestroyGUI"
+	SFDestroyGUI.Parent = SideFrame
+	SFDestroyGUI.AnchorPoint = Vector2.new(1, 0.5)
+	SFDestroyGUI.BackgroundTransparency = 1
+	SFDestroyGUI.Position = UDim2.new(1, 0, 0.5, 0)
+	SFDestroyGUI.Size = UDim2.new(0, 32, 0, 32)
+	SFDestroyGUI.Font = Enum.Font.FredokaOne
+	SFDestroyGUI.Text = "X"
+	SFDestroyGUI.TextColor3 = Color3.new(0, 0, 0)
+	SFDestroyGUI.TextSize = 34
+	SFDestroyGUI.TextWrapped = true
 	
 	local SFUIStroke = Instance.new("UIStroke")
 	SFUIStroke.Parent = SideFrame
@@ -138,17 +149,30 @@ local function CreateGui()
 	SpeedFrame.Name = "SpeedFrame"
 	SpeedFrame.Parent = MainFrame
 	SpeedFrame.Active = true
-	SpeedFrame.BackgroundTransparency = 1
-	SpeedFrame.Position = UDim2.new(0, 0, 1, 0)
-	SpeedFrame.Size = UDim2.new(0, 200, 0, 50)
+	SpeedFrame.Position = UDim2.new(0, 0, 1, 1)
+	SpeedFrame.Size = UDim2.new(0, 460, 0, 35)
+	SpeedFrame.BackgroundColor3 = Color3.new(0.541176, 0.647059, 1)
 
 	--SpeedFrame Parts
 	SFLayout.Name = "UIGridLayout"
 	SFLayout.Parent = SpeedFrame
 	SFLayout.FillDirection = Enum.FillDirection.Vertical
 	SFLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	SFLayout.CellSize = UDim2.new(0, 100, 0, 35)
+	SFLayout.CellSize = UDim2.new(0, 110, 0, 31)
+	SFLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+	
+	local SpeedUICorner = Instance.new("UICorner")
+	SpeedUICorner.Parent = SpeedFrame
+	SpeedUICorner.TopLeftRadius = UDim.new(0, 5)
+	SpeedUICorner.CornerRadius = UDim.new(0, 5)
+	SpeedUICorner.TopRightRadius = UDim.new(0, 5)
+	SpeedUICorner.BottomRightRadius = UDim.new(0, 5)
+	SpeedUICorner.BottomLeftRadius = UDim.new(0, 5)
 
+	local SpeedUIStroke = Instance.new("UIStroke")
+	SpeedUIStroke.Parent = SpeedFrame
+	SpeedUIStroke.Thickness = 2
+	
 	local SpeedValue = Instance.new("TextBox")
 	SpeedValue.Parent = SpeedFrame
 	SpeedValue.Name = "SpeedValue"
@@ -162,7 +186,6 @@ local function CreateGui()
 	SpeedValue.PlaceholderText = "0 = Default"
 	SpeedValue.Font = Enum.Font.SourceSans
 	SpeedValue.TextScaled = true
-
 
 	local UICorner = Instance.new("UICorner")
 	UICorner.Parent = SpeedValue
@@ -191,7 +214,7 @@ local function CreateGui()
 	CurSpeedText.Name = "CurSpeedText"
 	CurSpeedText.Parent = MainFrame
 	CurSpeedText.AnchorPoint = Vector2.new(1, 0)
-	CurSpeedText.Size = UDim2.new(0, 200, 0, 30)
+	CurSpeedText.Size = UDim2.new(0, 200, 0, 35)
 	CurSpeedText.Position = UDim2.new(1, 0, 1, 0)
 	CurSpeedText.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	CurSpeedText.BackgroundTransparency = 1
@@ -297,31 +320,40 @@ local function CreateGui()
 	GTFUICorner.BottomRightRadius = UDim.new(0, 5)
 	GTFUICorner.BottomLeftRadius = UDim.new(0, 5)
 	
+	DestroyGUI.Name = "DestroyGUI"
+	DestroyGUI.Parent = GuiTopFrame
+	DestroyGUI.AnchorPoint = Vector2.new(1, 0.5)
+	DestroyGUI.BackgroundTransparency = 1
+	DestroyGUI.Position = UDim2.new(1, 0, 0.5, 0)
+	DestroyGUI.Size = UDim2.new(0, 32, 0, 32)
+	DestroyGUI.Font = Enum.Font.FredokaOne
+	DestroyGUI.Text = "X"
+	DestroyGUI.TextColor3 = Color3.new(0, 0, 0)
+	DestroyGUI.TextSize = 34
+	DestroyGUI.TextWrapped = true
+	
 	CloseGUI.Name = "CloseGUI"
 	CloseGUI.Parent = GuiTopFrame
-	CloseGUI.AnchorPoint = Vector2.new(1, 0.5)
-	CloseGUI.BackgroundColor3 = Color3.new(1, 1, 1)
+	CloseGUI.AnchorPoint = Vector2.new(0, 0.5)
 	CloseGUI.BackgroundTransparency = 1
-	CloseGUI.Position = UDim2.new(1, 0, 0.5, 0)
+	CloseGUI.Position = UDim2.new(0, 0, 0.5, 0)
 	CloseGUI.Size = UDim2.new(0, 32, 0, 32)
-	CloseGUI.Font = Enum.Font.FredokaOne
-	CloseGUI.Text = "X"
-	CloseGUI.TextColor3 = Color3.new(0, 0, 0)
-	CloseGUI.TextSize = 34
-	CloseGUI.TextWrapped = true
-
+	CloseGUI.Image = "rbxassetid://118017289302281"
+	
 	Title.Name = "Title"
 	Title.Parent = GuiTopFrame
+	Title.AnchorPoint = Vector2.new(0.5, 0.5)
+	Title.Position = UDim2.new(0.5, 0, 0.5, 0)
 	Title.BackgroundColor3 = Color3.new(1, 1, 1)
 	Title.BackgroundTransparency = 1
-	Title.Size = UDim2.new(0, 460, 0, 31)
-	Title.FontSize = Enum.FontSize.Size14
+	Title.Size = UDim2.new(0, 119, 0, 31)
 	Title.Text = "Emotes GUI"
+	Title.Font = Enum.Font.SourceSansBold
+	Title.TextStrokeColor3 = Color3.new(1, 1, 1)
 	Title.TextColor3 = Color3.new(0.164706, 0.164706, 0.164706)
-	Title.TextSize = 14
-	Title.TextStrokeColor3 = Color3.new(0.384314, 0.917647, 1)
-	Title.TextStrokeTransparency = 0.7
-	Title.TextWrapped = true
+	Title.TextSize = 24
+	Title.TextStrokeTransparency = 0
+	Title.TextWrapped = false
 
 	CheckR.Name = "CheckR"
 	CheckR.Parent = GuiTopFrame
@@ -817,6 +849,16 @@ local function CreateGui()
 		SideFrame.Visible = true
 		SideFrame.Position = MainFrame.Position
 	end)
+	
+	DestroyGUI.MouseButton1Click:connect(function()
+		GuiActive = false
+		Energize:Destroy()
+	end)
+	
+	SFDestroyGUI.MouseButton1Click:connect(function()
+		GuiActive = false
+		Energize:Destroy()
+	end)
 
 	OpenGUI.MouseButton1Click:connect(function()
 		MainFrame.Visible = true
@@ -838,6 +880,31 @@ local function CreateGui()
 		SideFrameTitle.Text = "Emotes GUI (R6)"
 
 	end
+	
+	-- Playing Animations
+	
+	--[[ Script to stop all animations to play animations playable through /e chat command cuz without that it would look horrible
+	
+		if NameACTIVE then
+			
+			local nameList = {"Animation1", "Animation2", "ClimbAnim", "FallAnim", "JumpAnim", "RunAnim", "SitAnim", "ToolNoneAnim", "WalkAnim"}
+			local playingTracks = game.Players.LocalPlayer.Character.Humanoid:GetPlayingAnimationTracks()
+			game.Players.LocalPlayer.Character.Animate.Disabled = true
+			
+			for _, animtrack in ipairs(playingTracks) do
+				if table.find(nameList, animtrack.Name) then
+					animtrack:Stop()
+				end
+			end
+			
+		else
+
+			game.Players.LocalPlayer.Character.Animate.Disabled = false
+
+		end
+	end)
+	
+	]]
 
 	local Anim = Instance.new("Animation")
 	Anim.AnimationId = "rbxassetid://148840371"
@@ -987,7 +1054,7 @@ local function CreateGui()
 	local FaintACTIVE = false
 	Faint.MouseButton1Click:connect(function()
 		FaintACTIVE = not FaintACTIVE
-		if FaintACTIVE then
+		if FaintACTIVE then				
 			track:Play(.1, 1, 1 + SpeedNum)
 			Faint.BackgroundColor3 = loc
 			CurSpeedText.Text = "CurrentSpeed: ".. 1 + SpeedNum
@@ -1713,10 +1780,8 @@ local function CreateGui()
 			CurSpeedText.Text = "CurrentSpeed: -"
 		end
 	end)
-
+	
 end
-
-local GuiActive = true
 
 CreateGui()
 
