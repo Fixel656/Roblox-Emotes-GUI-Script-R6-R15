@@ -2,7 +2,7 @@
 --DO NOT COPY AND CLAIM AS OWN, if you are using some of the script for your own, 
 --credit (especially of original author) is highly appreciated! 
 
--- TO ADD dances = {"27789359", "30196114", "248263260", "45834924", "33796059", "28488254", "52155728"}
+-- TO ADD dances = {"27789359", 35154961, "45834924", "33796059", "28488254", 
 
 local function CreateGui()
 
