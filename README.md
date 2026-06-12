@@ -4,8 +4,7 @@ Script:
 
 `loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/MainScript.lua",true))()`
 
-<img width="486" height="308" alt="image" src="https://github.com/user-attachments/assets/73bb695d-a1b0-48f1-8aba-e0814569db6b" />
-
+<img width="480" height="309" alt="image" src="https://github.com/user-attachments/assets/60f98ba7-16aa-4f35-9b47-900d7d3e20b9" />
 
 What I changed/added:
 - Added abibily to change animation speed. The number you write in the window is adding to the default speed, 
