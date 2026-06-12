@@ -3,13 +3,12 @@
 --DO NOT COPY AND CLAIM AS OWN, if you are using some of the script for your own, 
 --credit (especially of original author) is highly appreciated! 
 
--- TO ADD dances = {"27789359", 35154961, "45834924", "33796059", "28488254", 
-
 local GuiActive = true
+local GuiEmoter = nil
 
 local function CreateGui()
 
-	Energize = Instance.new("ScreenGui") -- The actual GUI
+	local Emoter = Instance.new("ScreenGui") -- The actual GUI
 	local SideFrame = Instance.new("Frame") -- Visible when GUI is closed
 	local OpenGUI = Instance.new("ImageButton") -- Part of SideFrame
 	local SideFrameTitle = Instance.new("TextLabel") -- Part of SideFrame
@@ -21,12 +20,12 @@ local function CreateGui()
 	local ScrollingFrame = Instance.new("ScrollingFrame") -- The scrolling frame of animations
 	local CheckR = Instance.new("TextLabel") -- Check if R15 or R6, currently invisible
 	local ScrollingFrameR15 = Instance.new("ScrollingFrame") -- The scrolling frame of R15 animations
-	
+
 	local GuiTopFrame = Instance.new("Frame") -- Top of the main frame
 	local DestroyGUI = Instance.new("TextButton") -- To Destroy the GUI
 	local SFDestroyGUI = Instance.new("TextButton") -- To Destroy the GUI in SideFrame
 	local CloseGUI = Instance.new("ImageButton") -- To close the GUI
-	local Title = Instance.new("TextLabel") -- Actual title of GUI, Energize
+	local Title = Instance.new("TextLabel") -- Actual title of GUI, Emoter
 
 	local SpeedNum --Value, adding to default speed of animation
 
@@ -49,11 +48,11 @@ local function CreateGui()
 	local FullPunch = Instance.new("TextButton")--COMPLETE
 	local Crouch = Instance.new("TextButton")--COMPLETE
 	local SpinDance = Instance.new("TextButton")--COMPLETE
-	local FloorFaint = Instance.new("TextButton")--COMPLETE
+	local SwordSpin = Instance.new("TextButton")--COMPLETE
 	local JumpingJacks = Instance.new("TextButton")--COMPLETE
 	local Spinner = Instance.new("TextButton")--COMPLETE
 	local MegaInsane = Instance.new("TextButton")--COMPLETE
-	local ArmDetach = Instance.new("TextButton")--COMPLETE
+	local Punches = Instance.new("TextButton")--COMPLETE
 	local WeirdMove = Instance.new("TextButton")--COMPLETE
 	local Faint = Instance.new("TextButton")--COMPLETE
 	local CloneIllusion = Instance.new("TextButton")--COMPLETE
@@ -61,28 +60,35 @@ local function CreateGui()
 	local DinoWalk = Instance.new("TextButton")--COMPLETE
 	local FloorCrawl = Instance.new("TextButton")--COMPLETE
 	local SwordSlam = Instance.new("TextButton")--COMPLETE
-	local LoopHead = Instance.new("TextButton")--COMPLETE
+	local Scared = Instance.new("TextButton")--COMPLETE
 	local HeroJump = Instance.new("TextButton")--COMPLETE
 	local Insane = Instance.new("TextButton")--COMPLETE
 	local FloatingHead = Instance.new("TextButton")--COMPLETE
 	local HeadThrow = Instance.new("TextButton")--COMPLETE
+	local Bang = Instance.new("TextButton")--COMPLETE
 	local MovingDance = Instance.new("TextButton")--COMPLETE
 	local SuperPunch = Instance.new("TextButton")--COMPLETE
 	local ArmTurbine = Instance.new("TextButton")--COMPLETE
 	local Dab = Instance.new("TextButton")--COMPLETE
 	local FloatSit = Instance.new("TextButton")--COMPLETE
 	local BarrelRoll = Instance.new("TextButton")--COMPLETE
-	local LoopSlam = Instance.new("TextButton")--COMPLETE
+	local WallHack = Instance.new("TextButton")--COMPLETE
+
+	BgColor = Color3.new(0.541176, 0.647059, 1)
+	col = BgColor -- R6 Button Color
+	loc = Color3.new(0.427451, 0.490196, 0.792157) -- R6 Button darker color (idk how to make it just darker BgColor yet)
+	rcol = Color3.new(0.682353, 0.701961, 0.792157) --R15 Button color
+	rloc = Color3.new(0.882353, 0.901961, 0.992157) -- R15 Button darker color
 
 	-- Properties
 
-	Energize.Name = "Energize"
-	Energize.Parent = game.Players.LocalPlayer.PlayerGui
+	Emoter.Name = "Emoter"
+	Emoter.Parent = game.Players.LocalPlayer.PlayerGui
 
 	SideFrame.Name = "SideFrame"
-	SideFrame.Parent = Energize
+	SideFrame.Parent = Emoter
 	SideFrame.Active = true
-	SideFrame.BackgroundColor3 = Color3.new(0.541176, 0.647059, 1)
+	SideFrame.BackgroundColor3 = BgColor
 	SideFrame.Position = UDim2.new(0, 10, 0, 10)
 	SideFrame.Size = UDim2.new(0, 225, 0, 32)
 	SideFrame.Visible = false
@@ -90,11 +96,12 @@ local function CreateGui()
 	OpenGUI.Name = "OpenGUI"
 	OpenGUI.Parent = SideFrame
 	OpenGUI.AnchorPoint = Vector2.new(0, 0.5)
-	OpenGUI.BackgroundTransparency = 1
+	OpenGUI.BackgroundTransparency = 0
+	OpenGUI.BackgroundColor3 = BgColor
 	OpenGUI.Position = UDim2.new(0, 0, 0.5, 0)
 	OpenGUI.Size = UDim2.new(0, 32, 0, 32)
 	OpenGUI.Image = "rbxassetid://129394195458921"
-	
+
 	SideFrameTitle.Name = "SideFrameTitle"
 	SideFrameTitle.Parent = SideFrame
 	SideFrameTitle.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -107,35 +114,24 @@ local function CreateGui()
 	SideFrameTitle.Text = "Emote GUI"
 	SideFrameTitle.TextSize = 24
 	SideFrameTitle.TextStrokeTransparency = 0
-	
+
 	SFDestroyGUI.Name = "DestroyGUI"
 	SFDestroyGUI.Parent = SideFrame
 	SFDestroyGUI.AnchorPoint = Vector2.new(1, 0.5)
-	SFDestroyGUI.BackgroundTransparency = 1
+	SFDestroyGUI.BackgroundTransparency = 0
 	SFDestroyGUI.Position = UDim2.new(1, 0, 0.5, 0)
 	SFDestroyGUI.Size = UDim2.new(0, 32, 0, 32)
+	SFDestroyGUI.BackgroundColor3 = BgColor
 	SFDestroyGUI.Font = Enum.Font.FredokaOne
 	SFDestroyGUI.Text = "X"
 	SFDestroyGUI.TextColor3 = Color3.new(0, 0, 0)
 	SFDestroyGUI.TextSize = 34
 	SFDestroyGUI.TextWrapped = true
-	
-	local SFUIStroke = Instance.new("UIStroke")
-	SFUIStroke.Parent = SideFrame
-	SFUIStroke.Thickness = 2
-
-	local SFUICorner = Instance.new("UICorner")
-	SFUICorner.Parent = SideFrame
-	SFUICorner.TopLeftRadius = UDim.new(0, 5)
-	SFUICorner.CornerRadius = UDim.new(0, 5)
-	SFUICorner.TopRightRadius = UDim.new(0, 5)
-	SFUICorner.BottomRightRadius = UDim.new(0, 5)
-	SFUICorner.BottomLeftRadius = UDim.new(0, 5)
 
 	MainFrame.Name = "MainFrame"
-	MainFrame.Parent = Energize
+	MainFrame.Parent = Emoter
 	MainFrame.Active = true
-	MainFrame.BackgroundColor3 = Color3.new(1, 1, 1)
+	MainFrame.BackgroundColor3 = BgColor
 	MainFrame.BackgroundTransparency = 1
 	MainFrame.Position = UDim2.new(0, 10, 0, 10)
 	MainFrame.Size = UDim2.new(0, 460, 0, 250)
@@ -151,7 +147,7 @@ local function CreateGui()
 	SpeedFrame.Active = true
 	SpeedFrame.Position = UDim2.new(0, 0, 1, 1)
 	SpeedFrame.Size = UDim2.new(0, 460, 0, 35)
-	SpeedFrame.BackgroundColor3 = Color3.new(0.541176, 0.647059, 1)
+	SpeedFrame.BackgroundColor3 = BgColor
 
 	--SpeedFrame Parts
 	SFLayout.Name = "UIGridLayout"
@@ -160,19 +156,7 @@ local function CreateGui()
 	SFLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	SFLayout.CellSize = UDim2.new(0, 110, 0, 31)
 	SFLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-	
-	local SpeedUICorner = Instance.new("UICorner")
-	SpeedUICorner.Parent = SpeedFrame
-	SpeedUICorner.TopLeftRadius = UDim.new(0, 5)
-	SpeedUICorner.CornerRadius = UDim.new(0, 5)
-	SpeedUICorner.TopRightRadius = UDim.new(0, 5)
-	SpeedUICorner.BottomRightRadius = UDim.new(0, 5)
-	SpeedUICorner.BottomLeftRadius = UDim.new(0, 5)
 
-	local SpeedUIStroke = Instance.new("UIStroke")
-	SpeedUIStroke.Parent = SpeedFrame
-	SpeedUIStroke.Thickness = 2
-	
 	local SpeedValue = Instance.new("TextBox")
 	SpeedValue.Parent = SpeedFrame
 	SpeedValue.Name = "SpeedValue"
@@ -186,13 +170,6 @@ local function CreateGui()
 	SpeedValue.PlaceholderText = "0 = Default"
 	SpeedValue.Font = Enum.Font.SourceSans
 	SpeedValue.TextScaled = true
-
-	local UICorner = Instance.new("UICorner")
-	UICorner.Parent = SpeedValue
-
-	local UIStroke = Instance.new("UIStroke")
-	UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	UIStroke.Parent = SpeedValue
 
 	local ValueText = Instance.new("TextLabel")
 	ValueText.Name = "ValueText"
@@ -233,7 +210,7 @@ local function CreateGui()
 			SpeedNum = 0
 		end
 	end)
-	
+
 	--Scrolling Frames
 
 	ScrollingFrame.Parent = MainFrame
@@ -241,19 +218,8 @@ local function CreateGui()
 	ScrollingFrame.Position = UDim2.new(0, 0, 0, 34)
 	ScrollingFrame.ScrollBarImageColor3 = Color3.new(0, 0, 0)
 	ScrollingFrame.Size = UDim2.new(0, 460, 0, 215)
+	ScrollingFrame.CanvasSize = UDim2.new(0, 0, 1.5, 0)
 	ScrollingFrame.ScrollBarThickness = 10
-	
-	local SF6UIStroke = Instance.new("UIStroke")
-	SF6UIStroke.Parent = ScrollingFrame
-	SF6UIStroke.Thickness = 2
-
-	local SF6UICorner = Instance.new("UICorner")
-	SF6UICorner.Parent = ScrollingFrame
-	SF6UICorner.TopLeftRadius = UDim.new(0, 5)
-	SF6UICorner.CornerRadius = UDim.new(0, 5)
-	SF6UICorner.TopRightRadius = UDim.new(0, 5)
-	SF6UICorner.BottomRightRadius = UDim.new(0, 5)
-	SF6UICorner.BottomLeftRadius = UDim.new(0, 5)
 
 	local SF6UIGridLayout = Instance.new("UIGridLayout")
 	SF6UIGridLayout.Parent = ScrollingFrame
@@ -261,69 +227,47 @@ local function CreateGui()
 	SF6UIGridLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	SF6UIGridLayout.CellSize = UDim2.new(0, 100, 0, 30)
 	SF6UIGridLayout.CellPadding = UDim2.new(0, 10, 0, 10)
-	
+
 	local SF6UIPadding = Instance.new("UIPadding")
 	SF6UIPadding.Parent = ScrollingFrame
 	SF6UIPadding.PaddingTop = UDim.new(0, 10)
 	SF6UIPadding.PaddingRight = UDim.new(0, 10)
-	
+
 	ScrollingFrameR15.Name = "ScrollingFrameR15"
 	ScrollingFrameR15.Parent = MainFrame
 	ScrollingFrameR15.BackgroundColor3 = Color3.new(1, 0.564706, 0.564706)
 	ScrollingFrameR15.Position = UDim2.new(0, 0, 0, 32)
 	ScrollingFrameR15.ScrollBarImageColor3 = Color3.new(0, 0, 0)
 	ScrollingFrameR15.Size = UDim2.new(0, 460, 0, 215)
+	ScrollingFrameR15.CanvasSize = UDim2.new(0, 0, 1.5, 0)
 	ScrollingFrameR15.Visible = false
 	ScrollingFrameR15.ScrollBarThickness = 10
-	
-	local SF15UIStroke = Instance.new("UIStroke")
-	SF15UIStroke.Parent = ScrollingFrameR15
-	SF15UIStroke.Thickness = 2
 
-	local SF15UICorner = Instance.new("UICorner")
-	SF15UICorner.Parent = ScrollingFrameR15
-	SF15UICorner.TopLeftRadius = UDim.new(0, 5)
-	SF15UICorner.CornerRadius = UDim.new(0, 5)
-	SF15UICorner.TopRightRadius = UDim.new(0, 5)
-	SF15UICorner.BottomRightRadius = UDim.new(0, 5)
-	SF15UICorner.BottomLeftRadius = UDim.new(0, 5)
-	
 	local SF15UIGridLayout = Instance.new("UIGridLayout")
 	SF15UIGridLayout.Parent = ScrollingFrameR15
 	SF15UIGridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	SF15UIGridLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	SF15UIGridLayout.CellSize = UDim2.new(0, 100, 0, 30)
 	SF15UIGridLayout.CellPadding = UDim2.new(0, 10, 0, 10)
-	
+
 	local SF15UIPadding = Instance.new("UIPadding")
 	SF15UIPadding.Parent = ScrollingFrameR15
 	SF15UIPadding.PaddingTop = UDim.new(0, 10)
 	SF15UIPadding.PaddingRight = UDim.new(0, 10)
-	
+
 	--
-	
-	GuiTopFrame.Name = "Gui TopFrame"
+
+	GuiTopFrame.Name = "GuiTopFrame"
 	GuiTopFrame.Parent = MainFrame
 	GuiTopFrame.BackgroundColor3 = Color3.new(0.541176, 0.647059, 1)
 	GuiTopFrame.BorderColor3 = Color3.new(0.243137, 0.243137, 0.243137)
 	GuiTopFrame.Size = UDim2.new(0, 460, 0, 32)
-	
-	local GTFUIStroke = Instance.new("UIStroke")
-	GTFUIStroke.Parent = GuiTopFrame
-	GTFUIStroke.Thickness = 2
 
-	local GTFUICorner = Instance.new("UICorner")
-	GTFUICorner.Parent = GuiTopFrame
-	GTFUICorner.TopLeftRadius = UDim.new(0, 5)
-	GTFUICorner.CornerRadius = UDim.new(0, 5)
-	GTFUICorner.TopRightRadius = UDim.new(0, 5)
-	GTFUICorner.BottomRightRadius = UDim.new(0, 5)
-	GTFUICorner.BottomLeftRadius = UDim.new(0, 5)
-	
 	DestroyGUI.Name = "DestroyGUI"
 	DestroyGUI.Parent = GuiTopFrame
 	DestroyGUI.AnchorPoint = Vector2.new(1, 0.5)
-	DestroyGUI.BackgroundTransparency = 1
+	DestroyGUI.BackgroundTransparency = 0
+	DestroyGUI.BackgroundColor3 = BgColor
 	DestroyGUI.Position = UDim2.new(1, 0, 0.5, 0)
 	DestroyGUI.Size = UDim2.new(0, 32, 0, 32)
 	DestroyGUI.Font = Enum.Font.FredokaOne
@@ -331,15 +275,16 @@ local function CreateGui()
 	DestroyGUI.TextColor3 = Color3.new(0, 0, 0)
 	DestroyGUI.TextSize = 34
 	DestroyGUI.TextWrapped = true
-	
+
 	CloseGUI.Name = "CloseGUI"
 	CloseGUI.Parent = GuiTopFrame
 	CloseGUI.AnchorPoint = Vector2.new(0, 0.5)
-	CloseGUI.BackgroundTransparency = 1
+	CloseGUI.BackgroundColor3 = BgColor
+	CloseGUI.BackgroundTransparency = 0
 	CloseGUI.Position = UDim2.new(0, 0, 0.5, 0)
 	CloseGUI.Size = UDim2.new(0, 32, 0, 32)
 	CloseGUI.Image = "rbxassetid://118017289302281"
-	
+
 	Title.Name = "Title"
 	Title.Parent = GuiTopFrame
 	Title.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -367,11 +312,11 @@ local function CreateGui()
 	CheckR.TextScaled = true
 	CheckR.TextSize = 14
 	CheckR.TextWrapped = true
-	
+
 	local function CreateAnimButton(Name, Text, ID)
-		
+
 	end
-	
+
 	-- R6 Emotes
 
 	FullSwing.Name = "FullSwing"
@@ -440,16 +385,16 @@ local function CreateGui()
 	SpinDance.Text = "Spin Dance"
 	SpinDance.TextScaled = true
 
-	FloorFaint.Name = "FloorFaint"
-	FloorFaint.Parent = ScrollingFrame
-	FloorFaint.BackgroundColor3 = Color3.new(0.541176, 0.611765, 1)
-	FloorFaint.BorderColor3 = Color3.new(0.313726, 0.313726, 0.313726)
-	FloorFaint.Position = UDim2.new(0, 17, 0, 236)
-	FloorFaint.Size = UDim2.new(0, 119, 0, 34)
-	FloorFaint.Font = Enum.Font.Highway
-	FloorFaint.FontSize = Enum.FontSize.Size24
-	FloorFaint.Text = "Sword Spin"
-	FloorFaint.TextScaled = true
+	SwordSpin.Name = "SwordSpin"
+	SwordSpin.Parent = ScrollingFrame
+	SwordSpin.BackgroundColor3 = Color3.new(0.541176, 0.611765, 1)
+	SwordSpin.BorderColor3 = Color3.new(0.313726, 0.313726, 0.313726)
+	SwordSpin.Position = UDim2.new(0, 17, 0, 236)
+	SwordSpin.Size = UDim2.new(0, 119, 0, 34)
+	SwordSpin.Font = Enum.Font.Highway
+	SwordSpin.FontSize = Enum.FontSize.Size24
+	SwordSpin.Text = "Sword Spin"
+	SwordSpin.TextScaled = true
 
 	JumpingJacks.Name = "JumpingJacks"
 	JumpingJacks.Parent = ScrollingFrame
@@ -484,16 +429,16 @@ local function CreateGui()
 	MegaInsane.Text = "Mega Insane"
 	MegaInsane.TextScaled = true
 
-	ArmDetach.Name = "ArmDetach"
-	ArmDetach.Parent = ScrollingFrame
-	ArmDetach.BackgroundColor3 = Color3.new(0.541176, 0.611765, 1)
-	ArmDetach.BorderColor3 = Color3.new(0.313726, 0.313726, 0.313726)
-	ArmDetach.Position = UDim2.new(0, 319, 0, 192)
-	ArmDetach.Size = UDim2.new(0, 119, 0, 34)
-	ArmDetach.Font = Enum.Font.Highway
-	ArmDetach.FontSize = Enum.FontSize.Size24
-	ArmDetach.Text = "Punches"
-	ArmDetach.TextScaled = true
+	Punches.Name = "Punches"
+	Punches.Parent = ScrollingFrame
+	Punches.BackgroundColor3 = Color3.new(0.541176, 0.611765, 1)
+	Punches.BorderColor3 = Color3.new(0.313726, 0.313726, 0.313726)
+	Punches.Position = UDim2.new(0, 319, 0, 192)
+	Punches.Size = UDim2.new(0, 119, 0, 34)
+	Punches.Font = Enum.Font.Highway
+	Punches.FontSize = Enum.FontSize.Size24
+	Punches.Text = "Punches"
+	Punches.TextScaled = true
 
 	WeirdMove.Name = "WeirdMove"
 	WeirdMove.Parent = ScrollingFrame
@@ -514,7 +459,7 @@ local function CreateGui()
 	Faint.Size = UDim2.new(0, 119, 0, 34)
 	Faint.Font = Enum.Font.Highway
 	Faint.FontSize = Enum.FontSize.Size24
-	Faint.Text = "Faint"
+	Faint.Text = "Floor Faint"
 	Faint.TextScaled = true
 
 	CloneIllusion.Name = "CloneIllusion"
@@ -572,16 +517,16 @@ local function CreateGui()
 	SwordSlam.Text = "Weird body"
 	SwordSlam.TextScaled = true
 
-	LoopHead.Name = "LoopHead"
-	LoopHead.Parent = ScrollingFrame
-	LoopHead.BackgroundColor3 = Color3.new(0.541176, 0.611765, 1)
-	LoopHead.BorderColor3 = Color3.new(0.313726, 0.313726, 0.313726)
-	LoopHead.Position = UDim2.new(0, 168, 0, 60)
-	LoopHead.Size = UDim2.new(0, 119, 0, 34)
-	LoopHead.Font = Enum.Font.Highway
-	LoopHead.FontSize = Enum.FontSize.Size24
-	LoopHead.Text = "Scared"
-	LoopHead.TextScaled = true
+	Scared.Name = "Scared"
+	Scared.Parent = ScrollingFrame
+	Scared.BackgroundColor3 = Color3.new(0.541176, 0.611765, 1)
+	Scared.BorderColor3 = Color3.new(0.313726, 0.313726, 0.313726)
+	Scared.Position = UDim2.new(0, 168, 0, 60)
+	Scared.Size = UDim2.new(0, 119, 0, 34)
+	Scared.Font = Enum.Font.Highway
+	Scared.FontSize = Enum.FontSize.Size24
+	Scared.Text = "Scared"
+	Scared.TextScaled = true
 
 	HeroJump.Name = "HeroJump"
 	HeroJump.Parent = ScrollingFrame
@@ -624,8 +569,19 @@ local function CreateGui()
 	HeadThrow.Size = UDim2.new(0, 119, 0, 34)
 	HeadThrow.Font = Enum.Font.Highway
 	HeadThrow.FontSize = Enum.FontSize.Size24
-	HeadThrow.Text = "Bang)"
+	HeadThrow.Text = "Head Throw"
 	HeadThrow.TextScaled = true
+
+	Bang.Name = "Bang"
+	Bang.Parent = ScrollingFrame
+	Bang.BackgroundColor3 = Color3.new(0.541176, 0.611765, 1)
+	Bang.BorderColor3 = Color3.new(0.313726, 0.313726, 0.313726)
+	Bang.Position = UDim2.new(0, 17, 0, 16)
+	Bang.Size = UDim2.new(0, 119, 0, 34)
+	Bang.Font = Enum.Font.Highway
+	Bang.FontSize = Enum.FontSize.Size24
+	Bang.Text = "Bang)"
+	Bang.TextScaled = true
 
 	MovingDance.Name = "MovingDance"
 	MovingDance.Parent = ScrollingFrame
@@ -693,17 +649,19 @@ local function CreateGui()
 	BarrelRoll.Text = "Barrel Roll"
 	BarrelRoll.TextScaled = true
 
-	LoopSlam.Name = "LoopSlam"
-	LoopSlam.Parent = ScrollingFrame
-	LoopSlam.BackgroundColor3 = Color3.new(0.541176, 0.611765, 1)
-	LoopSlam.BorderColor3 = Color3.new(0.313726, 0.313726, 0.313726)
-	LoopSlam.Position = UDim2.new(0, 17, 0, 410)
-	LoopSlam.Size = UDim2.new(0, 119, 0, 34)
-	LoopSlam.Font = Enum.Font.Highway
-	LoopSlam.FontSize = Enum.FontSize.Size24
-	LoopSlam.Text = "Wall hack"
-	LoopSlam.TextScaled = true
-	
+	WallHack.Name = "WallHack"
+	WallHack.Parent = ScrollingFrame
+	WallHack.BackgroundColor3 = Color3.new(0.541176, 0.611765, 1)
+	WallHack.BorderColor3 = Color3.new(0.313726, 0.313726, 0.313726)
+	WallHack.Position = UDim2.new(0, 17, 0, 410)
+	WallHack.Size = UDim2.new(0, 119, 0, 34)
+	WallHack.Font = Enum.Font.Highway
+	WallHack.FontSize = Enum.FontSize.Size24
+	WallHack.Text = "Wall hack"
+	WallHack.TextScaled = true
+
+
+
 	-- R15 Emotes
 
 	CrazySlash.Name = "CrazySlash"
@@ -838,26 +796,61 @@ local function CreateGui()
 	FlingArms.Text = "FlingArms"
 	FlingArms.TextScaled = true
 
-	-- Buttons
-	col = Color3.new(0.541176, 0.619608, 1)
-	loc = Color3.new(0.427451, 0.490196, 0.792157)
-	rcol = Color3.new(0.682353, 0.701961, 0.792157)
-	rloc = Color3.new(0.882353, 0.901961, 0.992157)
+	local UiCornerParts = {"GuiTopFrame", "CloseGUI", "DestroyGUI", "SpeedFrame", "SpeedValue", "SideFrame", "OpenGUI"}
+	local UiStrokeParts = {"GuiTopFrame", "SpeedFrame", "SpeedValue", "SideFrame", "ScrollingFrame", "ScrollingFrameR15"}
 
+	for _, UiPart in ipairs(Emoter:GetDescendants()) do
+		if table.find(UiCornerParts, UiPart.Name) then
+			local UICorner = Instance.new("UICorner")
+			UICorner.Parent = UiPart
+			UICorner.CornerRadius = UDim.new(0, 5)
+			if UiPart.Name == "GuiTopFrame" then
+				UICorner.BottomRightRadius = UDim.new(0, 0)
+				UICorner.BottomLeftRadius = UDim.new(0, 0)
+			elseif UiPart.Name == "SpeedFrame" then
+				UICorner.TopLeftRadius = UDim.new(0, 0)
+				UICorner.TopRightRadius = UDim.new(0, 0)
+			end
+
+		end
+
+		if table.find(UiStrokeParts, UiPart.Name) then
+			local UIStroke = Instance.new("UIStroke")
+			UIStroke.Parent = UiPart
+			UIStroke.Thickness = 2
+			UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			if UiPart.Name == "SpeedValue" then
+				UIStroke.Thickness = 1
+			end
+		end
+
+		if (UiPart.Parent.Name == "ScrollingFrame" or UiPart.Parent.Name == "ScrollingFrameR15") and UiPart:IsA("TextButton") then
+			local UICorner = Instance.new("UICorner")
+			UICorner.Parent = UiPart
+			UICorner.CornerRadius = UDim.new(0, 3)
+			local UIStroke = Instance.new("UIStroke")
+			UIStroke.Parent = UiPart
+			UIStroke.Thickness = 1
+			UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+		end
+	end
+
+	-- Buttons
 	CloseGUI.MouseButton1Click:connect(function()
 		MainFrame.Visible = false
 		SideFrame.Visible = true
 		SideFrame.Position = MainFrame.Position
 	end)
-	
+
 	DestroyGUI.MouseButton1Click:connect(function()
 		GuiActive = false
-		Energize:Destroy()
+		Emoter:Destroy()
 	end)
-	
+
 	SFDestroyGUI.MouseButton1Click:connect(function()
 		GuiActive = false
-		Energize:Destroy()
+		Emoter:Destroy()
 	end)
 
 	OpenGUI.MouseButton1Click:connect(function()
@@ -880,9 +873,9 @@ local function CreateGui()
 		SideFrameTitle.Text = "Emotes GUI (R6)"
 
 	end
-	
+
 	-- Playing Animations
-	
+
 	--[[ Script to stop all animations to play animations playable through /e chat command cuz without that it would look horrible
 	
 		if NameACTIVE then
@@ -909,6 +902,29 @@ local function CreateGui()
 	local Anim = Instance.new("Animation")
 	Anim.AnimationId = "rbxassetid://148840371"
 	local track = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
+	local BangACTIVE = false
+	Bang.MouseButton1Click:connect(function()
+		BangACTIVE = not BangACTIVE
+		if BangACTIVE then
+			Bang.BackgroundColor3 = loc
+			while wait() do
+				if track.IsPlaying == false then
+					if BangACTIVE then
+						track:Play(.1, 1, 3 + SpeedNum)
+						CurSpeedText.Text = "CurrentSpeed: ".. 3 + SpeedNum
+					end
+				end
+			end
+		else
+			track:Stop()
+			Bang.BackgroundColor3 = col
+			CurSpeedText.Text = "CurrentSpeed: -"
+		end
+	end)
+
+	local Anim = Instance.new("Animation")
+	Anim.AnimationId = "rbxassetid://35154961"
+	local track = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
 	local HeadThrowACTIVE = false
 	HeadThrow.MouseButton1Click:connect(function()
 		HeadThrowACTIVE = not HeadThrowACTIVE
@@ -917,8 +933,8 @@ local function CreateGui()
 			while wait() do
 				if track.IsPlaying == false then
 					if HeadThrowACTIVE then
-						track:Play(.1, 1, 3 + SpeedNum)
-						CurSpeedText.Text = "CurrentSpeed: ".. 3 + SpeedNum
+						track:Play(.1, 1, 1 + SpeedNum)
+						CurSpeedText.Text = "CurrentSpeed: ".. 1 + SpeedNum
 					end
 				end
 			end
@@ -1017,16 +1033,18 @@ local function CreateGui()
 	local Anim = Instance.new("Animation")
 	Anim.AnimationId = "rbxassetid://180612465"
 	local track = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
-	local LoopHeadACTIVE = false
-	LoopHead.MouseButton1Click:connect(function()
-		LoopHeadACTIVE = not LoopHeadACTIVE
-		if LoopHeadACTIVE then
+	local ScaredACTIVE = false
+	Scared.MouseButton1Click:connect(function()
+		ScaredACTIVE = not ScaredACTIVE
+		if ScaredACTIVE then
 			track:Play(.1, 1, 0.3 + SpeedNum)
-			LoopHead.BackgroundColor3 = loc
+			Scared.BackgroundColor3 = loc
 			CurSpeedText.Text = "CurrentSpeed: ".. 0.3 + SpeedNum
+			wait(1)
+			track:AdjustSpeed(0)
 		else
 			track:Stop()
-			LoopHead.BackgroundColor3 = col
+			Scared.BackgroundColor3 = col
 			CurSpeedText.Text = "CurrentSpeed: -"
 		end
 	end)
@@ -1039,11 +1057,9 @@ local function CreateGui()
 		HeroJumpACTIVE = not JumpingJacksACTIVE
 		if HeroJumpACTIVE then
 			track:Play(.1, 1, 1 + SpeedNum)
-			HeroJump.BackgroundColor3 = loc
 			CurSpeedText.Text = "CurrentSpeed: ".. 1 + SpeedNum
 		else
 			track:Stop()
-			HeroJump.BackgroundColor3 = col
 			CurSpeedText.Text = "CurrentSpeed: -"
 		end
 	end)
@@ -1068,14 +1084,14 @@ local function CreateGui()
 	local Anim = Instance.new("Animation")
 	Anim.AnimationId = "rbxassetid://186934910"
 	local track = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
-	local FloorFaintACTIVE = false
-	FloorFaint.MouseButton1Click:connect(function()
-		FloorFaintACTIVE = not FloorFaintACTIVE
-		if FloorFaintACTIVE then
-			FloorFaint.BackgroundColor3 = loc
+	local SwordSpinACTIVE = false
+	SwordSpin.MouseButton1Click:connect(function()
+		SwordSpinACTIVE = not SwordSpinACTIVE
+		if SwordSpinACTIVE then
+			SwordSpin.BackgroundColor3 = loc
 			while wait() do
 				if track.IsPlaying == false then
-					if FloorFaintACTIVE then
+					if SwordSpinACTIVE then
 						track:Play(.1, 1, 0.8 + SpeedNum)
 						CurSpeedText.Text = "CurrentSpeed: ".. 0.8 + SpeedNum
 					end
@@ -1083,7 +1099,7 @@ local function CreateGui()
 			end
 		else
 			track:Stop()
-			FloorFaint.BackgroundColor3 = col
+			SwordSpin.BackgroundColor3 = col
 			CurSpeedText.Text = "CurrentSpeed: -"
 		end
 	end)
@@ -1337,14 +1353,14 @@ local function CreateGui()
 	local Anim = Instance.new("Animation")
 	Anim.AnimationId = "rbxassetid://204295235"
 	local track = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
-	local LoopSlamACTIVE = false
-	LoopSlam.MouseButton1Click:connect(function()
-		LoopSlamACTIVE = not LoopSlamACTIVE
-		if LoopSlamACTIVE then
-			LoopSlam.BackgroundColor3 = loc
+	local WallHackACTIVE = false
+	WallHack.MouseButton1Click:connect(function()
+		WallHackACTIVE = not WallHackACTIVE
+		if WallHackACTIVE then
+			WallHack.BackgroundColor3 = loc
 			while wait() do
 				if track.IsPlaying == false then
-					if LoopSlamACTIVE then
+					if WallHackACTIVE then
 						track:Play(.1, 1, 1e4 + SpeedNum)
 						CurSpeedText.Text = "CurrentSpeed: ".. 1e4 + SpeedNum
 					end
@@ -1352,7 +1368,7 @@ local function CreateGui()
 			end
 		else
 			track:Stop()
-			LoopSlam.BackgroundColor3 = col
+			WallHack.BackgroundColor3 = col
 			CurSpeedText.Text = "CurrentSpeed: -"
 		end
 	end)
@@ -1485,14 +1501,14 @@ local function CreateGui()
 	local Anim = Instance.new("Animation")
 	Anim.AnimationId = "rbxassetid://126753849"
 	local track = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(Anim)
-	local ArmDetachACTIVE = false
-	ArmDetach.MouseButton1Click:connect(function()
-		ArmDetachACTIVE = not ArmDetachACTIVE
-		if ArmDetachACTIVE then
-			ArmDetach.BackgroundColor3 = loc
+	local PunchesACTIVE = false
+	Punches.MouseButton1Click:connect(function()
+		PunchesACTIVE = not PunchesACTIVE
+		if PunchesACTIVE then
+			Punches.BackgroundColor3 = loc
 			while wait() do
 				if track.IsPlaying == false then
-					if ArmDetachACTIVE then
+					if PunchesACTIVE then
 						track:Play(.1, 1, 2 + SpeedNum)
 						CurSpeedText.Text = "CurrentSpeed: ".. 2 + SpeedNum
 					end
@@ -1500,7 +1516,7 @@ local function CreateGui()
 			end
 		else
 			track:Stop()
-			ArmDetach.BackgroundColor3 = col
+			Punches.BackgroundColor3 = col
 			CurSpeedText.Text = "CurrentSpeed: -"
 		end
 	end)
@@ -1780,14 +1796,24 @@ local function CreateGui()
 			CurSpeedText.Text = "CurrentSpeed: -"
 		end
 	end)
-	
+
+	GuiEmoter = Emoter
+
 end
 
+-- PLEASE DO NOT DELETE THIS
 CreateGui()
+game:GetService("StarterGui"):SetCore("SendNotification", {
+	Title = "Hello!",
+	Text = "Thank you for using Emote GUI by illremember and Fixel!", 
+	Duration = 5,
+	Icon = "rbxassetid://95707366110827"
+})
+-- PLEASE DO NOT DELETE THIS
 
 game.Players.LocalPlayer.CharacterAdded:connect(function()
 	if GuiActive then
-		Energize:Destroy()
+		GuiEmoter:Destroy()
 		CreateGui()	
 	end
 end)
