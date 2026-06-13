@@ -1,5 +1,4 @@
 --Test
--- TO ADD dances = {"27789359", 35154961, "45834924" (strange dance, "33796059", "28488254", 
 
 local GuiActive = true
 local GuiEmoter = nil
