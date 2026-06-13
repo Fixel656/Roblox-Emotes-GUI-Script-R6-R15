@@ -33,6 +33,7 @@ local function CreateGui()
 	-- AnimButtons In new place now (~340 string)
 
 	BgColor = Color3.new(0.541176, 0.647059, 1)
+	ScrollBgColor = Color3.new(0.862745, 0.960784, 1)
 	ButtonCol = BgColor -- R6 Button Color
 	ButtonBackCol = Color3.new(0.427451, 0.490196, 0.792157) -- R6 Button darker color (idk how to make it just darker BgColor yet)
 	R15ButtonCol = Color3.new(0.682353, 0.701961, 0.792157) --R15 Button color
@@ -271,7 +272,7 @@ local function CreateGui()
 	--Scrolling Frames
 
 	ScrollingFrame.Parent = MainFrame
-	ScrollingFrame.BackgroundColor3 = Color3.new(0.862745, 0.960784, 1)
+	ScrollingFrame.BackgroundColor3 = ScrollBgColor
 	ScrollingFrame.Position = UDim2.new(0, 0, 0, 34)
 	ScrollingFrame.ScrollBarImageColor3 = Color3.new(0, 0, 0)
 	ScrollingFrame.Size = UDim2.new(0, 460, 0, 215)
@@ -292,8 +293,8 @@ local function CreateGui()
 
 	ScrollingFrameR15.Name = "ScrollingFrameR15"
 	ScrollingFrameR15.Parent = MainFrame
-	ScrollingFrameR15.BackgroundColor3 = Color3.new(1, 0.564706, 0.564706)
-	ScrollingFrameR15.Position = UDim2.new(0, 0, 0, 32)
+	ScrollingFrameR15.BackgroundColor3 = ScrollBgColor
+	ScrollingFrameR15.Position = UDim2.new(0, 0, 0, 34)
 	ScrollingFrameR15.ScrollBarImageColor3 = Color3.new(0, 0, 0)
 	ScrollingFrameR15.Size = UDim2.new(0, 460, 0, 215)
 	ScrollingFrameR15.CanvasSize = UDim2.new(0, 0, 1.5, 0)
@@ -409,6 +410,12 @@ local function CreateGui()
 	local Dab = Instance.new("TextButton")--COMPLETE
 	CreateAnimButton(Dab, "Dab", "Dab", "R6", 0)
 	PlayAnim(Dab, "rbxassetid://248263260", .1, 1, "PriorLow", true)
+	local GoofyDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(GoofyDance, "GoofyDance", "Goofy Dance", "R6", 0)
+	PlayAnim(GoofyDance, "rbxassetid://27789359", .1, 0.8, "PriorLow", true)
+	local WeirdDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(WeirdDance, "WeirdDance", "Weird Dance", "R6", 0)
+	PlayAnim(WeirdDance, "rbxassetid://28488254", .1, 0.8, "PriorLow", true)
 	local Laugh = Instance.new("TextButton")--COMPLETE
 	CreateAnimButton(Laugh, "Laugh", "Laugh", "R6", 0)
 	PlayAnim(Laugh, "rbxassetid://129423131", .1, 1, "PriorLow", false)
@@ -510,7 +517,7 @@ local function CreateGui()
 	
 	local CrazySlash = Instance.new("TextButton")--COMPLETE
 	CreateAnimButton(CrazySlash, "NunchakSlashCrazySlash", "Crazy Slash", "R15")
-	PlayAnim(CrazySlash, "rbxassetid://674871189", .1, 1, "PriorLow", true)
+	PlayAnim(CrazySlash, "rbxassetid://135990691658209", .1, 1, "PriorLow", true)
 	
 	-- UICorners and UIStrokes
 
