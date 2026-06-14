@@ -73,6 +73,250 @@ Tenna Kick
 Tenna Swing Dance
 Tenna Dance
 
+	local WormAnim = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(WormAnim, "WormAnim", "Worm Fly", "R15")
+	PlayAnim(WormAnim, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Orbit = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Orbit, "Orbit", "Orbit", "R15")
+	PlayAnim(Orbit, "rbxassetid://", .1, 1, "PriorLow", true)
+	local TakeTheL = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(TakeTheL, "TakeTheL", "Take The L", "R15")
+	PlayAnim(TakeTheL, "rbxassetid://", .1, 1, "PriorLow", true)
+	local SillyAnimals = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(SillyAnimals, "SillyAnimals", "Silly Animals Dance", "R15")
+	PlayAnim(SillyAnimals, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Hanging = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Hanging, "Hanging", "Hanging", "R15")
+	PlayAnim(Hanging, "rbxassetid://", .1, 1, "PriorLow", true)
+	local AwkwardWave = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(AwkwardWave, "AwkwardWave", "Awkward Wave", "R15")
+	PlayAnim(AwkwardWave, "rbxassetid://", .1, 1, "PriorLow", true)
+	local ScubaSwim = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(ScubaSwim, "ScubaSwim", "Scuba Swim", "R15")
+	PlayAnim(ScubaSwim, "rbxassetid://", .1, 1, "PriorLow", true)
+	local FloatingHeadIdle = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(FloatingHeadIdle, "FloatingHeadIdle", "Floating Head Idle", "R15")
+	PlayAnim(FloatingHeadIdle, "rbxassetid://", .1, 1, "PriorLow", true)
+	local SnakeDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(SnakeDance, "SnakeDance", "Snake Dance", "R15")
+	PlayAnim(SnakeDance, "rbxassetid://", .1, 1, "PriorLow", true)
+	local ShakeItToMax = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(ShakeItToMax, "ShakeItToMax", "Shake It To the Max", "R15")
+	PlayAnim(ShakeItToMax, "rbxassetid://", .1, 1, "PriorLow", true)
+	local PitbullDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(PitbullDance, "PitbullDance", "Pitbull Dance", "R15")
+	PlayAnim(PitbullDance, "rbxassetid://", .1, 1, "PriorLow", true)
+	local LaDetoneDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(LaDetoneDance, "LaDetoneDance", "La Detone Dance", "R15")
+	PlayAnim(LaDetoneDance, "rbxassetid://", .1, 1, "PriorLow", true)
+	local BrazillianVibe = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(BrazillianVibe, "BrazillianVibe", "Brazillian Vibe", "R15")
+	PlayAnim(BrazillianVibe, "rbxassetid://", .1, 1, "PriorLow", true)
+	local DiaDeliciaDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(DiaDeliciaDance, "DiaDeliciaDance", "Dia Delicia Dance", "R15")
+	PlayAnim(DiaDeliciaDance, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Dwerk = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Dwerk, "Dwerk", "Dwerk", "R15")
+	PlayAnim(Dwerk, "rbxassetid://", .1, 1, "PriorLow", true)
+	local LaggyWalkTroll = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(LaggyWalkTroll, "LaggyWalkTroll", "Laggy Walk Troll", "R15")
+	PlayAnim(LaggyWalkTroll, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Tank = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Tank, "Tank", "Tank", "R15")
+	PlayAnim(Tank, "rbxassetid://", .1, 1, "PriorLow", true)
+	local FingerGun = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(FingerGun, "FingerGun", "Finger-Gun", "R15")
+	PlayAnim(FingerGun, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Helicopter = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Helicopter, "Helicopter", "Helicopter", "R15")
+	PlayAnim(Helicopter, "rbxassetid://", .1, 1, "PriorLow", true)
+	local RaceCar = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(RaceCar, "RaceCar", "Race Car", "R15")
+	PlayAnim(RaceCar, "rbxassetid://", .1, 1, "PriorLow", true)
+	local JumpingSpider = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(JumpingSpider, "JumpingSpider", "Jumping Spider", "R15")
+	PlayAnim(JumpingSpider, "rbxassetid://", .1, 1, "PriorLow", true)
+	local CrabDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(CrabDance, "CrabDance", "Crab Dance", "R15")
+	PlayAnim(CrabDance, "rbxassetid://", .1, 1, "PriorLow", true)
+	local InsaneDog = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(InsaneDog, "InsaneDog", "Insane Dog", "R15")
+	PlayAnim(InsaneDog, "rbxassetid://", .1, 1, "PriorLow", true)
+	local InchWorm = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(InchWorm, "InchWorm", "Inch Worm", "R15")
+	PlayAnim(InchWorm, "rbxassetid://", .1, 1, "PriorLow", true)
+	local GoofyWiggle = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(GoofyWiggle, "GoofyWiggle", "Goofy Wiggle", "R15")
+	PlayAnim(GoofyWiggle, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Tornado = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Tornado, "Tornado", "Tornado", "R15")
+	PlayAnim(Tornado, "rbxassetid://", .1, 1, "PriorLow", true)
+	local FloatChillSit = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(FloatChillSit, "FloatChillSit", "Float Chill Sit", "R15")
+	PlayAnim(FloatChillSit, "rbxassetid://", .1, 1, "PriorLow", true)
+	local FloatIdle = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(FloatIdle, "FloatIdle", "Float Idle", "R15")
+	PlayAnim(FloatIdle, "rbxassetid://", .1, 1, "PriorLow", true)
+	local GoofyFLY = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(GoofyFLY, "GoofyFLY", "Goofy FLY", "R15")
+	PlayAnim(GoofyFLY, "rbxassetid://", .1, 1, "PriorLow", true)
+	local AdminFly = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(AdminFly, "AdminFly", "Admin Fly", "R15")
+	PlayAnim(AdminFly, "rbxassetid://", .1, 1, "PriorLow", true)
+	local ObbyHead = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(ObbyHead, "ObbyHead", "Little Obbyist", "R15")
+	PlayAnim(ObbyHead, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Sitting = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Sitting, "Sitting", "Sitting", "R15")
+	PlayAnim(Sitting, "rbxassetid://", .1, 1, "PriorLow", true)
+	local MM2Sit = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(MM2Sit, "MM2Sit", "MM2 Sit", "R15")
+	PlayAnim(MM2Sit, "rbxassetid://", .1, 1, "PriorLow", true)
+	local RatDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(RatDance, "RatDance", "Rat Dance", "R15")
+	PlayAnim(RatDance, "rbxassetid://", .1, 1, "PriorLow", true)
+	local IWantMoneyDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(IWantMoneyDance, "IWantMoneyDance", "IWantMoney Dance", "R15")
+	PlayAnim(IWantMoneyDance, "rbxassetid://", .1, 1, "PriorLow", true)
+	local FortniteDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(FortniteDance, "FortniteDance", "Fortnite Dance", "R15")
+	PlayAnim(FortniteDance, "rbxassetid://", .1, 1, "PriorLow", true)
+	local GangnamStyle = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(GangnamStyle, "GangnamStyle", "Gangnam Style", "R15")
+	PlayAnim(GangnamStyle, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Box = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Box, "Box", "Box", "R15")
+	PlayAnim(Box, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Plane = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Plane, "Plane", "Plane", "R15")
+	PlayAnim(Plane, "rbxassetid://", .1, 1, "PriorLow", true)
+	local  MedusaWalk = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(MedusaWalk, "MedusaWalk", "Medusa Walk", "R15")
+	PlayAnim(MedusaWalk, "rbxassetid://", .1, 1, "PriorLow", true)
+	local TallCreatureWalk = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(TallCreatureWalk, "TallCreatureWalk", "Tall Creature Walk", "R15")
+	PlayAnim(TallCreatureWalk, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Insane = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Insane, "Insane", "Insane", "R15")
+	PlayAnim(Insane, "rbxassetid://", .1, 1, "PriorLow", true)
+	local DaHoodStomp = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(DaHoodStomp, "DaHoodStomp", "DaHood Stomp", "R15")
+	PlayAnim(DaHoodStomp, "rbxassetid://", .1, 1, "PriorLow", true)
+	local BodyPhone = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(BodyPhone, "BodyPhone", "Body Phone", "R15")
+	PlayAnim(BodyPhone, "rbxassetid://", .1, 1, "PriorLow", true)
+	local CartoonDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(CartoonDance, "CartoonDance", "Cartoon Dance", "R15")
+	PlayAnim(CartoonDance, "rbxassetid://", .1, 1, "PriorLow", true)
+	local CarDriving = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(CarDriving, "CarDriving", "Car Driving", "R15")
+	PlayAnim(CarDriving, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Sleeping = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Sleeping, "Sleeping", "Sleeping", "R15")
+	PlayAnim(Sleeping, "rbxassetid://", .1, 1, "PriorLow", true)
+	local RussianKick = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(RussianKick, "RussianKick", "Russian Kick", "R15")
+	PlayAnim(RussianKick, "rbxassetid://", .1, 1, "PriorLow", true)
+	local MannrobicsDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(MannrobicsDance, "MannrobicsDance", "Mannrobics Dance", "R15")
+	PlayAnim(MannrobicsDance, "rbxassetid://", .1, 1, "PriorLow", true)
+	local PennywiseDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(PennywiseDance, "PennywiseDance", "Pennywise Dance", "R15")
+	PlayAnim(PennywiseDance, "rbxassetid://", .1, 1, "PriorLow", true)
+	local RestingHeadJuggle = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(RestingHeadJuggle, "RestingHeadJuggle", "Resting Head Juggle", "R15")
+	PlayAnim(RestingHeadJuggle, "rbxassetid://", .1, 1, "PriorLow", true)
+	local PushUp = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(PushUp, "PushUp", "Push Ups", "R15")
+	PlayAnim(PushUp, "rbxassetid://", .1, 1, "PriorLow", true)
+	local BreakDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(BreakDance, "BreakDance", "Break Dance", "R15")
+	PlayAnim(BreakDance, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Rambunctious = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Rambunctious, "Rambunctious", "Rambunctious", "R15")
+	PlayAnim(Rambunctious, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Bodybuilder = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Bodybuilder, "Bodybuilder", "Bodybuilder", "R15")
+	PlayAnim(Bodybuilder, "rbxassetid://", .1, 1, "PriorLow", true)
+	local BigLaugh = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(BigLaugh, "BigLaugh", "Big Laugh", "R15")
+	PlayAnim(BigLaugh, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Bored = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Bored, "Bored", "Bored", "R15")
+	PlayAnim(Bored, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Applaud = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Applaud, "Applaud", "Applaud", "R15")
+	PlayAnim(Applaud, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Spin = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Spin, "Spin", "Spin", "R15")
+	PlayAnim(Spin, "rbxassetid://", .1, 1, "PriorLow", true)
+	local SpinAround = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(SpinAround, "SpinAround", "SpinAround", "R15")
+	PlayAnim(SpinAround, "rbxassetid://", .1, 1, "PriorLow", true)
+	local FloatingOnClouds = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(FloatingOnClouds, "FloatingOnClouds", "Floating On Clouds", "R15")
+	PlayAnim(FloatingOnClouds, "rbxassetid://", .1, 1, "PriorLow", true)
+	local NightmailDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(NightmailDance, "NightmailDance", "Nightmai lDance", "R15")
+	PlayAnim(NightmailDance, "rbxassetid://", .1, 1, "PriorLow", true)
+	local FloatingSpace = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(FloatingSpace, "FloatingSpace", "Floating Space", "R15")
+	PlayAnim(FloatingSpace, "rbxassetid://", .1, 1, "PriorLow", true)
+	local FloatingSpace2 = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(FloatingSpace2, "FloatingSpace2", "Floating Space 2", "R15")
+	PlayAnim(FloatingSpace2, "rbxassetid://", .1, 1, "PriorLow", true)
+	local FakeDeadRagdoll = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(FakeDeadRagdoll, "FakeDeadRagdoll", "Fake DeadRagdoll", "R15")
+	PlayAnim(FakeDeadRagdoll, "rbxassetid://", .1, 1, "PriorLow", true)
+	local FakeDeath = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(FakeDeath, "FakeDeath", "FakeDeath", "R15")
+	PlayAnim(FakeDeath, "rbxassetid://", .1, 1, "PriorLow", true)
+	local ShadowRun = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(ShadowRun, "ShadowRun", "Shadow Running", "R15")
+	PlayAnim(ShadowRun, "rbxassetid://", .1, 1, "PriorLow", true)
+	local AdidasRun = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(AdidasRun, "AdidasRun", "Adidas Running", "R15")
+	PlayAnim(AdidasRun, "rbxassetid://", .1, 1, "PriorLow", true)
+	local SitAnim = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(SitAnim, "SitAnim", "Sit Anim", "R15")
+	PlayAnim(SitAnim, "rbxassetid://", .1, 1, "PriorLow", true)
+	local ToolHandle = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(ToolHandle, "ToolHandle", "Tool Handle", "R15")
+	PlayAnim(ToolHandle, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Wave = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Wave, "Wave", "Wave", "R15")
+	PlayAnim(Wave, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Point = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Point, "Point", "Point", "R15")
+	PlayAnim(Point, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Dance1 = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Dance1, "Dance1", "Dance 1", "R15")
+	PlayAnim(Dance1, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Dance2 = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Dance2, "Dance2", "Dance 2", "R15")
+	PlayAnim(Dance2, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Dance3 = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Dance3, "Dance3", "Dance 3", "R15")
+	PlayAnim(Dance3, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Laugh = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Laugh, "Laugh", "Laugh", "R15")
+	PlayAnim(Laugh, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Cheer = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Cheer, "Cheer", "Cheer", "R15")
+	PlayAnim(Cheer, "rbxassetid://", .1, 1, "PriorLow", true)
+	local NaSaluteme = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Salute, "Salute", "Salute", "R15")
+	PlayAnim(Obj, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Name = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Obj, "Name", "Text", "R15")
+	PlayAnim(Obj, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Name = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Obj, "Name", "Text", "R15")
+	PlayAnim(Obj, "rbxassetid://", .1, 1, "PriorLow", true)
+	local Name = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(Obj, "Name", "Text", "R15")
+	PlayAnim(Obj, "rbxassetid://", .1, 1, "PriorLow", true)
+
 507768133 Sit anim
 507768375 Tool none
 507770239 Wave
