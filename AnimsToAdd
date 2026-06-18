@@ -70,9 +70,19 @@
 139643944264511 Quad Punch
 Fighting Idle 105947156749343
 Tenna Kick 118139885865308
-Quad Punch 139643944264511
 Tenna Swing Dance 77984841414450
 Tenna Dance 140315159513795
+
+507768133 Sit anim
+507768375 Tool none
+507770239 Wave
+10714395441 Point
+507771955 Dance1
+507776720 Dance2
+507777451 Dance3
+507770818 Laugh
+507770677 Cheer
+3360689775 Salute
 
 	local WormAnim = Instance.new("TextButton")--COMPLETE
 	CreateAnimButton(WormAnim, "WormAnim", "Worm Fly", "R15")
@@ -305,26 +315,21 @@ Tenna Dance 140315159513795
 	local Cheer = Instance.new("TextButton")--COMPLETE
 	CreateAnimButton(Cheer, "Cheer", "Cheer", "R15")
 	PlayAnim(Cheer, "rbxassetid://", .1, 1, "PriorLow", true)
-	local NaSaluteme = Instance.new("TextButton")--COMPLETE
+	local Salute = Instance.new("TextButton")--COMPLETE
 	CreateAnimButton(Salute, "Salute", "Salute", "R15")
-	PlayAnim(Obj, "rbxassetid://", .1, 1, "PriorLow", true)
-	local Name = Instance.new("TextButton")--COMPLETE
-	CreateAnimButton(Obj, "Name", "Text", "R15")
-	PlayAnim(Obj, "rbxassetid://", .1, 1, "PriorLow", true)
-	local Name = Instance.new("TextButton")--COMPLETE
-	CreateAnimButton(Obj, "Name", "Text", "R15")
-	PlayAnim(Obj, "rbxassetid://", .1, 1, "PriorLow", true)
-	local Name = Instance.new("TextButton")--COMPLETE
-	CreateAnimButton(Obj, "Name", "Text", "R15")
-	PlayAnim(Obj, "rbxassetid://", .1, 1, "PriorLow", true)
-
-507768133 Sit anim
-507768375 Tool none
-507770239 Wave
-10714395441 Point
-507771955 Dance1
-507776720 Dance2
-507777451 Dance3
-507770818 Laugh
-507770677 Cheer
-3360689775 Salute
+	PlayAnim(Salute, "rbxassetid://", .1, 1, "PriorLow", true)
+	local QuadPunch = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(QuadPunch, "QuadPunch", "Quad Punch", "R15")
+	PlayAnim(QuadPunch, "rbxassetid://", .1, 1, "PriorLow", true)
+	local FightingIdle = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(FightingIdle, "FightingIdle", "Fighting Idle", "R15")
+	PlayAnim(FightingIdle, "rbxassetid://", .1, 1, "PriorLow", true)
+	local TennaKick = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(TennaKick, "TennaKick", "TennaKick", "R15")
+	PlayAnim(TennaKick, "rbxassetid://", .1, 1, "PriorLow", true)
+	local TennaArmDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(TennaArmDance, "TennaArmDance", "Tenna Arm Dance", "R15")
+	PlayAnim(TennaArmDance, "rbxassetid://", .1, 1, "PriorLow", true)
+	local TennaSwingDance = Instance.new("TextButton")--COMPLETE
+	CreateAnimButton(TennaSwingDance, "TennaSwingDance", "Tenna Swing Dance", "R15")
+	PlayAnim(TennaSwingDance, "rbxassetid://", .1, 1, "PriorLow", true)
