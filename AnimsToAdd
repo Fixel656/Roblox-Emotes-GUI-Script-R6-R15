@@ -68,10 +68,11 @@
 82598234841035 Shadow Run (Better on 0.8 speed)
 18537384940 Goofy Adidas run
 139643944264511 Quad Punch
-Fighting Idle
-Tenna Kick
-Tenna Swing Dance
-Tenna Dance
+Fighting Idle 105947156749343
+Tenna Kick 118139885865308
+Quad Punch 139643944264511
+Tenna Swing Dance 77984841414450
+Tenna Dance 140315159513795
 
 	local WormAnim = Instance.new("TextButton")--COMPLETE
 	CreateAnimButton(WormAnim, "WormAnim", "Worm Fly", "R15")
