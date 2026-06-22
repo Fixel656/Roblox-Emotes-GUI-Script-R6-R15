@@ -9,7 +9,6 @@ and if summary is 0,animation will stuck on first frames.
 - changed Frame dragging from Frame.Draggable to using UiDragDetector (Now the Frame won't stop dragging even if you move mouse very quick)
 
   <img width="476" height="299" alt="image" src="https://github.com/user-attachments/assets/60f24374-a56a-4e04-83f3-54ce7c427b31" />
-
   
 V2:
 - Optimized script and made it easier to edit and add new emotes. Now it uses Functions for making anim buttons and playing anims insted of doing code for each button,
@@ -26,3 +25,7 @@ V2:
 - You can loop unlooped anims by clicking RMB on them now
 
   <img width="472" height="299" alt="image" src="https://github.com/user-attachments/assets/6b81659d-1763-4d45-8d4f-7aa5f98ef2dc" />
+
+V2.2:
+- Fixed Gui Reset when Character reappears (death or something else)
+- Fixed colors binding to BgColor
