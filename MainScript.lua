@@ -3,11 +3,6 @@
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
 
---V1
---Original by illremember, edited by Fixel656
---DO NOT COPY AND CLAIM AS OWN, if you are using some of the script for your own, 
---credit (especially of original author) is highly appreciated! 
-
 local GuiActive = true
 local GuiEmoter = nil
 local Player = game.Players.LocalPlayer
@@ -35,7 +30,7 @@ local function CreateGui()
 
 	local SpeedNum --Value, adding to default speed of animation
 
-	-- AnimButtons In new place now (~340 string)
+	-- AnimButtons are in new place now (~495 string)
 
 	BgColor = Color3.new(0.541176, 0.647059, 1)
 	ScrollBgColor = Color3.new(0.862745, 0.960784, 1)
@@ -262,7 +257,7 @@ local function CreateGui()
 	MainFrame.BackgroundColor3 = BgColor
 	MainFrame.BackgroundTransparency = 1
 	MainFrame.Position = UDim2.new(0, 10, 0, 10)
-	MainFrame.Size = UDim2.new(0, 460, 0, 250)
+	MainFrame.Size = UDim2.new(0, 460, 0, 285)
 
 	local UIDragDetectorMainFrame = Instance.new("UIDragDetector")
 	UIDragDetectorMainFrame.Parent = MainFrame
@@ -271,6 +266,7 @@ local function CreateGui()
 
 	GuiBottomFrame.Name = "GuiBottomFrame"
 	GuiBottomFrame.Parent = MainFrame
+	GuiBottomFrame.AnchorPoint = Vector2.new(0, 1)
 	GuiBottomFrame.Size = UDim2.new(0, 460, 0, 35)
 	GuiBottomFrame.Position = UDim2.new(0, 0, 1, 1)
 	GuiBottomFrame.Active = true
