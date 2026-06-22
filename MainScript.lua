@@ -1,4 +1,4 @@
---V2
+--V2.2
 --[[Script by Fixel656, based on Energize GUI by illremember
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
@@ -32,10 +32,10 @@ local function CreateGui()
 
 	-- AnimButtons are in new place now (~495 string)
 
-	BgColor = Color3.new(0.541176, 0.647059, 1)
+	BgColor = Color3.new(0.756863, 0.823529, 1)
 	ScrollBgColor = Color3.new(0.862745, 0.960784, 1)
-	ButtonCol = Color3.new(0.541176, 0.647059, 1) -- R6 Button Color
-	ButtonBackCol = Color3.new(0.741176, 0.780392, 1) -- R6 Button darker color (idk how to make it just darker BgColor yet)
+	ButtonCol = Color3.new(0.682353, 0.701961, 0.792157) -- R6 Button Color
+	ButtonBackCol = Color3.new(0.882353, 0.901961, 0.992157) -- R6 Button darker color (idk how to make it just darker BgColor yet)
 	R15ButtonCol = Color3.new(0.682353, 0.701961, 0.792157) --R15 Button color
 	R15ButtonBackCol = Color3.new(0.882353, 0.901961, 0.992157) -- R15 Button darker color
 
@@ -104,7 +104,7 @@ local function CreateGui()
 		end
 		local Anim = Instance.new("Animation")
 		Anim.AnimationId = ID
-		local track = Player.Character.Humanoid:LoadAnimation(Anim)
+		local track = Player.Character:WaitForChild("Humanoid"):LoadAnimation(Anim)
 		if Type:find("PriorLow") then
 			track.Priority = Enum.AnimationPriority.Action3
 		elseif Type:find("PriorHigh") then
@@ -284,7 +284,7 @@ local function CreateGui()
 	GBUIPadding.PaddingLeft = UDim.new(0, 5)
 	GBUIPadding.PaddingRight = UDim.new(0, 5)
 	GBUIPadding.Parent = GuiBottomFrame
-	
+
 	local SFLayout = Instance.new("UIGridLayout")
 	SFLayout.Name = "UIGridLayout"
 	SFLayout.Parent = SpeedFrame
@@ -397,11 +397,9 @@ local function CreateGui()
 	SF15UIPadding.PaddingTop = UDim.new(0, 10)
 	SF15UIPadding.PaddingRight = UDim.new(0, 10)
 
-	--
-
 	GuiTopFrame.Name = "GuiTopFrame"
 	GuiTopFrame.Parent = MainFrame
-	GuiTopFrame.BackgroundColor3 = Color3.new(0.541176, 0.647059, 1)
+	GuiTopFrame.BackgroundColor3 = BgColor
 	GuiTopFrame.BorderColor3 = Color3.new(0.243137, 0.243137, 0.243137)
 	GuiTopFrame.Size = UDim2.new(0, 460, 0, 32)
 
@@ -625,7 +623,7 @@ local function CreateGui()
 	PlayAnim(SwordSwing, "rbxassetid://32659699", .1, 1, "PriorLow", false)
 
 	--R15 Emotes (Types: Dance (1), Action (2), Walk (3), WeirdAnim (4), Idle (5), Attack (6))
-	
+
 	local Dance1 = Instance.new("TextButton")
 	CreateAnimButton(Dance1, "Dance1", "Dance 1", "R15", 1)
 	PlayAnim(Dance1, "rbxassetid://507771955", .1, 1, "PriorLow", true)
@@ -962,11 +960,11 @@ end
 
 -- PLEASE DO NOT DELETE THIS
 CreateGui()
-game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Hello!", Text = "Thank you for using Emote GUI by illremember and Fixel!", Duration = 5, Icon = "rbxassetid://95707366110827"})
+game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Hello!", Text = "Thank you for using Emote GUI by illremember and Fixel! (V2.2)", Duration = 5, Icon = "rbxassetid://95707366110827"})
 -- PLEASE DO NOT DELETE THIS
 
 Player.CharacterAdded:connect(function()
-	if GuiActive then
+	if GuiActive and Player.Character:WaitForChild("Humanoid") then
 		GuiEmoter:Destroy()
 		CreateGui()	
 	end
