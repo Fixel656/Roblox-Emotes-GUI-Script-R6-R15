@@ -3,6 +3,11 @@
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
 
+--V1
+--Original by illremember, edited by Fixel656
+--DO NOT COPY AND CLAIM AS OWN, if you are using some of the script for your own, 
+--credit (especially of original author) is highly appreciated! 
+
 local GuiActive = true
 local GuiEmoter = nil
 local Player = game.Players.LocalPlayer
@@ -20,7 +25,6 @@ local function CreateGui()
 	local CurSpeedText = Instance.new("TextLabel") --Text showing your current anim speed
 
 	local ScrollingFrame = Instance.new("ScrollingFrame") -- The scrolling frame of animations
-	local CheckR = Instance.new("TextLabel") -- Check if R15 or R6, currently invisible
 	local ScrollingFrameR15 = Instance.new("ScrollingFrame") -- The scrolling frame of R15 animations
 
 	local GuiTopFrame = Instance.new("Frame") -- Top of the main frame
@@ -30,6 +34,7 @@ local function CreateGui()
 	local Title = Instance.new("TextLabel") -- Actual title of GUI, Emoter
 
 	local SpeedNum --Value, adding to default speed of animation
+
 	-- AnimButtons In new place now (~340 string)
 
 	BgColor = Color3.new(0.541176, 0.647059, 1)
@@ -380,7 +385,7 @@ local function CreateGui()
 	ScrollingFrameR15.Position = UDim2.new(0, 0, 0, 34)
 	ScrollingFrameR15.ScrollBarImageColor3 = Color3.new(0, 0, 0)
 	ScrollingFrameR15.Size = UDim2.new(0, 460, 0, 215)
-	ScrollingFrameR15.CanvasSize = UDim2.new(0, 0, 3.5, 0)
+	ScrollingFrameR15.CanvasSize = UDim2.new(0, 0, 3.7, 0)
 	ScrollingFrameR15.Visible = false
 	ScrollingFrameR15.ScrollBarThickness = 10
 
@@ -443,18 +448,6 @@ local function CreateGui()
 	Title.TextStrokeTransparency = 0
 	Title.TextWrapped = false
 
-	CheckR.Name = "CheckR"
-	CheckR.Parent = GuiTopFrame
-	CheckR.Visible = false
-	CheckR.BackgroundColor3 = Color3.new(1, 1, 1)
-	CheckR.BackgroundTransparency = 1
-	CheckR.Size = UDim2.new(0, 171, 0, 32)
-	CheckR.Font = Enum.Font.SourceSansBold
-	CheckR.Text = "Text"
-	CheckR.TextScaled = true
-	CheckR.TextSize = 14
-	CheckR.TextWrapped = true
-
 	DestroyGUI.MouseButton1Click:connect(function()
 		GuiActive = false
 		Emoter:Destroy()
@@ -477,13 +470,11 @@ local function CreateGui()
 	if (game:GetService"Players".LocalPlayer.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R15) then
 		ScrollingFrame.Visible = false
 		ScrollingFrameR15.Visible = true
-		CheckR.Text = "R15 Animations"
 		Title.Text = "Emotes GUI (R15)"
 		SideFrameTitle.Text = "Emotes GUI (R15)"
 	else
 		ScrollingFrame.Visible = true
 		ScrollingFrameR15.Visible = false
-		CheckR.Text = "R6 Animations"
 		Title.Text = "Emotes GUI (R6)"
 		SideFrameTitle.Text = "Emotes GUI (R6)"
 
@@ -498,9 +489,11 @@ local function CreateGui()
 	
 	- CreateAnimation has Object (Button), Name of object, Text, Type ow whiich type of scrolling frame will it be, 
 	and LayoutOrder to organize Anim button to its type
-	- PlayAnim has Object (Button), Id of anim, Anim FadeTime, speed of anim, Type of Anim and Looped state value.
+	- PlayAnim has Object (Button), Id of anim, Anim FadeTime, speed of anim, Type of Anim and Looped state value (if anim is unlooped you can loop it by clicking RMB).
 	Type of anim is checked as Type:find("PriorLow"), so you can type in multiple states inside.
 	States available: PriorLow/PriorHigh (Priority of animation), Pause (Animation will stop after 1 second)
+	
+	WARNING: CHECK 
 	]]
 
 	-- R6 Emotes
@@ -778,6 +771,9 @@ local function CreateGui()
 	local TallCreatureWalk = Instance.new("TextButton")
 	CreateAnimButton(TallCreatureWalk, "TallCreatureWalk", "Tall Creature Walk", "R15", 3)
 	PlayAnim(TallCreatureWalk, "rbxassetid://134010853417610", .1, 1.5, "PriorLow", true)
+	local Crawl = Instance.new("TextButton")
+	CreateAnimButton(Crawl, "Crawl", "Crawl", "R15", 3)
+	PlayAnim(Crawl, "rbxassetid://106501741606953", .1, 1, "PriorLow", true)
 	local ShadowRun = Instance.new("TextButton")
 	CreateAnimButton(ShadowRun, "ShadowRun", "Shadow Running", "R15", 3)
 	PlayAnim(ShadowRun, "rbxassetid://82598234841035", .1, 0.8, "PriorLow", true)
@@ -850,6 +846,15 @@ local function CreateGui()
 	local FloatIdle = Instance.new("TextButton")
 	CreateAnimButton(FloatIdle, "FloatIdle", "Float Idle", "R15", 5)
 	PlayAnim(FloatIdle, "rbxassetid://94942486115057", .1, 1, "PriorLow", true)
+	local TPose = Instance.new("TextButton")
+	CreateAnimButton(TPose, "TPose", "T Pose", "R15", 5)
+	PlayAnim(TPose, "rbxassetid://121655148084031", .1, 1, "PriorLow", true)
+	local CrouchR15 = Instance.new("TextButton")
+	CreateAnimButton(CrouchR15, "CrouchR15", "Crouch", "R15", 5)
+	PlayAnim(CrouchR15, "rbxassetid://97517127273301", .3, 1, "PriorLow", true)
+	local Crawl = Instance.new("TextButton")
+	CreateAnimButton(Crawl, "Crawl", "Crawl", "R15", 5)
+	PlayAnim(Crawl, "rbxassetid://106501741606953", .3, 1, "PriorLow", true)
 	local Sitting = Instance.new("TextButton")
 	CreateAnimButton(Sitting, "Sitting", "Sitting", "R15", 5)
 	PlayAnim(Sitting, "rbxassetid://94763556845023", .1, 1, "PriorLow", true)
