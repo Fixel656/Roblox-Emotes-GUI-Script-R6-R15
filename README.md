@@ -4,32 +4,36 @@ Script:
 
 `loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/MainScript.lua",true))()`
 
-<img width="480" height="309" alt="image" src="https://github.com/user-attachments/assets/60f98ba7-16aa-4f35-9b47-900d7d3e20b9" />
+<img width="479" height="304" alt="image" src="https://github.com/user-attachments/assets/021f9b54-3d04-4f5e-b65a-d6a49313cd2a" />
 
-What I changed/added:
-- Added abibily to change animation speed. The number you write in the window is adding to the default speed, 
+What this Gui can do:
+- Play FE animations, of course (**43** R6 animations AND **88** R15 animations)
+- Highly configurable Button and animation functions
+- Abibily to change animation speed. The number you write in the window is adding to the default speed, 
 if you type negative number, it will make animation slower, but if summary speed will be negative, animation won't work, 
-and if summary is 0,animation will stuck on first frames. 
-- Changed how Gui looks
+and if summary is 0, animation will stuck on first frames. 
 - Gui will reappear on Player.CharacterAdded so it prevents Gui to disappear or stop working on death
-- Button to Destroy Gui
-- Added, edited and deleted some R6 animations
-- changed Frame dragging from Frame.Draggable to using UiDragDetector (Now the Frame won't stop dragging even if you move mouse very quick) 
+- All anmations have Action3 or Action4 priority so it wont be replaced or conflicting with default animations
+- You can loop unlooped anims by clicking RMB on them
 
 To do:
 - add other color themes and make style more modern
-- saveable settings and position (If I'll learn how to save data to the device)
-- more R6/R15 animations
+- saveable settings and position
+- more R15 animations (there`s no other good FE R6 anims left)
 - section with Animations for some separate games. It will be places with emotes available in these places specifically.
 It will be manually, so it will be a few games. I will type available ones in README.
-- Button to delete Gui
-- Activating Anims by pressing keys (will also be configurable after I learn how to save data on device)
+- HotKeys
 - Ability to use animation by entering its ID (maybe will make "Saved Anims" Section)
-- "Optimize" script and make it easier to edit
+- Options sections with cool things:
+  Pause ALL animations;
+  Stop Default "Animate" script (So you can look like you`re lagging) (May add support for other games);
+  Stop all animations from default "Animate" script;
+  And others!
+- Search function (find needed anim from the list by using keywords or LayoutOrder number)
 - More
 
+I made this script for myself, so it may be not fully suitable for you, especially on section with separate places. You can change it if you want.
 
-I made this script for myself, so it won't be fully suitable for you, especially on section with separate Places. you can change it if you want, Moreover, I am not the original author of the script,
-But it would be cool if you will credit me as well :) 
+But it would be cool if you will credit me and original author!
 
 Hope you like it! 
