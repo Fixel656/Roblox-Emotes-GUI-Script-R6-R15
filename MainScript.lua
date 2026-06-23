@@ -1056,6 +1056,7 @@ game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Hello!", Tex
 Player.CharacterAdded:connect(function()
 	if GuiActive and Player.Character:WaitForChild("Humanoid") then
 		GuiEmoter:Destroy()
+			wait(0.5)
 		CreateGui()	
 	end
 end)
