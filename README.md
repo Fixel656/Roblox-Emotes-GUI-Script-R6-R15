@@ -31,7 +31,8 @@ It will be manually, so it will be a few games. I will type available ones in RE
   And others!
 - Search function (find needed anim from the list by using keywords or LayoutOrder number)
 - Add AnimSmoothFade setting
-- Add Tool anims working while playing Anims 
+- Add Tool anims working while playing Anims
+- Add Animation Preview and make a setting for enabling it
 - More
 
 I made this script for myself, so it may be not fully suitable for you, especially on section with separate places. You can change it if you want.
