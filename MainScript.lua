@@ -1,4 +1,4 @@
---V2.2
+--V2.6
 --[[Script by Fixel656, based on Energize GUI by illremember
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
@@ -7,6 +7,8 @@ local GuiActive = true
 local GuiEmoter = nil
 local Player = game.Players.LocalPlayer
 
+local AnimPreviewEnable = false -- Didn`t added function to change it in Gui yet
+
 local function CreateGui()
 
 	local Emoter = Instance.new("ScreenGui") -- The actual GUI
@@ -14,7 +16,10 @@ local function CreateGui()
 	local OpenGUI = Instance.new("ImageButton") -- Part of SideFrame
 	local SideFrameTitle = Instance.new("TextLabel") -- Part of SideFrame
 	local MainFrame = Instance.new("Frame") -- All of the stuff on the main frame
-
+	
+	local ViewportFrame = Instance.new("ViewportFrame")
+	local ClonedChar = nil
+	
 	local GuiBottomFrame = Instance.new("Frame")
 	local SpeedFrame = Instance.new("Frame") -- Frame of Speed Changer
 	local CurSpeedText = Instance.new("TextLabel") --Text showing your current anim speed
@@ -96,6 +101,46 @@ local function CreateGui()
 		Button.LayoutOrder = LayoutPos
 
 	end
+	
+	local function AddVPF()
+		ViewportFrame.Visible = false
+		ViewportFrame.BackgroundTransparency = 1
+		ViewportFrame.Size = UDim2.new(0, 225, 0, 285)
+		ViewportFrame.Position = UDim2.new(1, 10, 0, 0)
+		ViewportFrame.BackgroundColor3 = Color3.fromRGB(166, 174, 175)
+		ViewportFrame.Ambient = Color3.fromRGB(175, 175, 175)
+		ViewportFrame.LightColor = Color3.fromRGB(208, 208, 208)
+		ViewportFrame.Parent = MainFrame
+		local UICorner = Instance.new("UICorner")
+		UICorner.Parent = ViewportFrame
+
+		local WorldModel = Instance.new("WorldModel")
+		WorldModel.Parent = ViewportFrame
+
+		local character = Player.Character or Player.CharacterAdded:Wait()
+		local VPFcam = Instance.new("Camera"); VPFcam.Parent = ViewportFrame
+		VPFcam.CameraType = Enum.CameraType.Scriptable
+
+		local targetPosition = nil
+		if (game:GetService"Players".LocalPlayer.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R15) then
+			targetPosition = Vector3.new(4.6, 0.2, 12) -- if R15
+		else
+			targetPosition = Vector3.new(4.6, -1, 12)
+		end
+
+		local targetRotation = CFrame.Angles(0, math.rad(20), 0)
+		VPFcam.CFrame = CFrame.new(targetPosition) * targetRotation
+
+		--VPFcam.CFrame = CFrame.new(Vector3.new(5, -1.5, 12.5), Vector3.new(0, 20, 0))
+		ViewportFrame.CurrentCamera = VPFcam
+		VPFcam.FieldOfView = 37
+		character.Archivable = true
+		ClonedChar = character:Clone()
+		ClonedChar.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+		ClonedChar.Parent = WorldModel
+		ClonedChar.Animate:Destroy()
+		ClonedChar:SetPrimaryPartCFrame(CFrame.new(Vector3.new(0,0,-0.4), Vector3.new(0,0,7)))
+	end
 
 	local function PlayAnim(Object, ID, AnimWeight, Speed, Type, LoopedVal, NeedPause) -- Types Tutorial on Emotes section
 		Object:SetAttribute("Looped", LoopedVal)
@@ -124,7 +169,7 @@ local function CreateGui()
 				end
 
 				track:Play(AnimWeight, 1, Speed + SpeedNum)
-
+				ViewportFrame.Visible = false
 				if Object.Parent == ScrollingFrame then
 					Object.BackgroundColor3 = ButtonBackCol
 				elseif Object.Parent == ScrollingFrameR15 then
@@ -133,14 +178,21 @@ local function CreateGui()
 				Object.UIStroke.Thickness = 2
 				Object.UIStroke.Color = Color3.new(0.0392157, 0.501961, 1)
 				CurSpeedText.Text = "Speed: ".. Speed + SpeedNum
-
+				
 				if Type:find("Pause") then
-					wait(1)
-					track:AdjustSpeed(0)
+					local PauseTask = task.spawn(function()
+						wait(1)
+						track:AdjustSpeed(0)
+					end)
+					while wait() do
+						if AnimACTIVE == false then
+							task.cancel(PauseTask)
+							return
+						end
+					end
 				end
 			else
 				track:Stop()
-
 				if Object.Parent == ScrollingFrame then
 					Object.BackgroundColor3 = ButtonCol
 				elseif Object.Parent == ScrollingFrameR15 then
@@ -169,7 +221,7 @@ local function CreateGui()
 				if AnimACTIVE then
 					track.Looped = true
 					track:Play(AnimWeight, 1, Speed + SpeedNum)
-
+					ViewportFrame.Visible = false
 					if Object.Parent == ScrollingFrame then
 						Object.BackgroundColor3 = ButtonBackCol
 					elseif Object.Parent == ScrollingFrameR15 then
@@ -193,7 +245,42 @@ local function CreateGui()
 				end
 			end
 		end)
+		
+		if AnimPreviewEnable then
+			local VPFtrack = ClonedChar:WaitForChild("Humanoid"):LoadAnimation(Anim)
+			local VPFActive = false
+			Object.MouseEnter:connect(function()
+				VPFActive = true
+				local CurLooped = Object:GetAttribute("Looped")
+				if CurLooped == false then
+					VPFtrack.Looped = false
+				elseif CurLooped == true then
+					VPFtrack.Looped = true
+				end
+				VPFtrack:Play(0, 1, Speed + SpeedNum)
+				ViewportFrame.Visible = true
+				game.TweenService:Create(ViewportFrame, TweenInfo.new(.1), {BackgroundTransparency = 0}):Play()
+				if Type:find("Pause") then
+					local PauseTask = task.spawn(function()
+						wait(1)
+						VPFtrack:AdjustSpeed(0)
+					end)
+					while wait() do
+						if VPFActive == false then
+							task.cancel(PauseTask)
+							return
+						end
+					end
+				end
+			end)
 
+			Object.MouseLeave:connect(function()
+				VPFActive = false
+				game.TweenService:Create(ViewportFrame, TweenInfo.new(.1), {BackgroundTransparency = 1}):Play()
+				ViewportFrame.Visible = false
+				VPFtrack:Stop(0)
+			end)
+		end
 	end
 
 	-- Properties
@@ -201,6 +288,7 @@ local function CreateGui()
 
 	Emoter.Name = "Emoter"
 	Emoter.Parent = Player.PlayerGui
+	Emoter.DisplayOrder = 100
 
 	SideFrame.Name = "SideFrame"
 	SideFrame.Parent = Emoter
@@ -470,8 +558,12 @@ local function CreateGui()
 		ScrollingFrame.Visible = true
 		ScrollingFrameR15.Visible = false
 		Title.Text = "Emotes GUI (R6)"
-		SideFrameTitle.Text = "Emotes GUI (R6)"
+		SidFrameTitle.Text = "Emotes GUI (R6)"
 
+	end
+	
+	if AnimPreviewEnable == true then
+		AddVPF()
 	end
 
 	-- EMOTES	
@@ -485,9 +577,7 @@ local function CreateGui()
 	and LayoutOrder to organize Anim button to its type
 	- PlayAnim has Object (Button), Id of anim, Anim FadeTime, speed of anim, Type of Anim and Looped state value (if anim is unlooped you can loop it by clicking RMB).
 	Type of anim is checked as Type:find("PriorLow"), so you can type in multiple states inside.
-	States available: PriorLow/PriorHigh (Priority of animation), Pause (Animation will stop after 1 second)
-	
-	WARNING: CHECK 
+	States available: PriorLow/PriorHigh (Priority of animation), Pause (Animation will stop after 1 second) 
 	]]
 
 	-- R6 Emotes
@@ -758,7 +848,7 @@ local function CreateGui()
 	PlayAnim(CarDriving, "rbxassetid://132471972345518", .5, 0.5, "PriorLow", true)
 	local ChibiWalk = Instance.new("TextButton")
 	CreateAnimButton(ChibiWalk, "ChibiWalk", "Chibi Walk", "R15", 3)
-	PlayAnim(ChibiWalk, "rbxassetid://85887415033585", .1, 1.7, "PriorLow", true)
+	PlayAnim(ChibiWalk, "rbxassetid://85887415033585", .1, 1.3, "PriorLow", true)
 	local MedusaWalk = Instance.new("TextButton")
 	CreateAnimButton(MedusaWalk, "MedusaWalk", "Medusa Walk", "R15", 3)
 	PlayAnim(MedusaWalk, "rbxassetid://131663132818596", .1, 1.5, "PriorLow", true)
