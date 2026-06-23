@@ -29,3 +29,7 @@ V2:
 V2.2:
 - Fixed Gui Reset when Character reappears (death or something else)
 - Fixed colors binding to BgColor
+
+V2.6:
+- Fixed "Pause" anim function bug when it pauses wrong if you quick enough to play anim with "Pause" Type again
+- Added anim Preview Frame (Unexpected, actually). Disabled by default because can be not useful and you can disable it in Gui
