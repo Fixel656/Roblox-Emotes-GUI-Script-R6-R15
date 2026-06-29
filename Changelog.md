@@ -33,3 +33,14 @@ V2.2:
 V2.6:
 - Fixed "Pause" anim function bug when it pauses wrong if you quick enough to play anim with "Pause" Type again
 - Added anim Preview Frame (Unexpected, actually). Disabled by default because can be not useful and you can disable it in Gui
+
+V2.8:
+- Added Options
+
+  <img width="234" height="134" alt="image" src="https://github.com/user-attachments/assets/dd2b59fd-7b3d-48fa-9746-8ae2271cbf54" />
+
+V2.9:
+- Added Divide Frames to visually separate animation buttons (By changing from UIGridLayout to UIListLayout)
+- Fixed some UIPadding things
+
+  <img width="473" height="300" alt="image" src="https://github.com/user-attachments/assets/9297a64e-7428-4c3c-a283-d346d3fa942a" />
