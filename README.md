@@ -35,7 +35,8 @@ CREATED ANIMATION ID DETECTOR
 
 <img width="435" height="293" alt="image" src="https://github.com/user-attachments/assets/acb8ced6-ca57-4411-b540-9ad5afd69ce5" />
 
-I made this script for myself, so it may be not fully suitable for you, especially on section with separate places. You can change it if you want.
+
+I made those scripts for myself, so it may be not fully suitable for you, especially on section with separate places. You can change it if you want.
 
 But it would be cool if you will credit me and original author!
 
