@@ -1,4 +1,4 @@
-This is an edit of Energize Emote Gui originally made by illremember. Original: https://github.com/IlikeyocutgHAH12/FEEGGEG/blob/main/%5BFE%5D%20Energize%20Animation%20Gui.txt
+Made an FE Animations script with some features
 
 - Script: `loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/MainScript.lua",true))()`
 
@@ -28,9 +28,14 @@ It will be manually, so it will be a few games. I will type available ones in RE
 - Search function (find needed anim from the list by using keywords or LayoutOrder number)
 - Add AnimSmoothFade setting
 - Add Tool anims working while playing Anims
-- More
-
-- CREATED ANIMATION ID DETECTOR (Maded to get Id for Section with Animations for some separate games And other things)
+- More<br/>
+<br/>
+   This script was based on Energize by illremember. Original: https://github.com/IlikeyocutgHAH12/FEEGGEG/blob/main/%5BFE%5D%20Energize%20Animation%20Gui.txt<br/>
+<br/>
+<br/>
+<br/>
+  CREATED ANIMATION ID DETECTOR (Maded to get Id for Section with Animations for some separate games And other things)<br/>
+<br/>
 - Script: `loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/AnimationIdDetector.lua",true))()`
 
 <img width="435" height="293" alt="image" src="https://github.com/user-attachments/assets/acb8ced6-ca57-4411-b540-9ad5afd69ce5" /> <img width="434" height="297" alt="image" src="https://github.com/user-attachments/assets/03bb8a6c-8fdd-454a-9dc4-88604b275967" />
@@ -42,8 +47,6 @@ What this Gui can do:
 - You can preview detected anims
 - Name and Id are copyable so you dont need to write it yourself
 
-I made those scripts for myself, so it may be not fully suitable for you, especially on section with separate places. You can change it if you want.
-
-But it would be cool if you will credit me and original author!
+I made those scripts for myself, so it may be not fully suitable for you, especially on section with separate places. You can change it if you want, but it would be cool if you will credit me and original author!
 
 Hope you like it! 
