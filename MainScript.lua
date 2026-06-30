@@ -350,7 +350,7 @@ local function CreateGui()
 	-- SideFrame
 
 	Emoter.Name = "Emoter"
-	Emoter.Parent = Player.PlayerGui
+	Emoter.Parent = game.CoreGui
 	Emoter.DisplayOrder = 100
 
 	SideFrame.Name = "SideFrame"
