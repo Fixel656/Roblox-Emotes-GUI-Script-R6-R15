@@ -681,7 +681,7 @@ end
 	PreviewEnableButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	PreviewEnableButton.BorderSizePixel = 0
 	PreviewEnableButton.BackgroundColor3 = R15ButtonCol
-	PreviewEnableButton.Image = "134858066894422"
+	PreviewEnableButton.Image = "rbxassetid://134858066894422"
 	PreviewEnableButton.Parent = OptionsFrame
 	PreviewEnableButton.ZIndex = 0
 	AddHoverText(PreviewEnableButton, "Enable Animation Preview")
