@@ -2,7 +2,7 @@ Made an FE Animations script with some features
 
 - Script: `loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/MainScript.lua",true))()`
 
-<img width="479" height="304" alt="image" src="https://github.com/user-attachments/assets/021f9b54-3d04-4f5e-b65a-d6a49313cd2a" />
+<img width="476" height="356" alt="image" src="https://github.com/user-attachments/assets/51f4a0ba-73d8-4b39-8042-b76c7d8f802c" /> <br/>
 
 What this Gui can do:
 - Play FE animations, of course (**43** R6 animations AND **88** R15 animations)
