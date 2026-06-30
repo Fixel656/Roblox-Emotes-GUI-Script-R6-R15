@@ -350,8 +350,12 @@ local function CreateGui()
 	-- SideFrame
 
 	Emoter.Name = "Emoter"
-	Emoter.Parent = game.CoreGui
 	Emoter.DisplayOrder = 100
+	if game:GetService("RunService"):IsStudio() then --Made this as i test script mostly in Studio
+	Emoter.Parent = game.Players.LocalPlayer.PlayerGui
+else
+	Emoter.Parent = game.CoreGui
+end
 
 	SideFrame.Name = "SideFrame"
 	SideFrame.Parent = Emoter
