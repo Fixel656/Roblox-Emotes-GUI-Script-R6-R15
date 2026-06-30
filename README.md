@@ -33,7 +33,8 @@ It will be manually, so it will be a few games. I will type available ones in RE
 - CREATED ANIMATION ID DETECTOR (Maded to get Id for Section with Animations for some separate games And other things)
 - Script: `loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/AnimationIdDetector.lua",true))()`
 
-<img width="435" height="293" alt="image" src="https://github.com/user-attachments/assets/acb8ced6-ca57-4411-b540-9ad5afd69ce5" />
+<img width="435" height="293" alt="image" src="https://github.com/user-attachments/assets/acb8ced6-ca57-4411-b540-9ad5afd69ce5" /> <img width="434" height="297" alt="image" src="https://github.com/user-attachments/assets/03bb8a6c-8fdd-454a-9dc4-88604b275967" />
+
 
 What this Gui can do:
 - Detects animation Character currently playing or Animation object (Name, Id and Priority if detecting from Character)
