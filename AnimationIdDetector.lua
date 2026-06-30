@@ -260,8 +260,12 @@ local function AddResult(Name, Id, Priority)
 end
 
 AnimIdDetector.Name = "AnimIdDetector"
-AnimIdDetector.Parent = game.Players.LocalPlayer.PlayerGui
 AnimIdDetector.DisplayOrder = 100
+if game:GetService("RunService"):IsStudio() then --Made this as i test script mostly in Studio
+	AnimIdDetector.Parent = game.Players.LocalPlayer.PlayerGui
+else
+	AnimIdDetector.Parent = game.CoreGui
+end
 
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 413, 0, 275)
