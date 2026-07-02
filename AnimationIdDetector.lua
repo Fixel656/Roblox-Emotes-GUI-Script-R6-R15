@@ -1,4 +1,4 @@
---[[V1
+--[[V2
 AnimationIdDetector by Fixel
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
@@ -16,14 +16,30 @@ local ViewportFrame = Instance.new("ViewportFrame")
 local ClonedChar = nil
 
 local GuiBottomFrame = Instance.new("Frame")
-local StartButton = Instance.new("ImageButton")
+local CharStartButton = Instance.new("ImageButton")
 local ModelValue = Instance.new("TextBox")
+local ObjectStartButton = Instance.new("ImageButton")
+local ObjectModelValue = Instance.new("TextBox")
 
+local TargetAnimObjServices = {
+	game:GetService("Workspace"),
+	game:GetService("ReplicatedStorage"),
+	game:GetService("ReplicatedFirst"),
+	game:GetService("Players"),
+	game:GetService("StarterGui"),
+	game:GetService("StarterPack"),
+	game:GetService("StarterPlayer"),
+}
 local Player = game.Players.LocalPlayer
 local Character = Player.Character or Player.CharacterAdded:Wait()
 local Humanoid = Character:WaitForChild("Humanoid")
+local ObjectModel = TargetAnimObjServices
 
-local OperationActive = false
+local CharOperationActive = false
+local ObjectOperationActive = false
+local DetectDefaultAnims = true
+
+game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Welcome to Animation Detector!", Text = "Wait for script to load", Duration = 5, Icon = "rbxassetid://88751076321975"})
 
 local function AddHoverText(Object, Text)
 	local TextLabel = nil
@@ -144,6 +160,17 @@ local function PlayAnim(Object, ID)
 	end)
 end
 
+local function createUniqueObject(Object, Name, parent)
+	local finalName = Name
+	local counter = 1
+	while parent:FindFirstChild(finalName) do
+		finalName = Name .. counter
+		counter = counter + 1
+	end
+	Object.Name = finalName
+	return Object
+end
+
 local function AddResult(Name, Id, Priority)
 	local ResultFrame = Instance.new("Frame")
 	local PriorityText = Instance.new("TextLabel")
@@ -209,13 +236,17 @@ local function AddResult(Name, Id, Priority)
 	PriorityText.Font = Enum.Font.SourceSansBold
 	PriorityText.TextScaled = true
 	PriorityText.Parent = ResultFrame
-
-	local UIListLayout = Instance.new("UIListLayout")
-	UIListLayout.FillDirection = Enum.FillDirection.Horizontal
-	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	UIListLayout.Wraps = true
-	UIListLayout.VerticalFlex = Enum.UIFlexAlignment.Fill
-	UIListLayout.Parent = ResultFrame
+	
+	local SaveButton = Instance.new("ImageButton")
+	SaveButton.Name = "SaveButton"
+	SaveButton.Parent = ResultFrame
+	SaveButton.Size = UDim2.new(0, 25, 0, 25)
+	SaveButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	SaveButton.LayoutOrder = 3
+	SaveButton.Position = UDim2.new(0.7860169, 0, 0, 0)
+	SaveButton.BorderSizePixel = 0
+	SaveButton.BackgroundColor3 = Color3.fromRGB(91, 255, 82)
+	SaveButton.Image = "rbxassetid://6087549875"
 
 	local UIPadding = Instance.new("UIPadding")
 	UIPadding.PaddingLeft = UDim.new(0, 3)
@@ -246,18 +277,63 @@ local function AddResult(Name, Id, Priority)
 
 	local UIStroke1 = Instance.new("UIStroke")
 	UIStroke1.Parent = ResultFrame
+	
+	local UICorner = Instance.new("UICorner")
+	UICorner.TopLeftRadius = UDim.new(0, 5)
+	UICorner.CornerRadius = UDim.new(0, 5)
+	UICorner.TopRightRadius = UDim.new(0, 5)
+	UICorner.BottomRightRadius = UDim.new(0, 5)
+	UICorner.BottomLeftRadius = UDim.new(0, 5)
+	UICorner.Parent = SaveButton
+	
+	local UIStroke = Instance.new("UIStroke")
+	UIStroke.Parent = SaveButton
+
+	local UIListLayout = Instance.new("UIListLayout")
+	UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	UIListLayout.Wraps = true
+	UIListLayout.VerticalFlex = Enum.UIFlexAlignment.Fill
+	UIListLayout.Parent = ResultFrame
 
 	AnimNameText.Text = Name
 	AnimIdText.Text = Id
 	if Priority ~= nil then
 		PriorityText.Text = Priority
 	end
+	
+	SaveButton.MouseButton1Click:Connect(function()
+		if game:GetService("RunService"):IsStudio() then
+			if not workspace:FindFirstChild("AnimsFolder") then
+				local AnimsFolder = Instance.new("Folder")
+				AnimsFolder.Name = "AnimsFolder"
+				AnimsFolder.Parent = workspace
+			end
+			local SaveFile = game:GetObjects("rbxassetid://"..Id)[1]
+			SaveFile.Parent = workspace:FindFirstChild("AnimsFolder")
+			createUniqueObject(SaveFile, SaveFile.Name, workspace.AnimsFolder)
+			SaveFile:SetAttribute("Id", Id)
+		else
+			if not game.CoreGui:FindFirstChild("AnimsFolder") then
+				local AnimsFolder = Instance.new("Folder")
+				AnimsFolder.Name = "AnimsFolder"
+				AnimsFolder.Parent = game.CoreGui
+			end
+			local SaveFile = game:GetObjects("rbxassetid://"..Id)[1]
+			SaveFile.Parent = game.CoreGui:FindFirstChild("AnimsFolder")
+			createUniqueObject(SaveFile, SaveFile.Name, game.CoreGui.AnimsFolder)
+			SaveFile:SetAttribute("Id", Id)
+		end
+		SaveButton.ImageTransparency = 0.5
+		SaveButton.Interactable = false
+	end)
 
 	PlayAnim(ResultFrame, Id)
-	AddHoverText(PriorityText, "Animation Priority")
-	AddHoverText(AnimNameText, "Animation Name")
-	AddHoverText(AnimIdText, "Animation Id")
+	AddHoverText(SaveButton, "Save Animation to Export")
 end
+
+local KeyframeId = game.KeyframeSequenceProvider:RegisterKeyframeSequence(workspace.R15ToR6ConvertedAnimation)
+
 
 AnimIdDetector.Name = "AnimIdDetector"
 AnimIdDetector.DisplayOrder = 100
@@ -268,7 +344,7 @@ else
 end
 
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 413, 0, 275)
+MainFrame.Size = UDim2.new(0, 434, 0, 275)
 MainFrame.BackgroundTransparency = 1
 MainFrame.Position = UDim2.new(0, 10, 0, 10)
 MainFrame.Active = true
@@ -345,7 +421,7 @@ TipLabel.TextScaled = true
 
 task.spawn(function()
 	while true do
-		if ResultsListFrame:FindFirstChildOfClass("Frame") then
+		if ResultsListFrame:FindFirstChildOfClass("Frame")  or AnimObjResultsListFrame:FindFirstChildOfClass("Frame") then
 			TipLabel:Destroy()
 		end
 		task.wait()
@@ -391,6 +467,17 @@ Title.Text = "Anim ID Detector"
 Title.Font = Enum.Font.SourceSansBold
 Title.Parent = GuiTopFrame
 
+local DetectDefaultAnimsButton = Instance.new("ImageButton")
+DetectDefaultAnimsButton.Parent = GuiTopFrame
+DetectDefaultAnimsButton.Name = "DetectDefaultAnimsButton"
+DetectDefaultAnimsButton.AnchorPoint = Vector2.new(1, 0.5)
+DetectDefaultAnimsButton.Size = UDim2.new(0, 32, 0, 32)
+DetectDefaultAnimsButton.Position = UDim2.new(1, -32, 0.5, 0)
+DetectDefaultAnimsButton.BackgroundColor3 = Color3.fromRGB(137, 165, 255)
+DetectDefaultAnimsButton.Image = "rbxassetid://116957047917442"
+
+--GuiBootomFrame Parts
+
 GuiBottomFrame.Name = "GuiBottomFrame"
 GuiBottomFrame.AnchorPoint = Vector2.new(0, 1)
 GuiBottomFrame.Size = UDim2.new(1, 0, 0, 35)
@@ -399,16 +486,16 @@ GuiBottomFrame.Active = true
 GuiBottomFrame.BackgroundColor3 = Color3.fromRGB(137, 165, 255)
 GuiBottomFrame.Parent = MainFrame
 
-StartButton.Name = "StartButton"
-StartButton.AnchorPoint = Vector2.new(1, 0.5)
-StartButton.Size = UDim2.new(0, 51, 0, 35)
-StartButton.LayoutOrder = 1
-StartButton.Position = UDim2.new(1, 0, 0.5, 0)
-StartButton.BackgroundColor3 = Color3.fromRGB(37, 255, 26)
-StartButton.ScaleType = Enum.ScaleType.Fit
-StartButton.Image = "rbxassetid://8215093320"
-StartButton.Parent = GuiBottomFrame
-AddHoverText(StartButton, "Start/Stop detecting animations")
+CharStartButton.Name = "CharStartButton"
+CharStartButton.AnchorPoint = Vector2.new(1, 0.5)
+CharStartButton.Size = UDim2.new(0, 51, 0, 35)
+CharStartButton.LayoutOrder = 1
+CharStartButton.Position = UDim2.new(1, 0, 0.5, 0)
+CharStartButton.BackgroundColor3 = Color3.fromRGB(37, 255, 26)
+CharStartButton.ScaleType = Enum.ScaleType.Fit
+CharStartButton.Image = "rbxassetid://8215093320"
+CharStartButton.Parent = GuiBottomFrame
+AddHoverText(CharStartButton, "Start/Stop detecting animations")
 
 local UICorner3 = Instance.new("UICorner")
 UICorner3.TopLeftRadius = UDim.new(0, 0)
@@ -416,7 +503,7 @@ UICorner3.CornerRadius = UDim.new(0, 0)
 UICorner3.TopRightRadius = UDim.new(0, 0)
 UICorner3.BottomRightRadius = UDim.new(0, 5)
 UICorner3.BottomLeftRadius = UDim.new(0, 0)
-UICorner3.Parent = StartButton
+UICorner3.Parent = CharStartButton
 
 ModelValue.Name = "ModelValue"
 ModelValue.AnchorPoint = Vector2.new(0.5, 0)
@@ -440,12 +527,55 @@ UIPadding1.PaddingLeft = UDim.new(0, 2)
 UIPadding1.PaddingRight = UDim.new(0, 2)
 UIPadding1.Parent = ModelValue
 
+ObjectStartButton.Name = "ObjectStartButton"
+ObjectStartButton.AnchorPoint = Vector2.new(1, 0.5)
+ObjectStartButton.Size = UDim2.new(0, 51, 0, 35)
+ObjectStartButton.LayoutOrder = 1
+ObjectStartButton.Position = UDim2.new(1, 0, 0.5, 0)
+ObjectStartButton.BackgroundColor3 = Color3.fromRGB(37, 255, 26)
+ObjectStartButton.ScaleType = Enum.ScaleType.Fit
+ObjectStartButton.Image = "rbxassetid://8215093320"
+ObjectStartButton.Visible = false
+ObjectStartButton.Parent = GuiBottomFrame
+AddHoverText(ObjectStartButton, "Start/Stop detecting animations")
+
+local UICorner3 = Instance.new("UICorner")
+UICorner3.TopLeftRadius = UDim.new(0, 0)
+UICorner3.CornerRadius = UDim.new(0, 0)
+UICorner3.TopRightRadius = UDim.new(0, 0)
+UICorner3.BottomRightRadius = UDim.new(0, 5)
+UICorner3.BottomLeftRadius = UDim.new(0, 0)
+UICorner3.Parent = ObjectStartButton
+
+ObjectModelValue.Name = "ObjectModelValue"
+ObjectModelValue.AnchorPoint = Vector2.new(0.5, 0)
+ObjectModelValue.Size = UDim2.new(0, 351, 0, 29)
+ObjectModelValue.Position = UDim2.new(0.4280488, 0, 0.0857143, 0)
+ObjectModelValue.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ObjectModelValue.TextWrapped = true
+ObjectModelValue.TextColor3 = Color3.fromRGB(0, 0, 0)
+ObjectModelValue.PlaceholderText = "'game' is Default"
+ObjectModelValue.Text = ""
+ObjectModelValue.CursorPosition = -1
+ObjectModelValue.Font = Enum.Font.SourceSans
+ObjectModelValue.TextXAlignment = Enum.TextXAlignment.Left
+ObjectModelValue.ClearTextOnFocus = false
+ObjectModelValue.TextScaled = true
+ObjectModelValue.Visible = false
+ObjectModelValue.Parent = GuiBottomFrame
+AddHoverText(ObjectModelValue, "Enter path to find anim objects in")
+
+local UIPadding1 = Instance.new("UIPadding")
+UIPadding1.PaddingLeft = UDim.new(0, 2)
+UIPadding1.PaddingRight = UDim.new(0, 2)
+UIPadding1.Parent = ObjectModelValue
+
 local UIListLayout1 = Instance.new("UIListLayout")
 UIListLayout1.FillDirection = Enum.FillDirection.Horizontal
 UIListLayout1.HorizontalAlignment = Enum.HorizontalAlignment.Center
 UIListLayout1.VerticalAlignment = Enum.VerticalAlignment.Center
 UIListLayout1.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout1.HorizontalFlex = Enum.UIFlexAlignment.SpaceBetween
+UIListLayout1.HorizontalFlex = Enum.UIFlexAlignment.Fill
 UIListLayout1.Padding = UDim.new(0, 5)
 UIListLayout1.Parent = GuiBottomFrame
 
@@ -453,13 +583,33 @@ local UIPadding2 = Instance.new("UIPadding")
 UIPadding2.PaddingLeft = UDim.new(0, 3)
 UIPadding2.Parent = GuiBottomFrame
 
+local ExportButton = Instance.new("ImageButton")
+ExportButton.Parent = MainFrame
+ExportButton.Name = "ExportButton"
+ExportButton.ZIndex = 0
+ExportButton.AnchorPoint = Vector2.new(1, 0.5)
+ExportButton.Size = UDim2.new(0, 35, 0, 40)
+ExportButton.Position = UDim2.new(0.9631336, 51, 0.5, 0)
+ExportButton.BackgroundColor3 = Color3.fromRGB(37, 255, 26)
+ExportButton.ScaleType = Enum.ScaleType.Fit
+ExportButton.ImageColor3 = Color3.fromRGB(0, 0, 0)
+ExportButton.Image = "rbxassetid://83856799245957"
+AddHoverText(ExportButton, "EXPORT saved anims to file (SaveInstance)")
+
+local UICorner = Instance.new("UICorner")
+UICorner.TopLeftRadius = UDim.new(0, 0)
+UICorner.CornerRadius = UDim.new(0, 0)
+UICorner.TopRightRadius = UDim.new(0, 5)
+UICorner.BottomRightRadius = UDim.new(0, 5)
+UICorner.BottomLeftRadius = UDim.new(0, 0)
+UICorner.Parent = ExportButton
+
 -- UI Decorations
 
-local UiCornerParts = {"GuiTopFrame", "DestroyGUI", "GuiBottomFrame", "ModelValue", "ViewportFrame", "AnimTypeButton"}
-local UiStrokeParts = {"GuiTopFrame", "GuiBottomFrame", "ModelValue", "ResultsListFrame", "AnimObjResultsListFrame"}
-local UiStroke1Parts = {"ModelValue"}
-local UiGradientParts = {"GuiTopFrame", "GuiBottomFrame", "DestroyGUI", "StartButton", "AnimTypeButton"}
-
+local UiCornerParts = {"GuiTopFrame", "DestroyGUI", "GuiBottomFrame", "CharStartButton", "ObjectStartButton", "ModelValue", "ObjectModelValue", "ViewportFrame", "AnimTypeButton", "DetectDefaultAnimsButton"}
+local UiStrokeParts = {"GuiTopFrame", "GuiBottomFrame", "CharStartButton", "ObjectStartButton", "ModelValue", "ObjectModelValue", "ResultsListFrame", "AnimObjResultsListFrame", "ExportButton"}
+local UiStroke1Parts = {"ModelValue", "ModelValue", "ObjectModelValue"}
+local UiGradientParts = {"GuiTopFrame", "GuiBottomFrame", "DestroyGUI", "CharStartButton", "ObjectStartButton", "AnimTypeButton", "DetectDefaultAnimsButton", "ExportButton"}
 for _, UiPart in ipairs(AnimIdDetector:GetDescendants()) do
 	if table.find(UiCornerParts, UiPart.Name) then
 		local UICorner = Instance.new("UICorner")
@@ -517,6 +667,10 @@ end)
 AnimTypeButton.MouseButton1Click:Connect(function()
 	ResultsListFrame.Visible = not ResultsListFrame.Visible
 	AnimObjResultsListFrame.Visible = not AnimObjResultsListFrame.Visible
+	CharStartButton.Visible = not CharStartButton.Visible
+	ObjectStartButton.Visible = not ObjectStartButton.Visible
+	ModelValue.Visible = not ModelValue.Visible
+	ObjectModelValue.Visible = not ObjectModelValue.Visible
 	if ResultsListFrame.Visible == true then
 		AnimTypeButton.Image = "rbxassetid://88751076321975"
 	else
@@ -524,9 +678,18 @@ AnimTypeButton.MouseButton1Click:Connect(function()
 	end
 end)
 
+DetectDefaultAnimsButton.MouseButton1Click:Connect(function()
+	DetectDefaultAnims = not DetectDefaultAnims
+	if DetectDefaultAnims == true then	
+		DetectDefaultAnimsButton.BackgroundColor3 = Color3.fromRGB(137, 165, 255)
+	else
+		DetectDefaultAnimsButton.BackgroundColor3 = Color3.fromRGB(198, 211, 255)
+	end
+end)
+
 local function DetectPlayingAnimations()
 	local Humanoid = Character:WaitForChild("Humanoid")
-	local playingTracks = Humanoid:GetPlayingAnimationTracks()
+	local playingTracks = Humanoid.Animator:GetPlayingAnimationTracks()
 
 	for i, track in ipairs(playingTracks) do
 		local animationObject = track.Animation
@@ -550,19 +713,34 @@ local function DetectPlayingAnimations()
 	end
 end
 
-local targetAnimObjServices = {
-	game:GetService("Workspace"),
-	game:GetService("ReplicatedStorage"),
-	game:GetService("ReplicatedFirst"),
-	game:GetService("Players"),
-	game:GetService("StarterGui"),
-	game:GetService("StarterPack"),
-	game:GetService("StarterPlayer"),
-}
-
 local function DetectAnimationObjects()
-	for _, service in ipairs(targetAnimObjServices) do
-		for i, Object in ipairs(service:GetDescendants()) do
+	if ObjectModel == TargetAnimObjServices then
+		for _, service in ipairs(ObjectModel) do
+			for i, Object in ipairs(service:GetDescendants()) do
+				if Object:IsA("Animation") then
+
+					local IdNumberString = string.match(Object.AnimationId, "%d+") 
+					local SameResult = false
+
+					for i, Result in ipairs(AnimObjResultsListFrame:GetDescendants()) do
+						if Result.Name == "AnimIdText" and Result.Text == IdNumberString then
+							SameResult = true
+							break
+						end
+					end
+					if Object:findFirstAncestor("Animate") and DetectDefaultAnims == false then
+						SameResult = true
+					end
+
+					if SameResult == false then
+						AddResult(Object.Name, IdNumberString)
+					end
+
+				end
+			end
+		end
+	else
+		for i, Object in ipairs(ObjectModel:GetDescendants()) do
 			if Object:IsA("Animation") or Object:IsA("AnimationClip") then
 
 				local IdNumberString = string.match(Object.AnimationId, "%d+") 
@@ -586,8 +764,10 @@ end
 
 task.spawn(function()
 	while true do
-		if OperationActive then
+		if CharOperationActive then
 			DetectPlayingAnimations()
+		end
+		if ObjectOperationActive then
 			DetectAnimationObjects()
 		end
 		wait(.1)
@@ -614,7 +794,7 @@ local function findObjectByName(name)
 end
 
 
-local function findObjectByPath(pathString)
+local function findObjectByPath(pathString, IsObjectModel)
 	local pathStringChanged = string.gsub(pathString, "^%s*(.-)%s*$", "%1")
 
 	local parts = {}
@@ -649,15 +829,22 @@ local function findObjectByPath(pathString)
 
 		currentObject = nextObject
 	end
-
-	return currentObject
+	
+	
+	if currentObject:IsA("Model") and currentObject:FindFirstChild("Humanoid") then
+		return currentObject
+	elseif IsObjectModel == true then
+		return currentObject
+	end
+	
+	return nil -- Если ничего не нашли
 end
 
 
-StartButton.MouseButton1Click:connect(function()
-	OperationActive = not OperationActive
-	if OperationActive then
-		StartButton.Image = "rbxassetid://99514193135085"
+CharStartButton.MouseButton1Click:connect(function()
+	CharOperationActive = not CharOperationActive
+	if CharOperationActive then
+		CharStartButton.Image = "rbxassetid://99514193135085"
 		
 		local pathInput = ModelValue.Text
 		if pathInput == "" then
@@ -667,13 +854,53 @@ StartButton.MouseButton1Click:connect(function()
 		local foundObject = findObjectByPath(pathInput)
 
 		if foundObject then
-			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Changed", Text = "CharacterChanged to ".. foundObject.Name, Duration = 3})
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Changed", Text = "Character changed to ".. foundObject.Name, Duration = 3})
 			Character = foundObject
 		else
-			warn("No such Object")
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error", Text = "No such Object!", Duration = 3})
 		end
 	else
-		StartButton.Image = "rbxassetid://8215093320"
+		CharStartButton.Image = "rbxassetid://8215093320"
 	end
 end)
-game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Welcome to Animation Detector!", Text = "Wait for script to load", Duration = 5, Icon = "rbxassetid://88751076321975"})
+
+ObjectStartButton.MouseButton1Click:connect(function()
+	ObjectOperationActive = not ObjectOperationActive
+	if ObjectOperationActive then
+		ObjectStartButton.Image = "rbxassetid://99514193135085"
+
+		local pathInput = ObjectModelValue.Text
+		if pathInput == "" then
+			ObjectModel = TargetAnimObjServices
+			return
+		end
+		local foundModelObject = findObjectByPath(pathInput, true)
+
+		if foundModelObject then
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Changed", Text = "Model changed to ".. foundModelObject.Name, Duration = 3})
+			ObjectModel = foundModelObject
+		else
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error", Text = "No such Object!", Duration = 3})
+		end
+	else
+		ObjectStartButton.Image = "rbxassetid://8215093320"
+	end
+end)
+
+ExportButton.MouseButton1Click:connect(function()
+	if game:GetService("RunService"):IsStudio() then return function() error("Cannot run in Roblox Studio!") end end
+	local Params = {
+		RepoURL = "https://raw.githubusercontent.com/luau/SynSaveInstance/main/",
+		SSI = "saveinstance",
+	}
+	local synsaveinstance = loadstring(game:HttpGet(Params.RepoURL .. Params.SSI .. ".luau", true), Params.SSI)()
+	local Options = {
+		ReadMe = true, -- Default: true,
+		SafeMode = false, -- Kicks you before Saving, which prevents you from being detected in any game. Default: false
+		AntiIdle = true,
+		mode = "invalid",
+		FilePath = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.."_Animations_"..os.date("%d-%m-%Y_%H-%M-%S"),
+		Object = game.CoreGui.AnimsFolder,
+	}
+	synsaveinstance(Options)
+end)
