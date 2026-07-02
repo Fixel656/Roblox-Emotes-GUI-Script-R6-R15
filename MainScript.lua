@@ -6,9 +6,20 @@ credit is highly appreciated!]]
 local GuiActive = true
 local GuiEmoter = nil
 local Player = game.Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
 
 local AnimPreviewEnable = true
 local ToolAnimHighPrior = false
+
+--Restart Values
+local GuiPos = nil
+local ScrollingFramePos = nil
+local GuiClosed = false
+local OptionsOpened = false
+
+local SearchOpened = false
+local PrevAnimSpeedValue = ""
+local PrevSearchText = ""
 
 local function CreateGui()
 
@@ -41,10 +52,15 @@ local function CreateGui()
 	local SFDestroyGUI = Instance.new("TextButton") -- To Destroy the GUI in SideFrame
 	local CloseGUI = Instance.new("ImageButton") -- To close the GUI
 	local Title = Instance.new("TextLabel") -- Actual title of GUI, Emoter
+	
+	local SearchFrame = Instance.new("Frame")
+	local SearchButton = Instance.new("ImageButton")
+	local SearchBox = Instance.new("TextBox")
+	local BackButton = Instance.new("ImageButton")
 
 	local SpeedNum --Value, adding to default speed of animation
 
-	-- AnimButtons are in new place now (~495 string)
+	--AnimButtons are in new place now (~495 string)
 	--Violet Color (0.541176, 0.647059, 1)
 	--LightViolet Color (0.756863, 0.823529, 1)
 	
@@ -105,13 +121,20 @@ local function CreateGui()
 		elseif Type == "R15" then
 			Button.BackgroundColor3 = R15ButtonCol
 		end
-
+		
+		Button.FontFace.Weight = Enum.FontWeight.Bold
 		Button.Size = UDim2.new(0, 100, 0, 30)
-		Button.Font = Enum.Font.Highway
-		Button.Text = Text
+		Button.RichText = true
+		Button.Font = Enum.Font.Roboto
+		Button.Text = "<b>" .. Text .. "</b>"
 		Button.TextScaled = true
 		Button.LayoutOrder = LayoutPos
-
+		
+		local ButtonPadding = Instance.new("UIPadding")
+		ButtonPadding.Parent = Button
+		ButtonPadding.PaddingLeft = UDim.new(0, 2)
+		ButtonPadding.PaddingRight = UDim.new(0, 2)
+		
 	end
 	
 	local function AddVPF()
@@ -315,7 +338,7 @@ local function CreateGui()
 		local VPFtrack = ClonedChar:WaitForChild("Humanoid"):LoadAnimation(Anim)
 		local VPFActive = false
 		Object.MouseEnter:connect(function()
-			if AnimPreviewEnable then
+			if AnimPreviewEnable and not AnimACTIVE then
 				VPFActive = true
 				VPFtrack.Looped = true
 				VPFtrack:Play(0, 1, Speed + SpeedNum)
@@ -350,20 +373,21 @@ local function CreateGui()
 	-- SideFrame
 
 	Emoter.Name = "Emoter"
+	Emoter.ResetOnSpawn = false
 	Emoter.DisplayOrder = 100
 	if game:GetService("RunService"):IsStudio() then --Made this as i test script mostly in Studio
-	Emoter.Parent = game.Players.LocalPlayer.PlayerGui
-else
-	Emoter.Parent = game.CoreGui
-end
+		Emoter.Parent = game.Players.LocalPlayer.PlayerGui
+	else
+		Emoter.Parent = game.CoreGui
+	end
 
 	SideFrame.Name = "SideFrame"
 	SideFrame.Parent = Emoter
 	SideFrame.Active = true
 	SideFrame.BackgroundColor3 = BgColor
-	SideFrame.Position = UDim2.new(0, 10, 0, 10)
 	SideFrame.Size = UDim2.new(0, 225, 0, 32)
 	SideFrame.Visible = false
+	SideFrame.Position = UDim2.new(0, 10, 0, 10)
 
 	local UIDragDetectorSideFrame = Instance.new("UIDragDetector")
 	UIDragDetectorSideFrame.Parent = SideFrame
@@ -411,8 +435,8 @@ end
 	MainFrame.Active = true
 	MainFrame.BackgroundColor3 = BgColor
 	MainFrame.BackgroundTransparency = 1
-	MainFrame.Position = UDim2.new(0, 10, 0, 10)
 	MainFrame.Size = UDim2.new(0, 460, 0, 285)
+	MainFrame.Position = UDim2.new(0, 10, 0, 10)
 
 	local UIDragDetectorMainFrame = Instance.new("UIDragDetector")
 	UIDragDetectorMainFrame.Parent = MainFrame
@@ -463,19 +487,11 @@ end
 	SpeedValue.Font = Enum.Font.SourceSans
 	SpeedValue.TextScaled = true
 	AddHoverText(SpeedValue, "Enter a number to add speed")
-	
-	--[[local UserInputService = game:GetService("UserInputService")
-	local input = UserInputService.InputBegan:Connect(function(input, processed)
-		if input.KeyCode == Enum.KeyCode.Q then
-			SpeedValue:CaptureFocus()
-		end
-	end)]]
 
 	local SVPadding = Instance.new("UIPadding")
 	SVPadding.Parent = SpeedValue
 	SVPadding.PaddingLeft = UDim.new(0, 2)
 	SVPadding.PaddingRight = UDim.new(0, 2)
-
 
 	local ValueText = Instance.new("TextLabel")
 	ValueText.Name = "ValueText"
@@ -495,7 +511,8 @@ end
 
 	CurSpeedText.Name = "CurSpeedText"
 	CurSpeedText.AnchorPoint = Vector2.new(1, 0)
-	CurSpeedText.Size = UDim2.new(0, 100, 0, 35)
+	CurSpeedText.Size = UDim2.new(0, 0, 0, 35)
+	CurSpeedText.AutomaticSize = Enum.AutomaticSize.X
 	CurSpeedText.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	CurSpeedText.BackgroundTransparency = 1
 	CurSpeedText.Position = UDim2.new(1, 0, 0, -2)
@@ -536,6 +553,7 @@ end
 	ScrollingFrame.Position = UDim2.new(0, 0, 0, 34)
 	ScrollingFrame.ScrollBarImageColor3 = Color3.new(0, 0, 0)
 	ScrollingFrame.Size = UDim2.new(0, 460, 0, 215)
+
 	ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0.5, 10)
 	ScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 	ScrollingFrame.ScrollBarThickness = 10
@@ -555,13 +573,13 @@ end
 	SF6UIPadding.PaddingRight = UDim.new(0, 16)
 	SF6UIPadding.PaddingLeft = UDim.new(0, 5)
 
-
 	ScrollingFrameR15.Name = "ScrollingFrameR15"
 	ScrollingFrameR15.Parent = MainFrame
 	ScrollingFrameR15.BackgroundColor3 = ScrollBgColor
 	ScrollingFrameR15.Position = UDim2.new(0, 0, 0, 34)
 	ScrollingFrameR15.ScrollBarImageColor3 = Color3.new(0, 0, 0)
 	ScrollingFrameR15.Size = UDim2.new(0, 460, 0, 215)
+
 	ScrollingFrameR15.CanvasSize = UDim2.new(0, 0, 0.5, 10)
 	ScrollingFrameR15.AutomaticCanvasSize = Enum.AutomaticSize.Y
 	ScrollingFrameR15.Visible = false
@@ -628,11 +646,11 @@ end
 	Title.TextWrapped = false
 	
 	OptionsFrame.Parent = MainFrame
-	OptionsFrame.Visible = false
 	OptionsFrame.Name = "OptionsFrame"
 	OptionsFrame.AnchorPoint = Vector2.new(0.5, 0)
 	OptionsFrame.Size = UDim2.new(0, 178, 0, 46)
 	OptionsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	OptionsFrame.Visible = false
 	OptionsFrame.Position = UDim2.new(0.5, 0, 1, -43)
 	OptionsFrame.BorderSizePixel = 0
 	OptionsFrame.BackgroundColor3 = Color3.fromRGB(219, 244, 255)
@@ -686,6 +704,78 @@ end
 	PreviewEnableButton.ZIndex = 0
 	AddHoverText(PreviewEnableButton, "Enable Animation Preview")
 	
+	--Search Box Items
+	SearchFrame.Parent = MainFrame
+	SearchFrame.Name = "SearchFrame"
+	SearchFrame.ZIndex = 0
+	SearchFrame.AnchorPoint = Vector2.new(1, 0)
+	SearchFrame.Size = UDim2.new(0, 165, 0, 40)
+	SearchFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	SearchFrame.Position = UDim2.new(1, 35, 0.119, 0)
+	SearchFrame.BorderSizePixel = 0
+	SearchFrame.BackgroundColor3 = BgColor
+
+	SearchButton.Name = "SearchButton"
+	SearchButton.ZIndex = 0
+	SearchButton.AnchorPoint = Vector2.new(1, 0)
+	SearchButton.Size = UDim2.new(0, 34, 0, 40)
+	SearchButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	SearchButton.LayoutOrder = 2
+	SearchButton.Position = UDim2.new(1, 0, 0.075, 0)
+	SearchButton.BorderSizePixel = 0
+	SearchButton.BackgroundColor3 = BgColor
+	SearchButton.ScaleType = Enum.ScaleType.Fit
+	SearchButton.ImageColor3 = Color3.fromRGB(0, 0, 0)
+	SearchButton.Image = "rbxassetid://118685771787843"
+	SearchButton.Parent = SearchFrame
+	AddHoverText(SearchButton, "Search (T)")
+
+	SearchBox.Name = "SearchBox"
+	SearchBox.ZIndex = 0
+	SearchBox.Visible = false
+	SearchBox.AnchorPoint = Vector2.new(0.5, 0)
+	SearchBox.Size = UDim2.new(0, 139, 0, 34)
+	SearchBox.LayoutOrder = 1
+	SearchBox.Position = UDim2.new(0.469697, 0, 0.075, 0)
+	SearchBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	SearchBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+	SearchBox.PlaceholderText = "Search..."
+	SearchBox.Text = ""
+	SearchBox.Font = Enum.Font.SourceSans
+	SearchBox.ClearTextOnFocus = false
+	SearchBox.TextScaled = true
+	SearchBox.TextXAlignment = Enum.TextXAlignment.Left
+	SearchBox.Parent = SearchFrame
+	AddHoverText(SearchBox, "Search for animation (T)")
+
+	local UIPadding = Instance.new("UIPadding")
+	UIPadding.PaddingLeft = UDim.new(0, 2)
+	UIPadding.PaddingRight = UDim.new(0, 2)
+	UIPadding.Parent = SearchBox
+
+	BackButton.Name = "BackButton"
+	BackButton.ZIndex = 0
+	BackButton.Visible = false
+	BackButton.AnchorPoint = Vector2.new(1, 0)
+	BackButton.Size = UDim2.new(0, 19, 0, 40)
+	BackButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	BackButton.LayoutOrder = 2
+	BackButton.Position = UDim2.new(1, 0, 0, 0)
+	BackButton.BackgroundColor3 = BgColor
+	BackButton.ScaleType = Enum.ScaleType.Crop
+	BackButton.ImageColor3 = Color3.fromRGB(0, 0, 0)
+	BackButton.Image = "rbxassetid://2418687610"
+	BackButton.Parent = SearchFrame
+	AddHoverText(BackButton, "Hide")
+
+	local UIListLayout = Instance.new("UIListLayout")
+	UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+	UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+	UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	UIListLayout.Padding = UDim.new(0, 1)
+	UIListLayout.Parent = SearchFrame
+	
 	-- Buttons
 	
 	if (game:GetService"Players".LocalPlayer.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R15) then
@@ -730,14 +820,87 @@ end
 				OptionsFrame.Visible = true
 				game.TweenService:Create(OptionsFrame, TweenInfo.new(.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, 0, 1, 7)}):Play()
 				wait(.3)
-				OptionsButtonClick = true				
+				OptionsButtonClick = true
 			else
 				OptionsButtonClick = false
 				game.TweenService:Create(OptionsFrame, TweenInfo.new(.2, Enum.EasingStyle.Cubic, Enum.EasingDirection.In), {Position = UDim2.new(0.5, 0, 1, -43)}):Play()
-				wait(.2)			
-				OptionsFrame.Visible = false	
+				wait(.2)
+				OptionsFrame.Visible = false
 				OptionsButtonClick = true
 			end
+		end
+	end)
+	
+	local SearchButtonClick = true
+	SearchButton.MouseButton1Click:Connect(function()
+		if SearchButtonClick == true then
+			SearchButtonClick = false
+			SearchButton.Visible = false
+			BackButton.Visible = true
+			SearchBox.Visible = true
+			game.TweenService:Create(SearchFrame, TweenInfo.new(.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Position = UDim2.new(1, 164, 0.119, 0)}):Play()
+			wait(.3)
+			SearchButtonClick = true
+		end
+	end)
+	BackButton.MouseButton1Click:Connect(function()
+		if SearchButtonClick == true then
+			SearchButtonClick = false
+			game.TweenService:Create(SearchFrame, TweenInfo.new(.2, Enum.EasingStyle.Cubic, Enum.EasingDirection.In), {Position = UDim2.new(1, 35, 0.119, 0)}):Play()
+			wait(.2)
+			SearchButton.Visible = true
+			BackButton.Visible = false
+			SearchBox.Visible = false
+			SearchButtonClick = true
+		end
+	end)
+	
+	if SearchOpened == true then
+		SearchButton.Visible = false
+		BackButton.Visible = true
+		SearchBox.Visible = true
+		SearchFrame.Position = UDim2.new(1, 164, 0.119, 0)
+	else
+		SearchButton.Visible = true
+		BackButton.Visible = false
+		SearchBox.Visible = false
+		SearchFrame.Position = UDim2.new(1, 35, 0.119, 0)
+	end
+	
+	SearchBox.Changed:Connect(function()
+		for _, Button in ipairs(ScrollingFrameR15:GetDescendants() and ScrollingFrame:GetDescendants()) do
+			if Button:IsA("TextButton") and string.find(Button.Text:lower(), SearchBox.Text) then
+				Button.Visible = true
+			elseif Button:IsA("TextButton") and not string.find(Button.Text, SearchBox.Text) then
+				Button.Visible = false
+			elseif Button.Name == "DivideFrame" then
+				Button.Visible = false
+			end
+			
+			if SearchBox.Text == "" then
+				if Button:IsA("TextButton") then
+					Button.Visible = true
+				elseif Button.Name == "DivideFrame"  then
+					Button.Visible = true
+				end
+
+			end
+
+		end
+	end)
+	
+	local input = UserInputService.InputBegan:Connect(function(input, processed)
+		if input.KeyCode == Enum.KeyCode.T then
+			if SearchBox.Visible == false then
+				SearchButtonClick = false
+				SearchButton.Visible = false
+				BackButton.Visible = true
+				SearchBox.Visible = true
+				game.TweenService:Create(SearchFrame, TweenInfo.new(.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Position = UDim2.new(1, 164, 0.119, 0)}):Play()
+				wait(.3)
+				SearchButtonClick = true
+			end
+			SearchBox:CaptureFocus()
 		end
 	end)
 	
@@ -870,7 +1033,7 @@ end
 		end
 	end
 
-	-- EMOTES	
+	-- EMOTES
 	
 	--[[Functions Template
 	local AnimName = Instance.new("TextButton")
@@ -935,7 +1098,7 @@ end
 		PlayAnim(Laugh, "129423131", .1, 1, "PriorLow", false)
 		local Cheer = Instance.new("TextButton")
 		CreateAnimButton(Cheer, "Cheer", "Cheer", "R6", 2)
-		PlayAnim(Cheer, "129423030", .1, 1, "PriorLow", true)
+		PlayAnim(Cheer, "129423030", .1, 1, "PriorLow", false)
 		local Point = Instance.new("TextButton")
 		CreateAnimButton(Point, "Point", "Point", "R6", 2)
 		PlayAnim(Point, "128853357", .1, 1, "PriorLow", false)
@@ -1015,7 +1178,7 @@ end
 		PlayAnim(NunchakSlash, "204292303", .1, 1.5, "PriorLow", false)
 		local FullPunch = Instance.new("TextButton")
 		CreateAnimButton(FullPunch, "FullPunch", "Full Punch", "R6", 5)
-		PlayAnim(FullPunch, "204062532", .1, 1, "PriorLow", false)
+		PlayAnim(FullPunch, "204062532", .1, 1.5, "PriorLow", false)
 		local SwordSpin = Instance.new("TextButton")
 		CreateAnimButton(SwordSpin, "SwordSpin", "Sword Spin", "R6", 5)
 		PlayAnim(SwordSpin, "186934910", .1, 0.8, "PriorLow", false)
@@ -1300,13 +1463,13 @@ end
 		CreateAnimButton(Dropkick, "Dropkick", "Dropkick", "R15", 6)
 		PlayAnim(Dropkick, "133566007754001", .1, 1, "PriorLow", false)
 	end
-
+	
 	-- UI Decorations
-
-	local UiCornerParts = {"GuiTopFrame", "CloseGUI", "DestroyGUI", "GuiBottomFrame", "SpeedValue", "SideFrame", "OpenGUI", "ViewportFrame", "OptionsFrame", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "PreviewEnableButton"}
-	local UiStrokeParts = {"GuiTopFrame", "GuiBottomFrame", "SpeedValue", "SideFrame", "ScrollingFrame", "ScrollingFrameR15", "OptionsFrame", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "PreviewEnableButton"}
-	local UiStroke1Parts = {"SpeedValue", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "PreviewEnableButton"}
-	local UiGradientParts = {"GuiTopFrame", "GuiBottomFrame", "SideFrame", "SettingsButton", "DestroyGUI", "CloseGUI", "OpenGUI", "OptionsButton", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "PreviewEnableButton"}
+	
+	local UiCornerParts = {"GuiTopFrame", "CloseGUI", "DestroyGUI", "GuiBottomFrame", "SpeedValue", "SideFrame", "OpenGUI", "ViewportFrame", "OptionsFrame", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "PreviewEnableButton", "SearchFrame", "SearchButton", "BackButton"}
+	local UiStrokeParts = {"GuiTopFrame", "GuiBottomFrame", "SpeedValue", "SearchBox", "SideFrame", "ScrollingFrame", "ScrollingFrameR15", "OptionsFrame", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "PreviewEnableButton", "SearchFrame"}
+	local UiStroke1Parts = {"SpeedValue", "SearchBox", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "PreviewEnableButton"}
+	local UiGradientParts = {"GuiTopFrame", "GuiBottomFrame", "SideFrame", "SettingsButton", "DestroyGUI", "CloseGUI", "OpenGUI", "OptionsButton", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "PreviewEnableButton", "SearchFrame", "SearchButton", "BackButton"}
 
 	for _, UiPart in ipairs(Emoter:GetDescendants()) do
 		if table.find(UiCornerParts, UiPart.Name) then
@@ -1355,9 +1518,67 @@ end
 
 		end
 	end
+	
+	--OnRestart things
 
+	if GuiPos ~= nil then
+		SideFrame.Position = GuiPos
+	end
+	if GuiClosed == true then
+		SideFrame.Visible = true
+	end
+	if GuiPos ~= nil then
+		MainFrame.Position = GuiPos
+	end
+	if GuiClosed == true then
+		MainFrame.Visible = false
+	end
+	if OptionsOpened == true then
+		OptionsFrame.Visible = true
+		OptionsFrame.Position = UDim2.new(0.5, 0, 1, 7)
+	end
+
+	if ScrollingFramePos ~= nil then
+		ScrollingFrame.CanvasPosition = ScrollingFramePos
+	end
+	if ScrollingFramePos ~= nil then
+		ScrollingFrameR15.CanvasPosition = ScrollingFramePos
+	end
+	SearchBox.Text = PrevSearchText
+	SpeedValue.Text = PrevAnimSpeedValue
+	
 	GuiEmoter = Emoter
 
+end
+
+local function OnRestart()
+	if GuiEmoter.MainFrame.Visible == true then
+		GuiClosed = false
+		GuiPos = GuiEmoter.MainFrame.Position
+	elseif GuiEmoter.SideFrame.Visible == true then
+		GuiClosed = true
+		GuiPos = GuiEmoter.SideFrame.Position
+	end
+	if (game:GetService"Players".LocalPlayer.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R15) then
+		ScrollingFramePos = GuiEmoter.MainFrame.ScrollingFrameR15.CanvasPosition
+	else
+		ScrollingFramePos = GuiEmoter.MainFrame.ScrollingFrame.CanvasPosition
+	end
+	if GuiEmoter.MainFrame.OptionsFrame.Visible == true then
+		OptionsOpened = true
+	else
+		OptionsOpened = false
+	end
+	
+	if GuiEmoter.MainFrame.SearchFrame.SearchBox.Visible == true then
+		SearchOpened = true
+	else
+		SearchOpened = false
+	end
+	PrevAnimSpeedValue = GuiEmoter.MainFrame.GuiBottomFrame.SpeedFrame.SpeedValue.Text
+	PrevSearchText = GuiEmoter.MainFrame.SearchFrame.SearchBox.Text
+	GuiEmoter:Destroy()
+	CreateGui()
 end
 
 -- PLEASE DO NOT DELETE THIS
@@ -1368,7 +1589,6 @@ CreateGui()
 
 Player.CharacterAdded:connect(function()
 	if GuiActive and Player.Character:WaitForChild("Humanoid") then
-		GuiEmoter:Destroy()
-		CreateGui()	
+		OnRestart()
 	end
 end)
