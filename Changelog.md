@@ -44,3 +44,7 @@ V2.9:
 - Fixed some UIPadding things
 
   <img width="473" height="300" alt="image" src="https://github.com/user-attachments/assets/9297a64e-7428-4c3c-a283-d346d3fa942a" />
+
+V2.9.5:
+- Added Search
+- Maded some positions to save on restart
