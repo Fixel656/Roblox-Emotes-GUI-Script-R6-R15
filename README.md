@@ -38,14 +38,16 @@ It will be manually, so it will be a few games. I will type available ones in RE
 <br/>
 - Script: `loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/AnimationIdDetector.lua",true))()`
 
-<img width="435" height="293" alt="image" src="https://github.com/user-attachments/assets/acb8ced6-ca57-4411-b540-9ad5afd69ce5" /> <img width="434" height="297" alt="image" src="https://github.com/user-attachments/assets/03bb8a6c-8fdd-454a-9dc4-88604b275967" />
+<img width="488" height="294" alt="image" src="https://github.com/user-attachments/assets/707e7d25-17d2-4ebe-9172-6c36988fab24" /> <img width="487" height="294" alt="image" src="https://github.com/user-attachments/assets/0c2901da-9b65-4c95-a884-cef52aaa7af5" />
 
 
 What this Gui can do:
-- Detects animation Character currently playing or Animation object (Name, Id and Priority if detecting from Character)
-- You can choose Character do detect anims from By entering it's Name or write a path to it (game.workspace.Rig)
-- You can preview detected anims
+- Detect animation Character currently playing or Animation object (Name, Id and Priority if detecting from Character)
+- Choose Character do detect anims from By entering it's Name or write a path to it (game.workspace.Rig)
+- Chose a path to search for Anim Objects in
+- Preview detected anims
 - Name and Id are copyable so you dont need to write it yourself
+- Save and EXPORT anims to file as KeyframeSequences (KeyframeSequence will have it's Animation Id as Attribute)
 
 I made those scripts for myself, so it may be not fully suitable for you, especially on section with separate places. You can change it if you want, but it would be cool if you will credit me and original author!
 
