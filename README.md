@@ -14,6 +14,7 @@ and if summary is 0, animation will stuck on first frames.
 - All anmations have Action3 or Action4 priority so it wont be replaced or conflicting with default animations
 - You can loop unlooped anims by clicking RMB on them
 - You can preview Animation by hovering on anim button
+- Search animation you need (no need to follow the symbol case)
 - Cool options: Pausing all animations, stopping all default animations, pausing default "Animate" script
 
 To do:
@@ -25,7 +26,6 @@ It will be manually, so it will be a few games. I will type available ones in RE
 - HotKeys
 - Ability to use animation by entering its ID (maybe will make "Saved Anims" Section)
 - More Options sections
-- Search function (find needed anim from the list by using keywords or LayoutOrder number)
 - Add AnimSmoothFade setting
 - Add Tool anims working while playing Anims
 - More<br/>
