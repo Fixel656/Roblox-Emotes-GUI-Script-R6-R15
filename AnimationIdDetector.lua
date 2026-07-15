@@ -39,8 +39,6 @@ local CharOperationActive = false
 local ObjectOperationActive = false
 local DetectDefaultAnims = true
 
-game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Welcome to Animation Detector!", Text = "Wait for script to load", Duration = 5, Icon = "rbxassetid://88751076321975"})
-
 local function AddHoverText(Object, Text)
 	local TextLabel = nil
 	Object.MouseEnter:connect(function()
