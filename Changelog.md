@@ -36,6 +36,7 @@ V2.6:
 
 V2.8:
 - Added Options
+- Added UiGradient
 
   <img width="234" height="134" alt="image" src="https://github.com/user-attachments/assets/dd2b59fd-7b3d-48fa-9746-8ae2271cbf54" />
 
@@ -47,4 +48,11 @@ V2.9:
 
 V2.9.5:
 - Added Search
-- Maded some positions to save on restart
+- Maded some values positions to save on restart
+
+V3
+- Added SAVEABLE Settings (Moved PreviewEnabled button along with it)
+- Added Ragdoll fall function
+- Added Custom Animation player
+  
+<img width="720" height="357" alt="image" src="https://github.com/user-attachments/assets/ada667c4-50fe-4215-a0e0-6419ac5dc734" />
