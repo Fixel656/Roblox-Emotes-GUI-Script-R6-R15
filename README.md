@@ -2,7 +2,7 @@ Made an FE Animations script with some features
 
 - Script: `loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/MainScript.lua",true))()`
 
-<img width="476" height="356" alt="image" src="https://github.com/user-attachments/assets/51f4a0ba-73d8-4b39-8042-b76c7d8f802c" /> <br/>
+<img width="720" height="357" alt="image" src="https://github.com/user-attachments/assets/011181d7-b8dc-4e56-bab1-fcddd4e49cf1" /><br/>
 
 What this Gui can do:
 - Play FE animations, of course (**43** R6 animations AND **88** R15 animations)
@@ -16,18 +16,17 @@ and if summary is 0, animation will stuck on first frames.
 - You can preview Animation by hovering on anim button
 - Search animation you need (no need to follow the symbol case)
 - Cool options: Pausing all animations, stopping all default animations, pausing default "Animate" script
+- Other color themes
+- Saveable settings and position
+- HotKeys
+- Ability to use animation by entering its ID
 
 To do:
-- Add other color themes and make style more modern
-- Saveable settings and position
 - More R15 animations (there`s no other good FE R6 anims left)
-- Section with Animations for some separate games. It will be places with emotes available in these places specifically.
-It will be manually, so it will be a few games. I will type available ones in README.
-- HotKeys
-- Ability to use animation by entering its ID (maybe will make "Saved Anims" Section)
-- More Options sections
-- Add AnimSmoothFade setting
-- Add Tool anims working while playing Anims
+- Section with Animations for some separate games. It will be places with emotes available in these places specifically.<br/>
+I will add it manually and you could add files for yourself in your files folder. I will type available ones in README.
+- "Saved Anims" Section
+- More Options sections (maybe)
 - More<br/>
 <br/>
    This script was based on Energize by illremember. Original: https://github.com/IlikeyocutgHAH12/FEEGGEG/blob/main/%5BFE%5D%20Energize%20Animation%20Gui.txt<br/>
