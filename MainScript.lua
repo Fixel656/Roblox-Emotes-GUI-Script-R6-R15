@@ -1,4 +1,4 @@
---V2.9
+--V2.9.9
 --[[Script by Fixel656, based on Energize GUI by illremember
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
@@ -7,9 +7,29 @@ local GuiActive = true
 local GuiEmoter = nil
 local Player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
 
-local AnimPreviewEnable = true
+--Settings
 local ToolAnimHighPrior = false
+local AnimPreviewEnable = true
+local AnimSwitchMode = true
+local AnimSmoothFade = true
+local theme = "LightPurple"
+
+local SearchHotkey = Instance.new("StringValue")
+local CloseHotkey = Instance.new("StringValue")
+local SitHotkey = Instance.new("StringValue")
+
+local HotkeysEnabled = true
+SearchHotkey.Value = "Y"
+CloseHotkey.Value = "T"
+SitHotkey.Value = "G"
+
+local BgColor = Color3.fromRGB(137, 165, 255)
+local ScrollBgColor = Color3.fromRGB(219, 244, 255)
+local UiButColor = Color3.new(0, 0, 0) -- Color of GUI's buttons and Texts
+local ButtonCol = Color3.fromRGB(192, 191, 211) -- R6 Button Color
+local ButtonSelectCol = Color3.fromRGB(255, 255, 255) -- R6 Button darker color (idk how to make it just darker BgColor yet)
 
 --Restart Values
 local GuiPos = nil
@@ -17,28 +37,51 @@ local ScrollingFramePos = nil
 local GuiClosed = false
 local OptionsOpened = false
 
-local SearchOpened = false
 local PrevAnimSpeedValue = ""
+local SearchOpened = false
 local PrevSearchText = ""
+local CustomAnimOpened = false
+local PrevCustomAnimId = ""
+
+local DefaultAnimsNameList = {"Animation1", "Animation2", "Animation3", "ClimbAnim", "FallAnim", "JumpAnim", "RunAnim", "SitAnim", "ToolNoneAnim", "WalkAnim", "CheerAnim", "LaughAnim", "PointAnim", "Swim", "SwimIdle", "ToolLungeAnim", "ToolSlashAnim", "WaveAnim"}
+
+local ConfigFileName = "EmoterConfig.json"
+
+if not game:GetService("RunService"):IsStudio() then
+	if isfile("EmoterData/"..ConfigFileName) then
+		local rawData = readfile("EmoterData/"..ConfigFileName)
+		local decodedSettings = HttpService:JSONDecode(rawData)
+		-- Accessing the loaded data
+		AnimPreviewEnable = decodedSettings.ConfAnimPreviewEnable
+		ToolAnimHighPrior = decodedSettings.ConfToolAnimHighPrior
+		AnimSwitchMode = decodedSettings.ConfAnimSwitchMode
+		AnimSmoothFade = decodedSettings.ConfAnimSmoothFade
+		theme = decodedSettings.ConfTheme
+		HotkeysEnabled = decodedSettings.ConfHotkeysEnabled
+	end
+end
 
 local function CreateGui()
 
-	local Emoter = Instance.new("ScreenGui") -- The actual GUI
-	local SideFrame = Instance.new("Frame") -- Visible when GUI is closed
-	local OpenGUI = Instance.new("ImageButton") -- Part of SideFrame
-	local SideFrameTitle = Instance.new("TextLabel") -- Part of SideFrame
-	local MainFrame = Instance.new("Frame") -- All of the stuff on the main frame
-	
-	local ViewportFrame = Instance.new("ViewportFrame")
+	local SpeedNum --Value, adding to default speed of animation
+	local Humanoid = nil
 	local ClonedChar = nil
-	
-	local OptionsFrame = Instance.new("Frame")
-	local PauseAnimsButton = Instance.new("ImageButton")
-	local StopDefAnimsButton = Instance.new("ImageButton")
-	local StopAnimsEvent = Instance.new("BindableEvent") -- To stop animations when disabling StopDefaultAnims option
-	local PauseAnimateButton = Instance.new("ImageButton")
-	local PreviewEnableButton = Instance.new("ImageButton")
-	
+
+	local Emoter = Instance.new("ScreenGui") -- The actual GUI
+	local MainFrame = Instance.new("Frame") -- All of the stuff on the main frame
+
+	local SideFrame = Instance.new("Frame") -- Visible when GUI is closed
+	local SideFrameTitle = Instance.new("TextLabel")
+	local OpenGUI = Instance.new("ImageButton")
+	local SFDestroyGUI = Instance.new("TextButton") -- To Destroy the GUI in SideFrame
+
+	local ViewportFrame = Instance.new("ViewportFrame")
+
+	local GuiTopFrame = Instance.new("Frame") -- Top of the main frame
+	local DestroyGUI = Instance.new("TextButton") -- To Destroy the GUI
+	local CloseGUI = Instance.new("ImageButton") -- To close the GUI
+	local Title = Instance.new("TextLabel") -- Actual title of GUI, Emoter
+
 	local GuiBottomFrame = Instance.new("Frame")
 	local SpeedFrame = Instance.new("Frame") -- Frame of Speed Changer
 	local CurSpeedText = Instance.new("TextLabel") --Text showing your current anim speed
@@ -46,31 +89,36 @@ local function CreateGui()
 
 	local ScrollingFrame = Instance.new("ScrollingFrame") -- The scrolling frame of animations
 	local ScrollingFrameR15 = Instance.new("ScrollingFrame") -- The scrolling frame of R15 animations
+	local ScrollingFramesList = {
+		ScrollingFrame,
+		ScrollingFrameR15
+	}
 
-	local GuiTopFrame = Instance.new("Frame") -- Top of the main frame
-	local DestroyGUI = Instance.new("TextButton") -- To Destroy the GUI
-	local SFDestroyGUI = Instance.new("TextButton") -- To Destroy the GUI in SideFrame
-	local CloseGUI = Instance.new("ImageButton") -- To close the GUI
-	local Title = Instance.new("TextLabel") -- Actual title of GUI, Emoter
-	
 	local SearchFrame = Instance.new("Frame")
 	local SearchButton = Instance.new("ImageButton")
 	local SearchBox = Instance.new("TextBox")
 	local BackButton = Instance.new("ImageButton")
 
-	local SpeedNum --Value, adding to default speed of animation
+	local OptionsFrame = Instance.new("Frame")
+	local PauseAnimsButton = Instance.new("ImageButton")
+	local StopDefAnimsButton = Instance.new("ImageButton")
+	local StopAnimsEvent = Instance.new("BindableEvent") -- To stop animations when disabling StopDefaultAnims option
+	local PauseAnimateButton = Instance.new("ImageButton")
+	local SitButton = Instance.new("ImageButton")
 
-	--AnimButtons are in new place now (~495 string)
-	--Violet Color (0.541176, 0.647059, 1)
-	--LightViolet Color (0.756863, 0.823529, 1)
-	
-	BgColor = Color3.fromRGB(137, 165, 255)
-	ScrollBgColor = Color3.fromRGB(219, 244, 255)
-	UiButColor = Color3.new(0, 0, 0) -- Color of GUI's buttons
-	ButtonCol = Color3.fromRGB(192, 191, 211) -- R6 Button Color
-	ButtonSelectCol = Color3.fromRGB(255, 255, 255) -- R6 Button darker color (idk how to make it just darker BgColor yet)
-	R15ButtonCol = Color3.fromRGB(192, 191, 211) --R15 Button color
-	R15ButtonSelectCol = Color3.fromRGB(255, 255, 255) -- R15 Button darker color
+	local SettingsFrame = Instance.new("Frame")
+
+	if theme == "LightOrange" then
+		BgColor = Color3.fromRGB(255, 171, 35)
+	elseif theme == "LightYellow" then
+		BgColor = Color3.fromRGB(255, 250, 112)
+	elseif theme == "Black" then
+		BgColor = Color3.fromRGB(65, 65, 65)
+		ScrollBgColor = Color3.fromRGB(20, 20, 20)
+		UiButColor = Color3.new(1, 1, 1) -- Color of GUI's buttons and Texts
+		ButtonCol = Color3.fromRGB(65, 65, 65) -- R6 Button Color
+		ButtonSelectCol = Color3.fromRGB(129, 129, 129) -- R6 Button darker color (idk how to make it just darker BgColor yet)
+	end
 
 	local function AddHoverText(Object, Text)
 		local TextLabel = nil
@@ -86,12 +134,17 @@ local function CreateGui()
 			TextLabel.TextSize = 17
 			TextLabel.TextWrapped = true
 			TextLabel.Font = Enum.Font.SourceSans
+			TextLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 			local UIPadding = Instance.new("UIPadding")
 			UIPadding.PaddingLeft = UDim.new(0, 2)
-			UIPadding.PaddingRight = UDim.new(0, 4)
+			UIPadding.PaddingRight = UDim.new(0, 2)
 			UIPadding.PaddingBottom = UDim.new(0, 2)
 			UIPadding.Parent = TextLabel
+
+			local UISizeConstraint = Instance.new("UISizeConstraint")
+			UISizeConstraint.Parent = TextLabel
+			UISizeConstraint.MaxSize = Vector2.new(300, 3000)
 
 			local UserInputService = game:GetService("UserInputService")
 			local mouse = Player:GetMouse()
@@ -116,27 +169,25 @@ local function CreateGui()
 		elseif Type == "R15" then
 			Button.Parent = ScrollingFrameR15
 		end
-		if Type == "R6" then
-			Button.BackgroundColor3 = ButtonCol
-		elseif Type == "R15" then
-			Button.BackgroundColor3 = R15ButtonCol
-		end
-		
+
+		Button.BackgroundColor3 = ButtonCol
+
 		Button.FontFace.Weight = Enum.FontWeight.Bold
 		Button.Size = UDim2.new(0, 100, 0, 30)
+		Button.TextColor3 = UiButColor
 		Button.RichText = true
 		Button.Font = Enum.Font.Roboto
 		Button.Text = "<b>" .. Text .. "</b>"
 		Button.TextScaled = true
 		Button.LayoutOrder = LayoutPos
-		
+
 		local ButtonPadding = Instance.new("UIPadding")
 		ButtonPadding.Parent = Button
 		ButtonPadding.PaddingLeft = UDim.new(0, 2)
 		ButtonPadding.PaddingRight = UDim.new(0, 2)
-		
+
 	end
-	
+
 	local function AddVPF()
 		ViewportFrame.Parent = MainFrame
 		ViewportFrame.Visible = false
@@ -156,6 +207,7 @@ local function CreateGui()
 			while wait() do 
 				if Player.Character:FindFirstChild("Humanoid") and Player.Character:FindFirstChild("HumanoidRootPart") then
 					Character = Player.Character or Player.CharacterAdded:Wait()
+					Humanoid = Character:FindFirstChild("Humanoid")
 					return
 				end
 			end
@@ -191,13 +243,14 @@ local function CreateGui()
 	end
 	AddVPF()
 
-	local function PlayAnim(Object, ID, AnimWeight, Speed, Type, LoopedVal, NeedPause) -- Types Tutorial on Emotes section
+	local function PlayAnim(Object, ID, FadeTime, Speed, Type, LoopedVal, NeedPause) -- Types Tutorial on Emotes section
 		Object:SetAttribute("Looped", LoopedVal)
 		if LoopedVal == false then
 			AddHoverText(Object, "Click RMB to loop")
 		end
-		
+
 		local Anim = Instance.new("Animation")
+		Anim.Name = "AAnimation"
 		Anim.AnimationId = "rbxassetid://"..ID
 		local track = Player.Character:WaitForChild("Humanoid"):LoadAnimation(Anim)
 		if Type:find("PriorLow") then
@@ -205,14 +258,21 @@ local function CreateGui()
 		elseif Type:find("PriorHigh") then
 			track.Priority = Enum.AnimationPriority.Action4
 		end		
-		
+
 		local AnimSpeed = nil
 		local PauseAnimsOption = false
+		local SwitchModeFactor = false
 		local AnimACTIVE = false
-		
+
 		Object.MouseButton1Click:connect(function()
 			AnimACTIVE = not AnimACTIVE
 			if AnimACTIVE then
+
+				if AnimSwitchMode == true then
+					SwitchModeFactor = true
+					StopAnimsEvent:Fire()
+					AnimACTIVE = true
+				end
 
 				local CurLooped = Object:GetAttribute("Looped")
 				if CurLooped == false then
@@ -221,21 +281,21 @@ local function CreateGui()
 					track.Looped = true
 				end
 
-				track:Play(AnimWeight, 1, Speed + SpeedNum)
+				if AnimSmoothFade == true then
+					track:Play(FadeTime, 1, Speed + SpeedNum)
+				else
+					track:Play(0, 1, Speed + SpeedNum)
+				end
+
 				if PauseAnimsOption then
 					track:AdjustSpeed(0)
 				end
 				AnimSpeed = Speed + SpeedNum
 				ViewportFrame.Visible = false
-				if Object.Parent == ScrollingFrame then
-					Object.BackgroundColor3 = ButtonSelectCol
-				elseif Object.Parent == ScrollingFrameR15 then
-					Object.BackgroundColor3 = R15ButtonSelectCol
-				end
+				Object.BackgroundColor3 = ButtonSelectCol
 				Object.UIStroke.Thickness = 2
 				Object.UIStroke.Color = Color3.new(0.0392157, 0.501961, 1)
 				CurSpeedText.Text = Speed + SpeedNum
-				
 				if Type:find("Pause") then
 					local PauseTask = task.spawn(function()
 						wait(1)
@@ -250,35 +310,30 @@ local function CreateGui()
 					end
 				end
 			else
-				track:Stop()
-				if Object.Parent == ScrollingFrame then
-					Object.BackgroundColor3 = ButtonCol
-				elseif Object.Parent == ScrollingFrameR15 then
-					Object.BackgroundColor3 = R15ButtonCol
+				if AnimSmoothFade == false then
+					track:Stop(0)
 				end
+				track:Stop()
+				Object.BackgroundColor3 = ButtonCol
 				Object.UIStroke.Thickness = 1
 				Object.UIStroke.Color = Color3.new(0, 0, 0)
 				CurSpeedText.Text = ""
 			end
 		end)
-		
+
 		Object.MouseButton2Click:connect(function()
 			local CurLooped = Object:GetAttribute("Looped")
 			if CurLooped == false then
 				AnimACTIVE = not AnimACTIVE
 				if AnimACTIVE then
 					track.Looped = true
-					track:Play(AnimWeight, 1, Speed + SpeedNum)
+					track:Play(FadeTime, 1, Speed + SpeedNum)
 					if PauseAnimsOption then
 						track:AdjustSpeed(0)
 					end
 					AnimSpeed = Speed + SpeedNum
 					ViewportFrame.Visible = false
-					if Object.Parent == ScrollingFrame then
-						Object.BackgroundColor3 = ButtonSelectCol
-					elseif Object.Parent == ScrollingFrameR15 then
-						Object.BackgroundColor3 = R15ButtonSelectCol
-					end
+					Object.BackgroundColor3 = ButtonSelectCol
 					Object.UIStroke.Thickness = 2
 					Object.UIStroke.Color = Color3.new(0.972549, 0.670588, 0.0627451)
 					CurSpeedText.Text = Speed + SpeedNum
@@ -286,55 +341,47 @@ local function CreateGui()
 				else
 					track:Stop()
 					track.Looped = false
-					if Object.Parent == ScrollingFrame then
-						Object.BackgroundColor3 = ButtonCol
-					elseif Object.Parent == ScrollingFrameR15 then
-						Object.BackgroundColor3 = R15ButtonCol
-					end
+					Object.BackgroundColor3 = ButtonCol
 					Object.UIStroke.Thickness = 1
 					Object.UIStroke.Color = Color3.new(0, 0, 0)
 					CurSpeedText.Text = ""
 				end
 			end
 		end)
-		
+
 		PauseAnimsButton.MouseButton1Click:Connect(function()
 			PauseAnimsOption = not PauseAnimsOption
 			if PauseAnimsOption then
 				track:AdjustSpeed(0)
-				PauseAnimsButton.BackgroundColor3 = R15ButtonSelectCol
+				PauseAnimsButton.BackgroundColor3 = ButtonSelectCol
 			else
 				track:AdjustSpeed(AnimSpeed)
-				PauseAnimsButton.BackgroundColor3 = R15ButtonCol
+				PauseAnimsButton.BackgroundColor3 = ButtonCol
 			end
 		end)
-		
+
 		track.Ended:connect(function()
 			AnimACTIVE = false
-			if Object.Parent == ScrollingFrame then
-				Object.BackgroundColor3 = ButtonCol
-			elseif Object.Parent == ScrollingFrameR15 then
-				Object.BackgroundColor3 = R15ButtonCol
-			end
+			Object.BackgroundColor3 = ButtonCol
 			Object.UIStroke.Thickness = 1
 			Object.UIStroke.Color = Color3.new(0, 0, 0)
 			CurSpeedText.Text = ""
 		end)
 
 		StopAnimsEvent.Event:Connect(function()
+			if SwitchModeFactor == true then 
+				SwitchModeFactor = false	
+				return 
+			end
+			CurSpeedText.Text = ""
 			AnimACTIVE = false
 			PauseAnimsOption = false
 			track:Stop()
-			if Object.Parent == ScrollingFrame then
-				Object.BackgroundColor3 = ButtonCol
-			elseif Object.Parent == ScrollingFrameR15 then
-				Object.BackgroundColor3 = R15ButtonCol
-			end
+			Object.BackgroundColor3 = ButtonCol
 			Object.UIStroke.Thickness = 1
 			Object.UIStroke.Color = Color3.new(0, 0, 0)
-			CurSpeedText.Text = ""
 		end)
-		
+
 		local VPFtrack = ClonedChar:WaitForChild("Humanoid"):LoadAnimation(Anim)
 		local VPFActive = false
 		Object.MouseEnter:connect(function()
@@ -364,21 +411,22 @@ local function CreateGui()
 				VPFActive = false
 				game.TweenService:Create(ViewportFrame, TweenInfo.new(.1), {BackgroundTransparency = 1}):Play()
 				ViewportFrame.Visible = false
-				VPFtrack:Stop(0)
+				VPFtrack:Stop()
 			end
 		end)
 	end
 
-	-- Properties
-	-- SideFrame
 
+	-- Creating Objects
+	-- SideFrame
 	Emoter.Name = "Emoter"
 	Emoter.ResetOnSpawn = false
-	Emoter.DisplayOrder = 100
 	if game:GetService("RunService"):IsStudio() then --Made this as i test script mostly in Studio
 		Emoter.Parent = game.Players.LocalPlayer.PlayerGui
+		Emoter.DisplayOrder = 100
 	else
 		Emoter.Parent = game.CoreGui
+		Emoter.DisplayOrder = -1
 	end
 
 	SideFrame.Name = "SideFrame"
@@ -392,16 +440,6 @@ local function CreateGui()
 	local UIDragDetectorSideFrame = Instance.new("UIDragDetector")
 	UIDragDetectorSideFrame.Parent = SideFrame
 
-	OpenGUI.Name = "OpenGUI"
-	OpenGUI.Parent = SideFrame
-	OpenGUI.AnchorPoint = Vector2.new(0, 0.5)
-	OpenGUI.BackgroundTransparency = 0
-	OpenGUI.BackgroundColor3 = BgColor
-	OpenGUI.Position = UDim2.new(0, 0, 0.5, 0)
-	OpenGUI.Size = UDim2.new(0, 32, 0, 32)
-	OpenGUI.Image = "rbxassetid://129394195458921"
-	AddHoverText(OpenGUI, "Open/Close GUI")
-
 	SideFrameTitle.Name = "SideFrameTitle"
 	SideFrameTitle.Parent = SideFrame
 	SideFrameTitle.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -409,7 +447,7 @@ local function CreateGui()
 	SideFrameTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
 	SideFrameTitle.Size = UDim2.new(0, 119, 0, 31)
 	SideFrameTitle.Font = Enum.Font.SourceSansBold
-	SideFrameTitle.TextStrokeColor3 = Color3.new(1, 1, 1)
+	SideFrameTitle.TextColor3 = Color3.new(1, 1, 1)
 	SideFrameTitle.Text = "Emote GUI"
 	SideFrameTitle.TextSize = 24
 	SideFrameTitle.TextStrokeTransparency = 0
@@ -428,8 +466,19 @@ local function CreateGui()
 	SFDestroyGUI.TextWrapped = true
 	AddHoverText(SFDestroyGUI, "Delete GUI")
 
-	-- MainFrame
+	OpenGUI.Name = "OpenGUI"
+	OpenGUI.Parent = SideFrame
+	OpenGUI.AnchorPoint = Vector2.new(0, 0.5)
+	OpenGUI.BackgroundTransparency = 0
+	OpenGUI.BackgroundColor3 = BgColor
+	OpenGUI.Position = UDim2.new(0, 0, 0.5, 0)
+	OpenGUI.Size = UDim2.new(0, 32, 0, 32)
+	OpenGUI.Image = "rbxassetid://101249930107274"
+	OpenGUI.ImageColor3 = UiButColor
+	AddHoverText(OpenGUI, "Open/Close GUI")
 
+
+	-- MainFrame
 	MainFrame.Name = "MainFrame"
 	MainFrame.Parent = Emoter
 	MainFrame.Active = true
@@ -441,165 +490,8 @@ local function CreateGui()
 	local UIDragDetectorMainFrame = Instance.new("UIDragDetector")
 	UIDragDetectorMainFrame.Parent = MainFrame
 
-	-- GuiBottomFrame
 
-	GuiBottomFrame.Name = "GuiBottomFrame"
-	GuiBottomFrame.Parent = MainFrame
-	GuiBottomFrame.AnchorPoint = Vector2.new(0, 1)
-	GuiBottomFrame.Size = UDim2.new(0, 460, 0, 35)
-	GuiBottomFrame.Position = UDim2.new(0, 0, 1, 1)
-	GuiBottomFrame.Active = true
-	GuiBottomFrame.BackgroundColor3 = BgColor
-
-	SpeedFrame.Name = "SpeedFrame"
-	SpeedFrame.Parent = GuiBottomFrame
-	SpeedFrame.Size = UDim2.new(0.5, 0, 0, 35)
-	SpeedFrame.BackgroundTransparency = 1
-	SpeedFrame.Active = true
-	SpeedFrame.BorderSizePixel = 0
-	SpeedFrame.BackgroundColor3 = Color3.fromRGB(138, 165, 255)
-
-	local GBUIPadding = Instance.new("UIPadding")
-	GBUIPadding.PaddingLeft = UDim.new(0, 5)
-	GBUIPadding.PaddingRight = UDim.new(0, 5)
-	GBUIPadding.Parent = GuiBottomFrame
-
-	local SFLayout = Instance.new("UIGridLayout")
-	SFLayout.Name = "UIGridLayout"
-	SFLayout.Parent = SpeedFrame
-	SFLayout.FillDirection = Enum.FillDirection.Vertical
-	SFLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	SFLayout.CellSize = UDim2.new(0, 90, 0, 31)
-	SFLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-
-	local SpeedValue = Instance.new("TextBox")
-	SpeedValue.Parent = SpeedFrame
-	SpeedValue.Name = "SpeedValue"
-	SpeedValue.ClearTextOnFocus = false
-	SpeedValue.AnchorPoint = Vector2.new(0.5, 0)
-	SpeedValue.Size = UDim2.new(0, 100, 0, 40)
-	SpeedValue.LayoutOrder = 2
-	SpeedValue.Position = UDim2.new(0.5, 0, 0, 0)
-	SpeedValue.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	SpeedValue.TextColor3 = Color3.fromRGB(0, 0, 0)
-	SpeedValue.Text = ""
-	SpeedValue.PlaceholderText = "0 = Default"
-	SpeedValue.Font = Enum.Font.SourceSans
-	SpeedValue.TextScaled = true
-	AddHoverText(SpeedValue, "Enter a number to add speed")
-
-	local SVPadding = Instance.new("UIPadding")
-	SVPadding.Parent = SpeedValue
-	SVPadding.PaddingLeft = UDim.new(0, 2)
-	SVPadding.PaddingRight = UDim.new(0, 2)
-
-	local ValueText = Instance.new("TextLabel")
-	ValueText.Name = "ValueText"
-	ValueText.Parent = SpeedFrame
-	ValueText.Size = UDim2.new(0, 200, 0, 50)
-	ValueText.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	ValueText.BackgroundTransparency = 1
-	ValueText.BorderSizePixel = 0
-	ValueText.BackgroundColor3 = Color3.fromRGB(226, 198, 93)
-	ValueText.TextStrokeTransparency = 0
-	ValueText.TextColor3 = Color3.fromRGB(255, 255, 255)
-	ValueText.Text = "Add Speed"
-	ValueText.Font = Enum.Font.SourceSansBold
-	ValueText.TextScaled = true
-
-	--
-
-	CurSpeedText.Name = "CurSpeedText"
-	CurSpeedText.AnchorPoint = Vector2.new(1, 0)
-	CurSpeedText.Size = UDim2.new(0, 0, 0, 35)
-	CurSpeedText.AutomaticSize = Enum.AutomaticSize.X
-	CurSpeedText.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	CurSpeedText.BackgroundTransparency = 1
-	CurSpeedText.Position = UDim2.new(1, 0, 0, -2)
-	CurSpeedText.BorderSizePixel = 0
-	CurSpeedText.BackgroundColor3 = Color3.fromRGB(226, 198, 93)
-	CurSpeedText.TextStrokeTransparency = 0
-	CurSpeedText.TextColor3 = Color3.fromRGB(255, 255, 255)
-	CurSpeedText.Text = ""
-	CurSpeedText.TextXAlignment = Enum.TextXAlignment.Right
-	CurSpeedText.TextWrapped = true
-	CurSpeedText.Font = Enum.Font.SourceSans
-	CurSpeedText.TextScaled = true
-	CurSpeedText.Parent = GuiBottomFrame
-	AddHoverText(CurSpeedText, "Current anim speed")
-
-	SpeedValue.Changed:Connect(function()
-		SpeedNum = SpeedValue.Text
-		if SpeedValue.Text == "" then
-			SpeedNum = 0
-		end
-	end)
-	
-	OptionsButton.Parent = GuiBottomFrame
-	OptionsButton.Name = "OptionsButton"
-	OptionsButton.AnchorPoint = Vector2.new(0.5, 0.5)
-	OptionsButton.Size = UDim2.new(0, 35, 0, 35)
-	OptionsButton.Position = UDim2.new(0.5, 0, 0.5, 0)
-	OptionsButton.BorderSizePixel = 0
-	OptionsButton.BackgroundColor3 = BgColor
-	OptionsButton.ImageColor3 = UiButColor
-	OptionsButton.Image = "rbxassetid://80468028389803"
-	AddHoverText(OptionsButton, "Options")
-	
-	--Scrolling Frames
-
-	ScrollingFrame.Parent = MainFrame
-	ScrollingFrame.BackgroundColor3 = ScrollBgColor
-	ScrollingFrame.Position = UDim2.new(0, 0, 0, 34)
-	ScrollingFrame.ScrollBarImageColor3 = Color3.new(0, 0, 0)
-	ScrollingFrame.Size = UDim2.new(0, 460, 0, 215)
-
-	ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0.5, 10)
-	ScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-	ScrollingFrame.ScrollBarThickness = 10
-
-	local SF6UIListLayout = Instance.new("UIListLayout")
-	SF6UIListLayout.Parent = ScrollingFrame
-	SF6UIListLayout.FillDirection = Enum.FillDirection.Horizontal
-	SF6UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	SF6UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	SF6UIListLayout.Wraps = true
-	SF6UIListLayout.Padding = UDim.new(0, 10)
-
-	local SF6UIPadding = Instance.new("UIPadding")
-	SF6UIPadding.Parent = ScrollingFrame
-	SF6UIPadding.PaddingTop = UDim.new(0, 7)
-	SF6UIPadding.PaddingBottom = UDim.new(0, 10)
-	SF6UIPadding.PaddingRight = UDim.new(0, 16)
-	SF6UIPadding.PaddingLeft = UDim.new(0, 5)
-
-	ScrollingFrameR15.Name = "ScrollingFrameR15"
-	ScrollingFrameR15.Parent = MainFrame
-	ScrollingFrameR15.BackgroundColor3 = ScrollBgColor
-	ScrollingFrameR15.Position = UDim2.new(0, 0, 0, 34)
-	ScrollingFrameR15.ScrollBarImageColor3 = Color3.new(0, 0, 0)
-	ScrollingFrameR15.Size = UDim2.new(0, 460, 0, 215)
-
-	ScrollingFrameR15.CanvasSize = UDim2.new(0, 0, 0.5, 10)
-	ScrollingFrameR15.AutomaticCanvasSize = Enum.AutomaticSize.Y
-	ScrollingFrameR15.Visible = false
-	ScrollingFrameR15.ScrollBarThickness = 10
-
-	local SF15UIListLayout = Instance.new("UIListLayout")
-	SF15UIListLayout.Parent = ScrollingFrameR15
-	SF15UIListLayout.FillDirection = Enum.FillDirection.Horizontal
-	SF15UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	SF15UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	SF15UIListLayout.Wraps = true
-	SF15UIListLayout.Padding = UDim.new(0, 10)
-
-	local SF15UIPadding = Instance.new("UIPadding")
-	SF15UIPadding.Parent = ScrollingFrameR15
-	SF15UIPadding.PaddingTop = UDim.new(0, 7)
-	SF15UIPadding.PaddingBottom = UDim.new(0, 10)
-	SF15UIPadding.PaddingRight = UDim.new(0, 16)
-	SF15UIPadding.PaddingLeft = UDim.new(0, 5)
-
+	-- GuiTopFrame
 	GuiTopFrame.Name = "GuiTopFrame"
 	GuiTopFrame.Parent = MainFrame
 	GuiTopFrame.BackgroundColor3 = BgColor
@@ -627,8 +519,20 @@ local function CreateGui()
 	CloseGUI.BackgroundTransparency = 0
 	CloseGUI.Position = UDim2.new(0, 0, 0.5, 0)
 	CloseGUI.Size = UDim2.new(0, 32, 0, 32)
-	CloseGUI.Image = "rbxassetid://118017289302281"
+	CloseGUI.Image = "rbxassetid://105612912027138"
+	CloseGUI.ImageColor3 = UiButColor
 	AddHoverText(CloseGUI, "Open/Close GUI")
+
+	local SettingsButton = Instance.new("ImageButton")
+	SettingsButton.Parent = GuiTopFrame
+	SettingsButton.Name = "SettingsButton"
+	SettingsButton.AnchorPoint = Vector2.new(1, 0.5)
+	SettingsButton.Size = UDim2.new(0, 32, 0, 32)
+	SettingsButton.Position = UDim2.new(1, -32, 0.5, 0)
+	SettingsButton.BackgroundColor3 = BgColor
+	SettingsButton.ImageColor3 = UiButColor
+	SettingsButton.Image = "rbxassetid://129555881355020"
+	AddHoverText(SettingsButton, "Settings")
 
 	Title.Name = "Title"
 	Title.Parent = GuiTopFrame
@@ -639,12 +543,145 @@ local function CreateGui()
 	Title.Size = UDim2.new(0, 119, 0, 31)
 	Title.Text = "Emotes GUI"
 	Title.Font = Enum.Font.SourceSansBold
-	Title.TextStrokeColor3 = Color3.new(1, 1, 1)
-	Title.TextColor3 = Color3.new(0.164706, 0.164706, 0.164706)
+	Title.TextColor3 = Color3.new(1, 1, 1)
 	Title.TextSize = 24
 	Title.TextStrokeTransparency = 0
 	Title.TextWrapped = false
-	
+
+
+	-- GuiBottomFrame
+	GuiBottomFrame.Name = "GuiBottomFrame"
+	GuiBottomFrame.Parent = MainFrame
+	GuiBottomFrame.AnchorPoint = Vector2.new(0, 1)
+	GuiBottomFrame.Size = UDim2.new(0, 460, 0, 35)
+	GuiBottomFrame.Position = UDim2.new(0, 0, 1, 1)
+	GuiBottomFrame.Active = true
+	GuiBottomFrame.BackgroundColor3 = BgColor
+
+	SpeedFrame.Name = "SpeedFrame"
+	SpeedFrame.Parent = GuiBottomFrame
+	SpeedFrame.Size = UDim2.new(0.5, 0, 0, 35)
+	SpeedFrame.BackgroundTransparency = 1
+	SpeedFrame.Active = true
+	SpeedFrame.BorderSizePixel = 0
+	SpeedFrame.BackgroundColor3 = Color3.fromRGB(138, 165, 255)
+
+	local SFLayout = Instance.new("UIGridLayout")
+	SFLayout.Name = "UIGridLayout"
+	SFLayout.Parent = SpeedFrame
+	SFLayout.FillDirection = Enum.FillDirection.Vertical
+	SFLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	SFLayout.CellSize = UDim2.new(0, 90, 0, 31)
+	SFLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+
+	OptionsButton.Parent = GuiBottomFrame
+	OptionsButton.Name = "OptionsButton"
+	OptionsButton.AnchorPoint = Vector2.new(0.5, 0.5)
+	OptionsButton.Size = UDim2.new(0, 35, 0, 35)
+	OptionsButton.Position = UDim2.new(0.5, 0, 0.5, 0)
+	OptionsButton.BorderSizePixel = 0
+	OptionsButton.BackgroundColor3 = BgColor
+	OptionsButton.ImageColor3 = UiButColor
+	OptionsButton.Image = "rbxassetid://80468028389803"
+	AddHoverText(OptionsButton, "Options")
+
+	local SpeedValue = Instance.new("TextBox")
+	SpeedValue.Parent = SpeedFrame
+	SpeedValue.Name = "SpeedValue"
+	SpeedValue.ClearTextOnFocus = false
+	SpeedValue.AnchorPoint = Vector2.new(0.5, 0)
+	SpeedValue.Size = UDim2.new(0, 100, 0, 40)
+	SpeedValue.LayoutOrder = 2
+	SpeedValue.Position = UDim2.new(0.5, 0, 0, 0)
+	SpeedValue.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	SpeedValue.TextColor3 = Color3.fromRGB(0, 0, 0)
+	SpeedValue.Text = ""
+	SpeedValue.PlaceholderText = "0 = Default"
+	SpeedValue.Font = Enum.Font.SourceSans
+	SpeedValue.TextScaled = true
+	AddHoverText(SpeedValue, "Enter a number to add speed")
+
+	local ValueText = Instance.new("TextLabel")
+	ValueText.Name = "ValueText"
+	ValueText.Parent = SpeedFrame
+	ValueText.Size = UDim2.new(0, 200, 0, 50)
+	ValueText.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	ValueText.BackgroundTransparency = 1
+	ValueText.BorderSizePixel = 0
+	ValueText.BackgroundColor3 = Color3.fromRGB(226, 198, 93)
+	ValueText.TextStrokeTransparency = 0
+	ValueText.TextColor3 = Color3.fromRGB(255, 255, 255)
+	ValueText.Text = "Add Speed"
+	ValueText.Font = Enum.Font.SourceSansBold
+	ValueText.TextScaled = true
+
+	CurSpeedText.Name = "CurSpeedText"
+	CurSpeedText.AnchorPoint = Vector2.new(1, 0)
+	CurSpeedText.Size = UDim2.new(0, 0, 0, 35)
+	CurSpeedText.AutomaticSize = Enum.AutomaticSize.X
+	CurSpeedText.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	CurSpeedText.BackgroundTransparency = 1
+	CurSpeedText.Position = UDim2.new(1, 0, 0, -2)
+	CurSpeedText.BorderSizePixel = 0
+	CurSpeedText.BackgroundColor3 = Color3.fromRGB(226, 198, 93)
+	CurSpeedText.TextStrokeTransparency = 0
+	CurSpeedText.TextColor3 = Color3.fromRGB(255, 255, 255)
+	CurSpeedText.Text = ""
+	CurSpeedText.TextXAlignment = Enum.TextXAlignment.Right
+	CurSpeedText.TextWrapped = true
+	CurSpeedText.Font = Enum.Font.SourceSansBold
+	CurSpeedText.TextScaled = true
+	CurSpeedText.Parent = GuiBottomFrame
+	AddHoverText(CurSpeedText, "Current anim speed")
+	SpeedValue.Changed:Connect(function()
+		SpeedNum = SpeedValue.Text
+		if SpeedValue.Text == "" then
+			SpeedNum = 0
+		end
+	end)
+
+
+	--Scrolling Frames
+	ScrollingFrame.Parent = MainFrame
+	ScrollingFrame.BackgroundColor3 = ScrollBgColor
+	ScrollingFrame.Position = UDim2.new(0, 0, 0, 34)
+	ScrollingFrame.ScrollBarImageColor3 = UiButColor
+	ScrollingFrame.Size = UDim2.new(0, 460, 0, 215)
+
+	ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0.5, 10)
+	ScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	ScrollingFrame.ScrollBarThickness = 10
+
+	local SF6UIListLayout = Instance.new("UIListLayout")
+	SF6UIListLayout.Parent = ScrollingFrame
+	SF6UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+	SF6UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	SF6UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	SF6UIListLayout.Wraps = true
+	SF6UIListLayout.Padding = UDim.new(0, 10)
+
+	ScrollingFrameR15.Name = "ScrollingFrameR15"
+	ScrollingFrameR15.Parent = MainFrame
+	ScrollingFrameR15.BackgroundColor3 = ScrollBgColor
+	ScrollingFrameR15.Position = UDim2.new(0, 0, 0, 34)
+	ScrollingFrameR15.ScrollBarImageColor3 = UiButColor
+	ScrollingFrameR15.Size = UDim2.new(0, 460, 0, 215)
+
+	ScrollingFrameR15.CanvasSize = UDim2.new(0, 0, 0.5, 10)
+	ScrollingFrameR15.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	ScrollingFrameR15.Visible = false
+	ScrollingFrameR15.ScrollBarThickness = 10
+
+	local SF15UIListLayout = Instance.new("UIListLayout")
+	SF15UIListLayout.Parent = ScrollingFrameR15
+	SF15UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+	SF15UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	SF15UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	SF15UIListLayout.Wraps = true
+	SF15UIListLayout.Padding = UDim.new(0, 10)
+
+
+	--Options Frame
 	OptionsFrame.Parent = MainFrame
 	OptionsFrame.Name = "OptionsFrame"
 	OptionsFrame.AnchorPoint = Vector2.new(0.5, 0)
@@ -653,7 +690,7 @@ local function CreateGui()
 	OptionsFrame.Visible = false
 	OptionsFrame.Position = UDim2.new(0.5, 0, 1, -43)
 	OptionsFrame.BorderSizePixel = 0
-	OptionsFrame.BackgroundColor3 = Color3.fromRGB(219, 244, 255)
+	OptionsFrame.BackgroundColor3 = ScrollBgColor
 	OptionsFrame.ZIndex = -1
 
 	local OFUIGridLayout = Instance.new("UIGridLayout")
@@ -668,7 +705,7 @@ local function CreateGui()
 	PauseAnimsButton.Size = UDim2.new(0, 100, 0, 100)
 	PauseAnimsButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	PauseAnimsButton.BorderSizePixel = 0
-	PauseAnimsButton.BackgroundColor3 = R15ButtonCol
+	PauseAnimsButton.BackgroundColor3 = ButtonCol
 	PauseAnimsButton.Image = "rbxassetid://103681828169035"
 	PauseAnimsButton.Parent = OptionsFrame
 	PauseAnimsButton.ZIndex = 0
@@ -676,57 +713,58 @@ local function CreateGui()
 
 	StopDefAnimsButton.Name = "StopDefAnimsButton"
 	StopDefAnimsButton.Size = UDim2.new(0, 100, 0, 100)
-	StopDefAnimsButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	StopDefAnimsButton.BorderSizePixel = 0
-	StopDefAnimsButton.BackgroundColor3 = R15ButtonCol
+	StopDefAnimsButton.BackgroundColor3 = ButtonCol
 	StopDefAnimsButton.Image = "rbxassetid://116957047917442"
 	StopDefAnimsButton.Parent = OptionsFrame
 	StopDefAnimsButton.ZIndex = 0
 	AddHoverText(StopDefAnimsButton, "Stop Default Anims. May not work on some games")
-	
+
 	PauseAnimateButton.Name = "PauseAnimateButton"
 	PauseAnimateButton.Size = UDim2.new(0, 100, 0, 100)
 	PauseAnimateButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	PauseAnimateButton.BorderSizePixel = 0
-	PauseAnimateButton.BackgroundColor3 = R15ButtonCol
+	PauseAnimateButton.BackgroundColor3 = ButtonCol
 	PauseAnimateButton.Image = "rbxassetid://109849420482663"
 	PauseAnimateButton.Parent = OptionsFrame
 	PauseAnimateButton.ZIndex = 0
-	AddHoverText(PauseAnimateButton, "Pause Default Animate Script (will look like you're lagging")
+	AddHoverText(PauseAnimateButton, "Pause Default Animate Script (will look like you're lagging)")
 
-	PreviewEnableButton.Name = "PreviewEnableButton"
-	PreviewEnableButton.Size = UDim2.new(0, 100, 0, 100)
-	PreviewEnableButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	PreviewEnableButton.BorderSizePixel = 0
-	PreviewEnableButton.BackgroundColor3 = R15ButtonCol
-	PreviewEnableButton.Image = "rbxassetid://134858066894422"
-	PreviewEnableButton.Parent = OptionsFrame
-	PreviewEnableButton.ZIndex = 0
-	AddHoverText(PreviewEnableButton, "Enable Animation Preview")
-	
-	--Search Box Items
+	SitButton.Name = "SitButton"
+	SitButton.Size = UDim2.new(0, 100, 0, 100)
+	SitButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	SitButton.BorderSizePixel = 0
+	SitButton.BackgroundColor3 = ButtonCol
+	SitButton.Image = "rbxassetid://94572819761865"
+	SitButton.ImageColor3 = UiButColor
+	SitButton.Parent = OptionsFrame
+	SitButton.ZIndex = 0
+	AddHoverText(SitButton, "Ragdoll-like falling with sit animation (G)")
+
+
+	--Search Box
 	SearchFrame.Parent = MainFrame
 	SearchFrame.Name = "SearchFrame"
 	SearchFrame.ZIndex = 0
 	SearchFrame.AnchorPoint = Vector2.new(1, 0)
-	SearchFrame.Size = UDim2.new(0, 165, 0, 40)
+	SearchFrame.Size = UDim2.new(0, 164, 0, 35)
 	SearchFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	SearchFrame.Position = UDim2.new(1, 35, 0.119, 0)
+	SearchFrame.Position = UDim2.new(1, 31, 0.119, 0)
 	SearchFrame.BorderSizePixel = 0
 	SearchFrame.BackgroundColor3 = BgColor
 
 	SearchButton.Name = "SearchButton"
 	SearchButton.ZIndex = 0
 	SearchButton.AnchorPoint = Vector2.new(1, 0)
-	SearchButton.Size = UDim2.new(0, 34, 0, 40)
+	SearchButton.Size = UDim2.new(0, 30, 1, 0)
 	SearchButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	SearchButton.LayoutOrder = 2
 	SearchButton.Position = UDim2.new(1, 0, 0.075, 0)
 	SearchButton.BorderSizePixel = 0
 	SearchButton.BackgroundColor3 = BgColor
 	SearchButton.ScaleType = Enum.ScaleType.Fit
-	SearchButton.ImageColor3 = Color3.fromRGB(0, 0, 0)
 	SearchButton.Image = "rbxassetid://118685771787843"
+	SearchButton.ImageColor3 = UiButColor
 	SearchButton.Parent = SearchFrame
 	AddHoverText(SearchButton, "Search (T)")
 
@@ -734,7 +772,7 @@ local function CreateGui()
 	SearchBox.ZIndex = 0
 	SearchBox.Visible = false
 	SearchBox.AnchorPoint = Vector2.new(0.5, 0)
-	SearchBox.Size = UDim2.new(0, 139, 0, 34)
+	SearchBox.Size = UDim2.new(0, 140, 0, 29)
 	SearchBox.LayoutOrder = 1
 	SearchBox.Position = UDim2.new(0.469697, 0, 0.075, 0)
 	SearchBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -746,51 +784,536 @@ local function CreateGui()
 	SearchBox.TextScaled = true
 	SearchBox.TextXAlignment = Enum.TextXAlignment.Left
 	SearchBox.Parent = SearchFrame
-	AddHoverText(SearchBox, "Search for animation (T)")
-
-	local UIPadding = Instance.new("UIPadding")
-	UIPadding.PaddingLeft = UDim.new(0, 2)
-	UIPadding.PaddingRight = UDim.new(0, 2)
-	UIPadding.Parent = SearchBox
 
 	BackButton.Name = "BackButton"
 	BackButton.ZIndex = 0
 	BackButton.Visible = false
 	BackButton.AnchorPoint = Vector2.new(1, 0)
-	BackButton.Size = UDim2.new(0, 19, 0, 40)
-	BackButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	BackButton.LayoutOrder = 2
+	BackButton.Size = UDim2.new(0, 19, 1, 0)
+	BackButton.BorderSizePixel = 0
+	BackButton.LayoutOrder = 0
 	BackButton.Position = UDim2.new(1, 0, 0, 0)
 	BackButton.BackgroundColor3 = BgColor
 	BackButton.ScaleType = Enum.ScaleType.Crop
-	BackButton.ImageColor3 = Color3.fromRGB(0, 0, 0)
 	BackButton.Image = "rbxassetid://2418687610"
+	BackButton.ImageColor3 = UiButColor
 	BackButton.Parent = SearchFrame
 	AddHoverText(BackButton, "Hide")
 
+	local SFUIListLayout = Instance.new("UIListLayout")
+	SFUIListLayout.FillDirection = Enum.FillDirection.Horizontal
+	SFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+	SFUIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+	SFUIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	SFUIListLayout.Padding = UDim.new(0, 1)
+	SFUIListLayout.Parent = SearchFrame
+
+
+	--CustomAnimFrame
+	local CustomAnimFrame = Instance.new("Frame")
+	CustomAnimFrame.Parent = MainFrame
+	CustomAnimFrame.Name = "CustomAnimFrame"
+	CustomAnimFrame.ZIndex = 0
+	CustomAnimFrame.AnchorPoint = Vector2.new(1, 0)
+	CustomAnimFrame.Size = UDim2.new(0, 194, 0, 35)
+	CustomAnimFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	CustomAnimFrame.Position = UDim2.new(1, 31, 0.119, 39)
+	CustomAnimFrame.BorderSizePixel = 0
+	CustomAnimFrame.BackgroundColor3 = BgColor
+
+	local CustomAnimButton = Instance.new("ImageButton")
+	CustomAnimButton.Name = "CustomAnimButton"
+	CustomAnimButton.ZIndex = 0
+	CustomAnimButton.Visible = true
+	CustomAnimButton.AnchorPoint = Vector2.new(1, 0)
+	CustomAnimButton.Size = UDim2.new(0, 30, 1, 0)
+	CustomAnimButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	CustomAnimButton.LayoutOrder = 2
+	CustomAnimButton.Position = UDim2.new(1.4484849, 0, 0.9714286, 0)
+	CustomAnimButton.BorderSizePixel = 0
+	CustomAnimButton.BackgroundColor3 = BgColor
+	CustomAnimButton.ScaleType = Enum.ScaleType.Fit
+	CustomAnimButton.Image = "rbxassetid://74724767412656"
+	CustomAnimButton.ImageColor3 = UiButColor
+	CustomAnimButton.Parent = CustomAnimFrame
+	AddHoverText(CustomAnimButton, "Play animation with Id")
+
+	local IdBox = Instance.new("TextBox")
+	IdBox.Name = "IdBox"
+	IdBox.ZIndex = 0
+	IdBox.Visible = false
+	IdBox.AnchorPoint = Vector2.new(0.5, 0)
+	IdBox.Size = UDim2.new(0, 140, 0, 29)
+	IdBox.LayoutOrder = 1
+	IdBox.Position = UDim2.new(0.469697, 0, 0.075, 0)
+	IdBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	IdBox.TextWrapped = true
+	IdBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+	IdBox.PlaceholderText = "Enter Id..."
+	IdBox.Text = ""
+	IdBox.CursorPosition = -1
+	IdBox.Font = Enum.Font.SourceSans
+	IdBox.TextXAlignment = Enum.TextXAlignment.Left
+	IdBox.ClearTextOnFocus = false
+	IdBox.TextScaled = true
+	IdBox.Parent = CustomAnimFrame
+
+	local CustomAnimBackButton = Instance.new("ImageButton")
+	CustomAnimBackButton.Name = "CustomAnimBackButton"
+	CustomAnimBackButton.ZIndex = 0
+	CustomAnimBackButton.Visible = false
+	CustomAnimBackButton.AnchorPoint = Vector2.new(1, 0)
+	CustomAnimBackButton.Size = UDim2.new(0, 19, 1, 0)
+	CustomAnimBackButton.BorderSizePixel = 0
+	CustomAnimBackButton.Position = UDim2.new(0.1212121, 0, 0, 0)
+	CustomAnimBackButton.BackgroundColor3 = BgColor
+	CustomAnimBackButton.ScaleType = Enum.ScaleType.Crop
+	CustomAnimBackButton.ImageColor3 = UiButColor
+	CustomAnimBackButton.Image = "rbxassetid://2418687610"
+	CustomAnimBackButton.Parent = CustomAnimFrame
+	AddHoverText(CustomAnimBackButton, "Hide")
+
+	local CAFUIListLayout = Instance.new("UIListLayout")
+	CAFUIListLayout.FillDirection = Enum.FillDirection.Horizontal
+	CAFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+	CAFUIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+	CAFUIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	CAFUIListLayout.Padding = UDim.new(0, 1)
+	CAFUIListLayout.Parent = CustomAnimFrame
+
+	local PlayAnimButton = Instance.new("ImageButton")
+	PlayAnimButton.Name = "PlayAnimButton"
+	PlayAnimButton.ZIndex = 0
+	PlayAnimButton.Visible = false
+	PlayAnimButton.AnchorPoint = Vector2.new(1, 0)
+	PlayAnimButton.Size = UDim2.new(0.0103627, 30, 1, 0)
+	PlayAnimButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	PlayAnimButton.LayoutOrder = 3
+	PlayAnimButton.Position = UDim2.new(1, 0, 0, 0)
+	PlayAnimButton.BorderSizePixel = 0
+	PlayAnimButton.BackgroundColor3 = ButtonCol
+	PlayAnimButton.ScaleType = Enum.ScaleType.Fit
+	PlayAnimButton.ImageColor3 = UiButColor
+	PlayAnimButton.Image = "rbxassetid://8215093320"
+	PlayAnimButton.Parent = CustomAnimFrame
+	AddHoverText(PlayAnimButton, "Play animation")
+
+
+	--SettingsFrame
+	SettingsFrame.Parent = Emoter
+	SettingsFrame.Name = "SettingsFrame"
+	SettingsFrame.AnchorPoint = Vector2.new(0.5, 0)
+	SettingsFrame.Size = UDim2.new(0, 193, 0, 286)
+	SettingsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	SettingsFrame.Position = MainFrame.Position + UDim2.new(0, 575, 0, 0)
+	SettingsFrame.BorderSizePixel = 0
+	SettingsFrame.BackgroundColor3 = ScrollBgColor
+	SettingsFrame.Visible = false
+
+	local UIShadow = Instance.new("UIShadow")
+	UIShadow.BlurRadius = UDim.new(0, 20)
+	UIShadow.Transparency = 0.5
+	UIShadow.Parent = SettingsFrame
+
+	local UIDragDetector = Instance.new("UIDragDetector")
+	UIDragDetector.DragUDim2 = UDim2.new(0, -89, 0, 32)
+	UIDragDetector.Parent = SettingsFrame
+
+	local GuiName = Instance.new("TextLabel")
+	GuiName.Name = "Name"
+	GuiName.Size = UDim2.new(1, 0, 0.0022999, 25)
+	GuiName.BackgroundTransparency = 1
+	GuiName.Position = UDim2.new(0, 0, 0.0175439, 0)
+	GuiName.TextSize = 14
+	GuiName.Text = "Emoter GUI"
+	GuiName.Font = Enum.Font.Highway
+	GuiName.TextScaled = true
+	GuiName.TextColor3 = UiButColor
+	GuiName.Parent = SettingsFrame
+
+	local AutorText = Instance.new("TextLabel")
+	AutorText.Name = "AutorText"
+	AutorText.Size = UDim2.new(1, 0, -0.025, 25)
+	AutorText.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	AutorText.LayoutOrder = 1
+	AutorText.BackgroundTransparency = 1
+	AutorText.Position = UDim2.new(-0.0069782, 0, 0.0940293, 0)
+	AutorText.BorderSizePixel = 0
+	AutorText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	AutorText.TextColor3 = Color3.new(0, 0, 0)
+	AutorText.TextSize = 14
+	AutorText.Text = "by Fixel"
+	AutorText.Font = Enum.Font.SourceSans
+	AutorText.TextScaled = true
+	AutorText.TextColor3 = UiButColor
+	AutorText.Parent = SettingsFrame
+
+	local SettingsStuff = Instance.new("Frame")
+	SettingsStuff.Name = "SettingsStuff"
+	SettingsStuff.Size = UDim2.new(1, 0, 0.8196392, 0)
+	SettingsStuff.BackgroundTransparency = 1
+	SettingsStuff.Position = UDim2.new(0, 0, 0.1803608, 0)
+	SettingsStuff.BorderSizePixel = 0
+	SettingsStuff.Parent = SettingsFrame
+
 	local UIListLayout = Instance.new("UIListLayout")
-	UIListLayout.FillDirection = Enum.FillDirection.Horizontal
-	UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
-	UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+	UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	UIListLayout.Padding = UDim.new(0, 1)
-	UIListLayout.Parent = SearchFrame
-	
-	-- Buttons
-	
-	if (game:GetService"Players".LocalPlayer.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R15) then
-		ScrollingFrame.Visible = false
-		ScrollingFrameR15.Visible = true
-		Title.Text = "Emotes GUI (R15)"
-		SideFrameTitle.Text = "Emotes GUI (R15)"
-	else
-		ScrollingFrame.Visible = true
-		ScrollingFrameR15.Visible = false
-		Title.Text = "Emotes GUI (R6)"
-		SideFrameTitle.Text = "Emotes GUI (R6)"
+	UIListLayout.Parent = SettingsStuff
+
+	local function AddSettings(Setting, Title, Text, LayoutOrder)
+		local OptionButton = Instance.new("TextButton")
+		OptionButton.Name = Title
+		OptionButton.Size = UDim2.new(1, 0, 0, 25)
+		OptionButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		OptionButton.BackgroundTransparency = 1
+		OptionButton.LayoutOrder = LayoutOrder
+		OptionButton.Position = UDim2.new(0, 0, 0.1558714, 0)
+		OptionButton.BorderSizePixel = 0
+		OptionButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		OptionButton.TextSize = 14
+		OptionButton.Font = Enum.Font.SourceSans
+		OptionButton.TextTransparency = 1
+		OptionButton.Parent = SettingsStuff
+
+		local CheckImage = Instance.new("ImageLabel")
+		CheckImage.Name = "CheckImage"
+		CheckImage.AnchorPoint = Vector2.new(0, 0.5)
+		CheckImage.Size = UDim2.new(0, 15, 0, 15)
+		CheckImage.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		CheckImage.Position = UDim2.new(0, 0, 0.5, 0)
+		CheckImage.BorderSizePixel = 1
+		CheckImage.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		CheckImage.Image = "rbxassetid://130396712201457"
+		CheckImage.ImageColor3 = Color3.fromRGB(0, 0, 0)
+		CheckImage.Parent = OptionButton
+		if Setting == true then
+			CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			CheckImage.Image = ""
+		end
+
+		local UIStroke = Instance.new("UIStroke")
+		UIStroke.Parent = CheckImage
+
+		local UIListLayout1 = Instance.new("UIListLayout")
+		UIListLayout1.FillDirection = Enum.FillDirection.Horizontal
+		UIListLayout1.VerticalAlignment = Enum.VerticalAlignment.Center
+		UIListLayout1.SortOrder = Enum.SortOrder.LayoutOrder
+		UIListLayout1.Padding = UDim.new(0, 5)
+		UIListLayout1.Parent = OptionButton
+
+		local TextLabel = Instance.new("TextLabel")
+		TextLabel.Size = UDim2.new(0.9500334, -10, 0, 25)
+		TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		TextLabel.BackgroundTransparency = 1
+		TextLabel.Position = UDim2.new(0.115608, 0, 0, 0)
+		TextLabel.BorderSizePixel = 0
+		TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		TextLabel.TextColor3 = UiButColor
+		TextLabel.TextSize = 14
+		TextLabel.Text = Text
+		TextLabel.Font = Enum.Font.SourceSans
+		TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+		TextLabel.Parent = OptionButton
+
+		local UIPadding1 = Instance.new("UIPadding")
+		UIPadding1.PaddingBottom = UDim.new(0, 2)
+		UIPadding1.Parent = TextLabel
 
 	end
-	
+
+	AddSettings(ToolAnimHighPrior, "ToolPriorityOption", "High priority on Tool anims", 0)
+	AddSettings(AnimPreviewEnable, "PreviewOption", "Enable Animation Preview", 1)
+	AddSettings(AnimSwitchMode, "SwitchOption", "Anims Switch mode", 2)
+	AddSettings(AnimSmoothFade, "AnimFadeOption", "Anim smooth Start/Stop", 3)
+	AddSettings(HotkeysEnabled, "HotkeysOption", "Enable Hotkeys", 5)
+
+	local ThemeOption = Instance.new("Frame")
+	ThemeOption.Name = "ThemeOption"
+	ThemeOption.Size = UDim2.new(1, 0, 0, 25)
+	ThemeOption.LayoutOrder = 4
+	ThemeOption.BackgroundTransparency = 1
+	ThemeOption.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	ThemeOption.Parent = SettingsStuff
+
+	local UIListLayout5 = Instance.new("UIListLayout")
+	UIListLayout5.FillDirection = Enum.FillDirection.Horizontal
+	UIListLayout5.VerticalAlignment = Enum.VerticalAlignment.Center
+	UIListLayout5.SortOrder = Enum.SortOrder.LayoutOrder
+	UIListLayout5.Padding = UDim.new(0, 5)
+	UIListLayout5.Parent = ThemeOption
+
+	local ThemeOptionText = Instance.new("TextLabel")
+	ThemeOptionText.Name = "ThemeOptionText"
+	ThemeOptionText.Size = UDim2.new(0.6, -10, 0, 25)
+	ThemeOptionText.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	ThemeOptionText.BackgroundTransparency = 1
+	ThemeOptionText.BorderSizePixel = 0
+	ThemeOptionText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	ThemeOptionText.TextSize = 14
+	ThemeOptionText.TextColor3 = UiButColor
+	ThemeOptionText.Text = "Theme"
+	ThemeOptionText.Font = Enum.Font.SourceSans
+	ThemeOptionText.TextXAlignment = Enum.TextXAlignment.Left
+	ThemeOptionText.Parent = ThemeOption
+	AddHoverText(ThemeOption, "Change theme of Gui (Restart required)")
+
+	local PurpleThemeColor = Instance.new("TextButton")
+	PurpleThemeColor.Name = "PurpleThemeColor"
+	PurpleThemeColor.Size = UDim2.new(0, 15, 0, 15)
+	PurpleThemeColor.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	PurpleThemeColor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	PurpleThemeColor.Text = ""
+	PurpleThemeColor.Parent = ThemeOption
+	AddHoverText(PurpleThemeColor, "Light theme with purple parts")
+
+	local PurpleGradient = Instance.new("UIGradient")
+	PurpleGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(137, 165, 255)), ColorSequenceKeypoint.new(0.4342561, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))})
+	PurpleGradient.Rotation = 90
+	PurpleGradient.Parent = PurpleThemeColor
+
+	local OrangeThemeColor = Instance.new("TextButton")
+	OrangeThemeColor.Name = "OrangeThemeColor"
+	OrangeThemeColor.Size = UDim2.new(0, 15, 0, 15)
+	OrangeThemeColor.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	OrangeThemeColor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	OrangeThemeColor.Text = ""
+	OrangeThemeColor.Parent = ThemeOption
+	AddHoverText(OrangeThemeColor, "Light theme with orange parts")
+
+	local OrangeGradient = Instance.new("UIGradient")
+	OrangeGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 171, 35)), ColorSequenceKeypoint.new(0.4342561, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))})
+	OrangeGradient.Rotation = 90
+	OrangeGradient.Parent = OrangeThemeColor
+
+	local YellowThemeColor = Instance.new("TextButton")
+	YellowThemeColor.Name = "YellowThemeColor"
+	YellowThemeColor.Size = UDim2.new(0, 15, 0, 15)
+	YellowThemeColor.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	YellowThemeColor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	YellowThemeColor.Text = ""
+	YellowThemeColor.Parent = ThemeOption
+	AddHoverText(YellowThemeColor, "Light theme with yellow parts")
+
+	local YellowGradient = Instance.new("UIGradient")
+	YellowGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 250, 112)), ColorSequenceKeypoint.new(0.4342561, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))})
+	YellowGradient.Rotation = 90
+	YellowGradient.Parent = YellowThemeColor
+
+	local BlackThemeColor = Instance.new("TextButton")
+	BlackThemeColor.Name = "BlackThemeColor"
+	BlackThemeColor.Size = UDim2.new(0, 15, 0, 15)
+	BlackThemeColor.LayoutOrder = 1
+	BlackThemeColor.BorderColor3 = UiButColor
+	BlackThemeColor.BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+	BlackThemeColor.Text = ""
+	BlackThemeColor.Parent = ThemeOption
+	AddHoverText(BlackThemeColor, "Black theme")
+
+	local HotkeysEditOption = Instance.new("TextButton")
+	HotkeysEditOption.Name = "HotkeysEditOption"
+	HotkeysEditOption.Size = UDim2.new(0.55, 0, 0, 22)
+	HotkeysEditOption.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	HotkeysEditOption.LayoutOrder = 5
+	HotkeysEditOption.Position = UDim2.new(0, 0, 0.1558714, 0)
+	HotkeysEditOption.BorderSizePixel = 0
+	HotkeysEditOption.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	HotkeysEditOption.TextColor3 = Color3.new(0, 0, 0)
+	HotkeysEditOption.TextSize = 14
+	HotkeysEditOption.Text = "Edit Hotkeys..."
+	HotkeysEditOption.Font = Enum.Font.SourceSans
+	HotkeysEditOption.Parent = SettingsStuff
+	AddHoverText(HotkeysEditOption, "Coming Soon i guess")
+
+	local UIListLayout7 = Instance.new("UIListLayout")
+	UIListLayout7.FillDirection = Enum.FillDirection.Horizontal
+	UIListLayout7.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	UIListLayout7.VerticalAlignment = Enum.VerticalAlignment.Center
+	UIListLayout7.SortOrder = Enum.SortOrder.LayoutOrder
+	UIListLayout7.Padding = UDim.new(0, 5)
+	UIListLayout7.Parent = HotkeysEditOption
+
+	local HotkeysFrame = Instance.new("Frame")
+	HotkeysFrame.Name = "HotkeysFrame"
+	HotkeysFrame.AnchorPoint = Vector2.new(0.5, 0)
+	HotkeysFrame.Size = UDim2.new(0, 193, 0, 285)
+	HotkeysFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	HotkeysFrame.Position = UDim2.new(0.517, 199, -0.1859649, 53)
+	HotkeysFrame.BorderSizePixel = 0
+	HotkeysFrame.BackgroundColor3 = ScrollBgColor
+	HotkeysFrame.Visible = false
+	HotkeysFrame.Parent = SettingsFrame
+
+	local HotkeysStuff = Instance.new("Frame")
+	HotkeysStuff.Name = "HotkeysStuff"
+	HotkeysStuff.Size = UDim2.new(1, 0, 0.8801966, 0)
+	HotkeysStuff.BackgroundTransparency = 1
+	HotkeysStuff.Position = UDim2.new(0, 0, 0.1198031, 0)
+	HotkeysStuff.Parent = HotkeysFrame
+
+	local UIListLayout8 = Instance.new("UIListLayout")
+	UIListLayout8.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	UIListLayout8.SortOrder = Enum.SortOrder.LayoutOrder
+	UIListLayout8.Parent = HotkeysStuff
+
+	local HotkeyFrameName = Instance.new("TextLabel")
+	HotkeyFrameName.Name = "Name"
+	HotkeyFrameName.Size = UDim2.new(1, 0, 0.0022999, 25)
+	HotkeyFrameName.BackgroundTransparency = 1
+	HotkeyFrameName.Position = UDim2.new(0, 0, 0.0175439, 0)
+	HotkeyFrameName.TextColor3 = UiButColor
+	HotkeyFrameName.TextSize = 14
+	HotkeyFrameName.Text = "Hotkeys"
+	HotkeyFrameName.TextWrapped = true
+	HotkeyFrameName.Font = Enum.Font.Highway
+	HotkeyFrameName.TextScaled = true
+	HotkeyFrameName.Parent = HotkeysFrame
+
+	local function AddHotkey(Hotkey, FrameName, Text)
+		local HotkeyFrame = Instance.new("Frame")
+		HotkeyFrame.Name = FrameName
+		HotkeyFrame.Size = UDim2.new(1, 0, 0, 25)
+		HotkeyFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		HotkeyFrame.BackgroundTransparency = 1
+		HotkeyFrame.BorderSizePixel = 0
+		HotkeyFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		HotkeyFrame.Parent = HotkeysStuff
+
+		local HotkeyText = Instance.new("TextLabel")
+		HotkeyText.Size = UDim2.new(0.8241132, -10, 0, 25)
+		HotkeyText.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		HotkeyText.BackgroundTransparency = 1
+		HotkeyText.BorderSizePixel = 0
+		HotkeyText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		HotkeyText.TextColor3 = UiButColor
+		HotkeyText.TextSize = 14
+		HotkeyText.Text = Text
+		HotkeyText.TextWrapped = true
+		HotkeyText.Font = Enum.Font.SourceSans
+		HotkeyText.TextXAlignment = Enum.TextXAlignment.Left
+		HotkeyText.Parent = HotkeyFrame
+
+		local UIPadding9 = Instance.new("UIPadding")
+		UIPadding9.PaddingBottom = UDim.new(0, 2)
+		UIPadding9.Parent = HotkeyText
+
+		local RebindButton = Instance.new("TextButton")
+		RebindButton.AnchorPoint = Vector2.new(1, 0.5)
+		RebindButton.Size = UDim2.new(0.234, 0, 0, 21)
+		RebindButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		RebindButton.Position = UDim2.new(1, 0, 0.5, 0)
+		RebindButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		RebindButton.TextColor3 = Color3.new(0, 0, 0)
+		RebindButton.TextSize = 14
+		RebindButton.Text = Hotkey.Value or "..."
+		RebindButton.Font = Enum.Font.SourceSans
+		RebindButton.Parent = HotkeyFrame
+
+		local isListening = false
+
+		RebindButton.MouseButton1Click:Connect(function()
+			if isListening then return end
+
+			isListening = true
+			RebindButton.Text = "..."
+		end)
+
+		UserInputService.InputBegan:Connect(function(input, gameProcessed)
+
+			if gameProcessed then return end 
+
+			if isListening then
+				if input.UserInputType == Enum.UserInputType.Keyboard then
+					if input.KeyCode.Name == "Backspace" then
+						Hotkey.Value = nil
+						isListening = false
+						RebindButton.Text = "..."
+						return
+					end
+					Hotkey.Value = tostring(input.KeyCode.Name)
+					isListening = false
+					RebindButton.Text = Hotkey.Value
+					print(Hotkey.Value)
+				end
+				return
+			end
+
+			--[[local function performCustomAction()
+				print("Keybind activated! Key pressed: " .. Hotkey.Value)
+			end
+			if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Hotkey then
+				performCustomAction()
+			end]]
+		end)
+	end
+
+	AddHotkey(SearchHotkey, "SearchHotkey", "Search")
+	AddHotkey(CloseHotkey, "CloseHotkey", "Close/Open Gui")
+	AddHotkey(SitHotkey, "SitHotkey", "Ragdoll-like falling")
+
+	local MoreButtonsFrame = Instance.new("Frame")
+	MoreButtonsFrame.Parent = SettingsFrame
+	MoreButtonsFrame.Name = "MoreButtonsFrame"
+	MoreButtonsFrame.Interactable = true
+	MoreButtonsFrame.AnchorPoint = Vector2.new(0, 1)
+	MoreButtonsFrame.Size = UDim2.new(1, 0, 0, 50)
+	MoreButtonsFrame.BackgroundTransparency = 1
+	MoreButtonsFrame.Position = UDim2.new(0, 0, 1, 0)
+	MoreButtonsFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+
+	local UIListLayout = Instance.new("UIListLayout")
+	UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+	UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	UIListLayout.Padding = UDim.new(0, 12)
+	UIListLayout.Parent = MoreButtonsFrame
+
+	local SaveSettingsButton = Instance.new("ImageButton")
+	SaveSettingsButton.Name = "SaveSettingsButton"
+	SaveSettingsButton.Size = UDim2.new(0, 35, 0, 35)
+	SaveSettingsButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	SaveSettingsButton.Position = UDim2.new(0.0518135, 0, 0.845614, 0)
+	SaveSettingsButton.BorderSizePixel = 0
+	SaveSettingsButton.BackgroundColor3 = ButtonCol
+	SaveSettingsButton.Image = "rbxassetid://11768914234"
+	SaveSettingsButton.ImageColor3 = UiButColor
+	SaveSettingsButton.Parent = MoreButtonsFrame
+	AddHoverText(SaveSettingsButton, "Save settings")
+
+	local LaunchIdDetectorButton = Instance.new("ImageButton")
+	LaunchIdDetectorButton.Name = "LaunchIdDetectorButton"
+	LaunchIdDetectorButton.Size = UDim2.new(0, 35, 0, 35)
+	LaunchIdDetectorButton.Position = UDim2.new(0.4093264, 0, 0.845614, 0)
+	LaunchIdDetectorButton.BackgroundColor3 = ButtonCol
+	LaunchIdDetectorButton.ImageColor3 = UiButColor
+	LaunchIdDetectorButton.Image = "rbxassetid://88751076321975"
+	LaunchIdDetectorButton.Parent = MoreButtonsFrame
+	AddHoverText(LaunchIdDetectorButton, "Launch IdDetector Script")
+
+	local ResetButton = Instance.new("ImageButton")
+	ResetButton.Parent = MoreButtonsFrame
+	ResetButton.Name = "ResetButton"
+	ResetButton.Size = UDim2.new(0, 35, 0, 35)
+	ResetButton.Position = UDim2.new(0.2487047, 0, 0.8561404, 0)
+	ResetButton.BackgroundColor3 = ButtonCol
+	ResetButton.Image = "rbxassetid://84090157888894"
+	ResetButton.ImageColor3 = UiButColor
+	AddHoverText(ResetButton, "Reset Gui")
+
+	local GithubLinkButton = Instance.new("ImageButton")
+	GithubLinkButton.Name = "GithubLinkButton"
+	GithubLinkButton.Size = UDim2.new(0, 35, 0, 35)
+	GithubLinkButton.Position = UDim2.new(0.7720207, 0, 0.845614, 0)
+	GithubLinkButton.BackgroundColor3 = ButtonCol
+	GithubLinkButton.Image = "rbxassetid://133448000957069"
+	GithubLinkButton.ImageColor3 = UiButColor
+	GithubLinkButton.Parent = MoreButtonsFrame
+	AddHoverText(GithubLinkButton, "Get the Github for Tutorials and more Info! (Copy Link)")
+
+
+	-- Buttons and other functions
 	DestroyGUI.MouseButton1Click:connect(function()
 		GuiActive = false
 		StopAnimsEvent:Fire()
@@ -811,7 +1334,119 @@ local function CreateGui()
 		SideFrame.Visible = true
 		SideFrame.Position = MainFrame.Position
 	end)
-	
+	SettingsButton.MouseButton1Click:Connect(function()
+		SettingsFrame.Visible = not SettingsFrame.Visible
+	end)
+
+	--Settings buttons
+	local ToolAnimPriorityButton = SettingsStuff.ToolPriorityOption
+	ToolAnimPriorityButton.MouseButton1Click:Connect(function()
+		ToolAnimHighPrior = not ToolAnimHighPrior
+		if ToolAnimHighPrior == true then
+			ToolAnimPriorityButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			ToolAnimPriorityButton.CheckImage.Image = ""
+		end
+	end)
+
+	local PreviewOptionButton = SettingsStuff.PreviewOption
+	PreviewOptionButton.MouseButton1Click:Connect(function()
+		AnimPreviewEnable = not AnimPreviewEnable
+		if AnimPreviewEnable == true then
+			PreviewOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			ViewportFrame.Visible = false
+			PreviewOptionButton.CheckImage.Image = ""
+		end
+	end)
+
+	local SwitchOptionButton = SettingsStuff.SwitchOption
+	SwitchOptionButton.MouseButton1Click:Connect(function()
+		AnimSwitchMode = not AnimSwitchMode
+		if AnimSwitchMode == true then
+			SwitchOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			SwitchOptionButton.CheckImage.Image = ""
+		end
+	end)
+
+	local AnimFadeOptionButton = SettingsStuff.AnimFadeOption
+	AnimFadeOptionButton.MouseButton1Click:Connect(function()
+		AnimSmoothFade = not AnimSmoothFade
+		if AnimSmoothFade == true then
+			AnimFadeOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			AnimFadeOptionButton.CheckImage.Image = ""
+		end
+	end)
+
+	local HotkeysOptionButton = SettingsStuff.HotkeysOption
+	HotkeysOptionButton.MouseButton1Click:Connect(function()
+		HotkeysEnabled = not HotkeysEnabled
+		if HotkeysEnabled == true then
+			HotkeysOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			HotkeysOptionButton.CheckImage.Image = ""
+		end
+	end)
+
+	HotkeysEditOption.MouseButton1Click:Connect(function()
+		HotkeysFrame.Visible = not HotkeysFrame.Visible
+	end)
+
+	PurpleThemeColor.MouseButton1Click:Connect(function()
+		theme = "LightPurple"
+	end)
+	OrangeThemeColor.MouseButton1Click:Connect(function()
+		theme = "LightOrange"
+	end)
+	YellowThemeColor.MouseButton1Click:Connect(function()
+		theme = "LightYellow"
+	end)
+	BlackThemeColor.MouseButton1Click:Connect(function()
+		theme = "Black"
+	end)
+
+	SaveSettingsButton.MouseButton1Click:Connect(function()
+		print(1)
+		local mySettings = {
+			ConfAnimPreviewEnable = AnimPreviewEnable,
+			ConfToolAnimHighPrior = ToolAnimHighPrior,
+			ConfAnimSwitchMode = AnimSwitchMode,
+			ConfAnimSmoothFade = AnimSmoothFade,
+			ConfTheme = theme,
+			ConfHotkeysEnabled = HotkeysEnabled
+		}
+		local encodedData = HttpService:JSONEncode(mySettings)
+		writefile("EmoterData/"..ConfigFileName, encodedData)
+		print(2)
+	end)
+
+	LaunchIdDetectorButton.MouseButton1Click:Connect(function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/AnimationIdDetector.lua",true))()
+	end)
+
+	ResetButton.MouseButton1Click:Connect(function()
+		OnRestart()
+	end)
+
+	GithubLinkButton.MouseButton1Click:Connect(function()
+		setclipboard("https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/tree/main")
+	end)
+
+	if (game:GetService"Players".LocalPlayer.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R15) then
+		ScrollingFrame.Visible = false
+		ScrollingFrameR15.Visible = true
+		Title.Text = "Emotes GUI (R15)"
+		SideFrameTitle.Text = "Emotes GUI (R15)"
+	else
+		ScrollingFrame.Visible = true
+		ScrollingFrameR15.Visible = false
+		Title.Text = "Emotes GUI (R6)"
+		SideFrameTitle.Text = "Emotes GUI (R6)"
+
+	end
+
 	local OptionsButtonClick = true
 	OptionsButton.MouseButton1Click:Connect(function()
 		if OptionsButtonClick == true then
@@ -830,7 +1465,9 @@ local function CreateGui()
 			end
 		end
 	end)
-	
+
+
+	--Searchbox
 	local SearchButtonClick = true
 	SearchButton.MouseButton1Click:Connect(function()
 		if SearchButtonClick == true then
@@ -838,6 +1475,7 @@ local function CreateGui()
 			SearchButton.Visible = false
 			BackButton.Visible = true
 			SearchBox.Visible = true
+			SFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
 			game.TweenService:Create(SearchFrame, TweenInfo.new(.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Position = UDim2.new(1, 164, 0.119, 0)}):Play()
 			wait(.3)
 			SearchButtonClick = true
@@ -846,66 +1484,124 @@ local function CreateGui()
 	BackButton.MouseButton1Click:Connect(function()
 		if SearchButtonClick == true then
 			SearchButtonClick = false
-			game.TweenService:Create(SearchFrame, TweenInfo.new(.2, Enum.EasingStyle.Cubic, Enum.EasingDirection.In), {Position = UDim2.new(1, 35, 0.119, 0)}):Play()
+			game.TweenService:Create(SearchFrame, TweenInfo.new(.2, Enum.EasingStyle.Cubic, Enum.EasingDirection.In), {Position = UDim2.new(1, 31, 0.119, 0)}):Play()
 			wait(.2)
+			SFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
 			SearchButton.Visible = true
 			BackButton.Visible = false
 			SearchBox.Visible = false
 			SearchButtonClick = true
 		end
 	end)
-	
+
 	if SearchOpened == true then
 		SearchButton.Visible = false
 		BackButton.Visible = true
 		SearchBox.Visible = true
+		SFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
 		SearchFrame.Position = UDim2.new(1, 164, 0.119, 0)
-	else
-		SearchButton.Visible = true
-		BackButton.Visible = false
-		SearchBox.Visible = false
-		SearchFrame.Position = UDim2.new(1, 35, 0.119, 0)
 	end
-	
+
 	SearchBox.Changed:Connect(function()
-		for _, Button in ipairs(ScrollingFrameR15:GetDescendants() and ScrollingFrame:GetDescendants()) do
-			if Button:IsA("TextButton") and string.find(Button.Text:lower(), SearchBox.Text) then
-				Button.Visible = true
-			elseif Button:IsA("TextButton") and not string.find(Button.Text, SearchBox.Text) then
-				Button.Visible = false
-			elseif Button.Name == "DivideFrame" then
-				Button.Visible = false
-			end
-			
-			if SearchBox.Text == "" then
-				if Button:IsA("TextButton") then
+		for _, ScrollFrame in ipairs(ScrollingFramesList) do
+			for _, Button in ipairs(ScrollFrame:GetDescendants()) do
+				if Button:IsA("TextButton") and string.find(Button.Text:lower(), SearchBox.Text) then
 					Button.Visible = true
-				elseif Button.Name == "DivideFrame"  then
-					Button.Visible = true
+				elseif Button:IsA("TextButton") and not string.find(Button.Text, SearchBox.Text) then
+					Button.Visible = false
+				elseif Button.Name == "DivideFrame" then
+					Button.Visible = false
 				end
+				if SearchBox.Text == "" then
+					if Button:IsA("TextButton") then
+						Button.Visible = true
+					elseif Button.Name == "DivideFrame"  then
+						Button.Visible = true
+					end
 
+				end
 			end
-
 		end
 	end)
-	
-	local input = UserInputService.InputBegan:Connect(function(input, processed)
-		if input.KeyCode == Enum.KeyCode.T then
-			if SearchBox.Visible == false then
-				SearchButtonClick = false
-				SearchButton.Visible = false
-				BackButton.Visible = true
-				SearchBox.Visible = true
-				game.TweenService:Create(SearchFrame, TweenInfo.new(.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Position = UDim2.new(1, 164, 0.119, 0)}):Play()
-				wait(.3)
-				SearchButtonClick = true
-			end
-			SearchBox:CaptureFocus()
+
+
+	--CustomAnimSearch
+	local CustomAnimButtonClick = true
+	CustomAnimButton.MouseButton1Click:Connect(function()
+		if CustomAnimButtonClick == true then
+			CustomAnimButtonClick = false
+			CustomAnimButton.Visible = false
+			CustomAnimBackButton.Visible = true
+			IdBox.Visible = true
+			PlayAnimButton.Visible = true
+			CAFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+			game.TweenService:Create(CustomAnimFrame, TweenInfo.new(.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Position = UDim2.new(1, 194, 0.119, 39)}):Play()
+			wait(.3)
+			CustomAnimButtonClick = true
 		end
 	end)
-	
-	local DefaultAnimsNameList = {"Animation1", "Animation2", "Animation3", "ClimbAnim", "FallAnim", "JumpAnim", "RunAnim", "SitAnim", "ToolNoneAnim", "WalkAnim", "CheerAnim", "LaughAnim", "PointAnim", "Swim", "SwimIdle", "ToolLungeAnim", "ToolSlashAnim", "WaveAnim"}
-	
+	CustomAnimBackButton.MouseButton1Click:Connect(function()
+		if CustomAnimButtonClick == true then
+			CustomAnimButtonClick = false
+			game.TweenService:Create(CustomAnimFrame, TweenInfo.new(.2, Enum.EasingStyle.Cubic, Enum.EasingDirection.In), {Position = UDim2.new(1, 31, 0.119, 39)}):Play()
+			wait(.2)
+			CAFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+			CustomAnimButton.Visible = true
+			CustomAnimBackButton.Visible = false
+			IdBox.Visible = false
+			PlayAnimButton.Visible = false
+			CustomAnimButtonClick = true
+		end
+	end)
+
+	local CustomAnim = Instance.new("Animation")
+	CustomAnim.Name = "CustomAAnimation"
+	local track = nil
+	local CustomAnimACTIVE = false
+	PlayAnimButton.MouseButton1Click:Connect(function()
+		CustomAnim.AnimationId = "rbxassetid://"..IdBox.Text
+		if track == nil then
+			track = Player.Character:WaitForChild("Humanoid"):LoadAnimation(CustomAnim)
+		end
+		if CustomAnim.AnimationId == "rbxassetid://" then return end
+		track.Priority = Enum.AnimationPriority.Action3
+
+		local PauseAnimsOption = false
+
+		CustomAnimACTIVE = not CustomAnimACTIVE
+		if CustomAnimACTIVE then
+			PlayAnimButton.Image = "rbxassetid://99514193135085"
+			if AnimSmoothFade == true then
+				track:Play(.1, 1, 1 + SpeedNum)
+			else
+				track:Play(0, 1, 1 + SpeedNum)
+			end
+
+			if PauseAnimsOption then
+				track:AdjustSpeed(0)
+			end
+
+		else
+			PlayAnimButton.Image = "rbxassetid://8215093320"
+			if AnimSmoothFade == false then
+				track:Stop(0)
+			end
+			track:Stop()
+			track:Destroy()
+		end
+	end)
+
+	if CustomAnimOpened == true then
+		CustomAnimButton.Visible = false
+		CustomAnimBackButton.Visible = true
+		IdBox.Visible = true
+		PlayAnimButton.Visible = true
+		CAFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+		CustomAnimFrame.Position = UDim2.new(1, 194, 0.119, 39)
+	end
+
+
+	--Option Buttons
 	local PauseDefAnimsOption = false
 	PauseAnimsButton.MouseButton1Click:Connect(function()
 		PauseDefAnimsOption = not PauseDefAnimsOption
@@ -926,21 +1622,21 @@ local function CreateGui()
 			end
 		end
 	end)
-	
-	local AnimateScript = Player.Character:WaitForChild("Animate")
+
+	local AnimateScript = Player.Character:FindFirstChild("Animate")
 	PauseAnimateButton.MouseButton1Click:Connect(function()
 		if AnimateScript.Disabled == false then
 			AnimateScript.Disabled = true
-			PauseAnimateButton.BackgroundColor3 = R15ButtonSelectCol
+			PauseAnimateButton.BackgroundColor3 = ButtonSelectCol
 		else
 			StopAnimsEvent:Fire()
 			AnimateScript.Disabled = false
-			PauseAnimateButton.BackgroundColor3 = R15ButtonCol
+			PauseAnimateButton.BackgroundColor3 = ButtonCol
 			PauseDefAnimsOption = false
-			PauseAnimsButton.BackgroundColor3 = R15ButtonCol
+			PauseAnimsButton.BackgroundColor3 = ButtonCol
 		end
 	end)
-	
+
 	local StopDefAnimsOption = false
 	StopDefAnimsButton.MouseButton1Click:Connect(function()
 		StopDefAnimsOption = not StopDefAnimsOption
@@ -954,48 +1650,32 @@ local function CreateGui()
 					animtrack:Stop()
 				end
 			end
-			StopDefAnimsButton.BackgroundColor3 = R15ButtonSelectCol
-			
-			PauseAnimateButton.BackgroundColor3 = R15ButtonCol
+			StopDefAnimsButton.BackgroundColor3 = ButtonSelectCol
+
+			PauseAnimateButton.BackgroundColor3 = ButtonCol
 			PauseAnimateButton.ImageTransparency = 0.5
 			PauseAnimateButton.Interactable = false
 		else
 			StopAnimsEvent:Fire()
 			Player.Character.Animate.Disabled = false
-			StopDefAnimsButton.BackgroundColor3 = R15ButtonCol
-			
+			StopDefAnimsButton.BackgroundColor3 = ButtonCol
+
 			PauseDefAnimsOption = false
-			PauseAnimsButton.BackgroundColor3 = R15ButtonCol
-			PauseAnimateButton.BackgroundColor3 = R15ButtonCol
+			PauseAnimsButton.BackgroundColor3 = ButtonCol
+			PauseAnimateButton.BackgroundColor3 = ButtonCol
 			PauseAnimateButton.ImageTransparency = 0
 			PauseAnimateButton.Interactable = true
 		end
 	end)
-	
-	if AnimPreviewEnable == true then
-		PreviewEnableButton.BackgroundColor3 = R15ButtonSelectCol
-	end
-	PreviewEnableButton.MouseButton1Click:Connect(function()
-		if AnimPreviewEnable == true then
-			AnimPreviewEnable = false
-			PreviewEnableButton.BackgroundColor3 = R15ButtonCol
-		else
-			AnimPreviewEnable = true
-			PreviewEnableButton.BackgroundColor3 = R15ButtonSelectCol
-		end
-	end)
-	
+
 	local function CreateDivideFrame(Title, LayoutOrder, Type)
 		local DivideFrame = Instance.new("Frame")
 		local Line = Instance.new("Frame")
 		local TextLabel = Instance.new("TextLabel")
-		
+
 		DivideFrame.Name = "DivideFrame"
-		DivideFrame.Size = UDim2.new(0.98, 0, 0, 20)
-		DivideFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		DivideFrame.Size = UDim2.new(0.98, 0, 0, 15)
 		DivideFrame.BackgroundTransparency = 1
-		DivideFrame.BorderSizePixel = 0
-		DivideFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		DivideFrame.LayoutOrder = LayoutOrder
 
 		Line.Name = "Line"
@@ -1004,18 +1684,17 @@ local function CreateGui()
 		Line.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Line.Position = UDim2.new(0, 0, 0.5, 0)
 		Line.BorderSizePixel = 0
-		Line.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+		Line.BackgroundColor3 = UiButColor
 		Line.Parent = DivideFrame
 
 		TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
 		TextLabel.AutomaticSize = Enum.AutomaticSize.X
 		TextLabel.Size = UDim2.new(0, 50, 0, 25)
-		TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
 		TextLabel.BorderSizePixel = 0
-		TextLabel.BackgroundColor3 = Color3.fromRGB(219, 244, 255)
+		TextLabel.BackgroundColor3 = ScrollBgColor
 		TextLabel.TextSize = 25
-		TextLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+		TextLabel.TextColor3 = UiButColor
 		TextLabel.Text = Title
 		TextLabel.TextWrapped = true
 		TextLabel.Font = Enum.Font.SourceSansBold
@@ -1025,7 +1704,7 @@ local function CreateGui()
 		UIPadding.PaddingLeft = UDim.new(0, 8)
 		UIPadding.PaddingRight = UDim.new(0, 10)
 		UIPadding.Parent = TextLabel
-		
+
 		if Type == "R6" then
 			DivideFrame.Parent = ScrollingFrame
 		elseif Type == "R15" then
@@ -1033,8 +1712,94 @@ local function CreateGui()
 		end
 	end
 
+	local ToolIdleAnimsList = {"ToolNoneAnim", "507768375", "182393478"}
+	local ToolActionAnimsList = {"ToolLungeAnim", "ToolSlashAnim", "522638767", "522635514", }
+	local Task = task.spawn(function()
+		while GuiActive == true do
+			if ToolAnimHighPrior == true then
+				local playingTracks = Humanoid:GetPlayingAnimationTracks()
+				local anyTrue = false
+				for _, ScrollFrame in ipairs(ScrollingFramesList) do
+					for _, item in ipairs(ScrollFrame:GetChildren()) do
+						if item:IsA("TextButton") and item.BackgroundColor3 == ButtonSelectCol then
+							anyTrue = true
+							break
+						end
+					end
+				end
+
+				if anyTrue then
+					for _, animtrack in ipairs(playingTracks) do
+						local animationObject = animtrack.Animation
+						local IdNumberString = string.match(animationObject.AnimationId, "%d+") 
+
+						if table.find(ToolIdleAnimsList, animtrack.Name) or table.find(ToolIdleAnimsList, IdNumberString) then
+							animtrack.Priority = Enum.AnimationPriority.Action4
+						end
+						if table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString) then
+							animtrack.Priority = Enum.AnimationPriority.Action4
+							animtrack:AdjustWeight(100)
+						end
+					end
+				else
+					for _, animtrack in ipairs(playingTracks) do
+						local animationObject = animtrack.Animation
+						local IdNumberString = string.match(animationObject.AnimationId, "%d+") 
+
+						if table.find(ToolIdleAnimsList, animtrack.Name) or table.find(ToolIdleAnimsList, IdNumberString) then
+							animtrack.Priority = Enum.AnimationPriority.Idle
+						end
+						if table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString) then
+							animtrack.Priority = Enum.AnimationPriority.Action
+							animtrack:AdjustWeight(1)
+						end
+					end
+				end
+			end
+			task.wait()
+		end
+	end)
+
+	SitButton.MouseButton1Click:Connect(function()
+		if Humanoid.Sit == false then
+			Humanoid.Sit = true
+		else
+			Humanoid.Sit = false
+		end
+	end)
+
+	--Hotkey Functions
+	local input = UserInputService.InputBegan:Connect(function(input, processed)
+		if input.KeyCode.Name == SearchHotkey.Value and HotkeysEnabled then
+			if MainFrame.Visible == true then
+				SearchBox:CaptureFocus()
+				if SearchBox.Visible == false then
+					SearchButtonClick = false
+					SearchButton.Visible = false
+					BackButton.Visible = true
+					SearchBox.Visible = true
+					SFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+					game.TweenService:Create(SearchFrame, TweenInfo.new(.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Position = UDim2.new(1, 164, 0.119, 0)}):Play()
+					wait(.3)
+					SearchButtonClick = true
+				end
+			end
+		end
+	end)
+
+	UserInputService.InputBegan:Connect(function(input, processed)
+		if tostring(input.KeyCode.Name) == SitHotkey.Value and HotkeysEnabled then
+			if Humanoid.Sit == false then
+				Humanoid.Sit = true
+			else
+				Humanoid.Sit = false
+			end
+		end
+	end)
+
+
 	-- EMOTES
-	
+
 	--[[Functions Template
 	local AnimName = Instance.new("TextButton")
 	CreateAnimButton(Obj, "Name", "Text", "R6", 0)
@@ -1046,14 +1811,14 @@ local function CreateGui()
 	Type of anim is checked as Type:find("PriorLow"), so you can type in multiple states inside.
 	States available: PriorLow/PriorHigh (Priority of animation), Pause (Animation will stop after 1 second) 
 	]]
-	
+
 	--DivideFrames
 	CreateDivideFrame("Dances", 1, "R6")
 	CreateDivideFrame("Actions", 2, "R6")
 	CreateDivideFrame("Idles & Walks", 3, "R6")
 	CreateDivideFrame("Weird", 4, "R6")
 	CreateDivideFrame("Attack", 5, "R6")
-	
+
 	CreateDivideFrame("Dances", 1, "R15")
 	CreateDivideFrame("Actions", 2, "R15")
 	CreateDivideFrame("Walk & Run", 3, "R15")
@@ -1168,8 +1933,6 @@ local function CreateGui()
 		local WallHack = Instance.new("TextButton")
 		CreateAnimButton(WallHack, "WallHack", "Wall Hack", "R6", 4)
 		PlayAnim(WallHack, "204295235", .1, 1e4, "PriorLow", true)
-		CreateAnimButton(WallHack, "WallHack", "Wall Hack", "R6", 4)
-		PlayAnim(WallHack, "204295235", .1, -89999, "PriorLow", true)
 		local FullSwing = Instance.new("TextButton")
 		CreateAnimButton(FullSwing, "FullSwing", "Full Swing", "R6", 5)
 		PlayAnim(FullSwing, "218504594", .1, 1, "PriorHigh", false)
@@ -1196,7 +1959,7 @@ local function CreateGui()
 		PlayAnim(SwordSwing, "32659699", .1, 1, "PriorLow", false)
 	end
 
-	--R15 Emotes (Types: Dance (1), Action (2), Walk (3), WeirdAnim (4), Idle (5), Attack (6))
+	--R15 Emotes
 	if (game:GetService"Players".LocalPlayer.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R15) then
 		local Dance1 = Instance.new("TextButton")
 		CreateAnimButton(Dance1, "Dance1", "Dance 1", "R15", 1)
@@ -1401,7 +2164,7 @@ local function CreateGui()
 		PlayAnim(FloatingSpace, "71209604118044", .1, 1, "PriorLow", true)
 		local FloatingSpace2 = Instance.new("TextButton")
 		CreateAnimButton(FloatingSpace2, "FloatingSpace2", "Floating Space 2", "R15", 4)
-		PlayAnim(FloatingSpace2, "70394064781064", .1, 1, "PriorLow", true)
+		PlayAnim(FloatingSpace2, "70394064781064", .1, 0.5, "PriorLow", true)
 		local FloatingHeadSitting = Instance.new("TextButton")
 		CreateAnimButton(FloatingHeadSitting, "FloatingHeadSitting", "Floating Head Sit", "R15", 5)
 		PlayAnim(FloatingHeadSitting, "111681053387222", .3, 1, "PriorLow", true)
@@ -1463,13 +2226,13 @@ local function CreateGui()
 		CreateAnimButton(Dropkick, "Dropkick", "Dropkick", "R15", 6)
 		PlayAnim(Dropkick, "133566007754001", .1, 1, "PriorLow", false)
 	end
-	
+
 	-- UI Decorations
-	
-	local UiCornerParts = {"GuiTopFrame", "CloseGUI", "DestroyGUI", "GuiBottomFrame", "SpeedValue", "SideFrame", "OpenGUI", "ViewportFrame", "OptionsFrame", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "PreviewEnableButton", "SearchFrame", "SearchButton", "BackButton"}
-	local UiStrokeParts = {"GuiTopFrame", "GuiBottomFrame", "SpeedValue", "SearchBox", "SideFrame", "ScrollingFrame", "ScrollingFrameR15", "OptionsFrame", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "PreviewEnableButton", "SearchFrame"}
-	local UiStroke1Parts = {"SpeedValue", "SearchBox", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "PreviewEnableButton"}
-	local UiGradientParts = {"GuiTopFrame", "GuiBottomFrame", "SideFrame", "SettingsButton", "DestroyGUI", "CloseGUI", "OpenGUI", "OptionsButton", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "PreviewEnableButton", "SearchFrame", "SearchButton", "BackButton"}
+
+	local UiCornerParts = {"ResetButton", "CustomAnimFrame", "PlayAnimButton", "CustomAnimButton", "HotkeysEditOption", "SaveSettingsButton", "LaunchIdDetectorButton", "GithubLinkButton", "HotkeysFrame", "SettingsFrame", "SettingsButton", "GuiTopFrame", "CloseGUI", "DestroyGUI", "GuiBottomFrame", "SpeedValue", "SideFrame", "OpenGUI", "ViewportFrame", "OptionsFrame", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "SitButton", "SearchFrame", "SearchButton"}
+	local UiStrokeParts = {"CustomAnimFrame", "HotkeysFrame", "SettingsFrame", "GuiTopFrame", "GuiBottomFrame", "SideFrame", "ScrollingFrame", "ScrollingFrameR15", "OptionsFrame", "SearchFrame"}
+	local UiStroke1Parts = {"ResetButton", "PlayAnimButton", "IdBox", "HotkeysEditOption", "SaveSettingsButton", "LaunchIdDetectorButton", "GithubLinkButton", "SpeedValue", "SearchBox", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "SitButton"}
+	local UiGradientParts = {"CustomAnimBackButton", "BackButton", "CustomAnimFrame", "PlayAnimButton", "CustomAnimButton", "SettingsButton", "GuiTopFrame", "GuiBottomFrame", "SideFrame", "SettingsButton", "DestroyGUI", "CloseGUI", "OpenGUI", "OptionsButton", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "SitButton", "SearchFrame", "SearchButton", "BackButton"}
 
 	for _, UiPart in ipairs(Emoter:GetDescendants()) do
 		if table.find(UiCornerParts, UiPart.Name) then
@@ -1486,7 +2249,7 @@ local function CreateGui()
 
 		end
 
-		if table.find(UiStrokeParts, UiPart.Name) then
+		if table.find(UiStrokeParts, UiPart.Name) or table.find(UiStroke1Parts, UiPart.Name) then
 			local UIStroke = Instance.new("UIStroke")
 			UIStroke.Parent = UiPart
 			UIStroke.Thickness = 2
@@ -1495,7 +2258,7 @@ local function CreateGui()
 				UIStroke.Thickness = 1
 			end
 		end
-		
+
 		if table.find(UiGradientParts, UiPart.Name) then
 			local UIGradient = Instance.new("UIGradient")
 			UIGradient.Parent = UiPart
@@ -1518,9 +2281,34 @@ local function CreateGui()
 
 		end
 	end
-	
-	--OnRestart things
 
+	local function AddUiPadding(Part, left, right, top, bottom)
+		for _, UiPart in ipairs(Emoter:GetDescendants()) do
+			if UiPart.Name == Part then
+				local UIPadding = Instance.new("UIPadding")
+				UIPadding.PaddingLeft = UDim.new(0, left)
+				UIPadding.PaddingRight = UDim.new(0, right)
+				UIPadding.PaddingTop = UDim.new(0, top)
+				UIPadding.PaddingBottom = UDim.new(0, bottom)
+				UIPadding.Parent = UiPart
+			end
+		end
+	end
+
+	AddUiPadding("GuiBottomFrame",5,5)
+	AddUiPadding("SpeedValue",2,2)
+	AddUiPadding("ScrollingFrame",5,16,7,10)
+	AddUiPadding("ScrollingFrameR15",5,16,7,10)
+	AddUiPadding("SearchBox",2,2)
+	AddUiPadding("SettingsStuff",10,10,5)
+	AddUiPadding("ThemeOptionText",0,0,0,2)
+	AddUiPadding("HotkeysEditOption",0,0,0,2)
+	AddUiPadding("HotkeysStuff",10,10,5)
+	AddUiPadding("SearchFrame",2)
+	AddUiPadding("IdBox",2,2)
+	AddUiPadding("CustomAnimFrame",2)
+
+	--OnRestart things
 	if GuiPos ~= nil then
 		SideFrame.Position = GuiPos
 	end
@@ -1545,13 +2333,13 @@ local function CreateGui()
 		ScrollingFrameR15.CanvasPosition = ScrollingFramePos
 	end
 	SearchBox.Text = PrevSearchText
+	IdBox.Text = PrevCustomAnimId
 	SpeedValue.Text = PrevAnimSpeedValue
-	
-	GuiEmoter = Emoter
 
+	GuiEmoter = Emoter
 end
 
-local function OnRestart()
+function OnRestart()
 	if GuiEmoter.MainFrame.Visible == true then
 		GuiClosed = false
 		GuiPos = GuiEmoter.MainFrame.Position
@@ -1569,14 +2357,20 @@ local function OnRestart()
 	else
 		OptionsOpened = false
 	end
-	
+
 	if GuiEmoter.MainFrame.SearchFrame.SearchBox.Visible == true then
 		SearchOpened = true
 	else
 		SearchOpened = false
 	end
+	if GuiEmoter.MainFrame.CustomAnimFrame.IdBox.Visible == true then
+		CustomAnimOpened = true
+	else
+		CustomAnimOpened = false
+	end
 	PrevAnimSpeedValue = GuiEmoter.MainFrame.GuiBottomFrame.SpeedFrame.SpeedValue.Text
 	PrevSearchText = GuiEmoter.MainFrame.SearchFrame.SearchBox.Text
+	PrevCustomAnimId = GuiEmoter.MainFrame.CustomAnimFrame.IdBox.Text
 	GuiEmoter:Destroy()
 	CreateGui()
 end
