@@ -1,4 +1,4 @@
---V2.9.9
+--V3
 --[[Script by Fixel656, based on Energize GUI by illremember
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
@@ -12,18 +12,24 @@ local HttpService = game:GetService("HttpService")
 --Settings
 local ToolAnimHighPrior = false
 local AnimPreviewEnable = true
-local AnimSwitchMode = true
+local AnimSwitchMode = false
 local AnimSmoothFade = true
 local theme = "LightPurple"
 
+local HotkeysEnabled = true
 local SearchHotkey = Instance.new("StringValue")
 local CloseHotkey = Instance.new("StringValue")
 local SitHotkey = Instance.new("StringValue")
+local SwitchAnimHotkey = Instance.new("StringValue")
+local AnimFadeHotkey = Instance.new("StringValue")
+local SettingsHotkey = Instance.new("StringValue")
 
-local HotkeysEnabled = true
 SearchHotkey.Value = "Y"
 CloseHotkey.Value = "T"
 SitHotkey.Value = "G"
+SwitchAnimHotkey.Value = "V"
+AnimFadeHotkey.Value = "B"
+SettingsHotkey.Value = "H"
 
 local BgColor = Color3.fromRGB(137, 165, 255)
 local ScrollBgColor = Color3.fromRGB(219, 244, 255)
@@ -33,9 +39,11 @@ local ButtonSelectCol = Color3.fromRGB(255, 255, 255) -- R6 Button darker color 
 
 --Restart Values
 local GuiPos = nil
+local SettingsPos = nil
 local ScrollingFramePos = nil
 local GuiClosed = false
 local OptionsOpened = false
+local SettingsOpened = false
 
 local PrevAnimSpeedValue = ""
 local SearchOpened = false
@@ -58,6 +66,12 @@ if not game:GetService("RunService"):IsStudio() then
 		AnimSmoothFade = decodedSettings.ConfAnimSmoothFade
 		theme = decodedSettings.ConfTheme
 		HotkeysEnabled = decodedSettings.ConfHotkeysEnabled
+		SearchHotkey.Value = decodedSettings.ConfSearchHotkey
+		CloseHotkey.Value = decodedSettings.ConfCloseHotkey
+		SitHotkey.Value = decodedSettings.ConfSitHotkey
+		SwitchAnimHotkey.Value = decodedSettings.ConfSwitchAnimHotkey
+		AnimFadeHotkey.Value = decodedSettings.ConfAnimFadeHotkey
+		SettingsHotkey.Value = decodedSettings.ConfSettingsHotkey
 	end
 end
 
@@ -110,14 +124,28 @@ local function CreateGui()
 
 	if theme == "LightOrange" then
 		BgColor = Color3.fromRGB(255, 171, 35)
+		ScrollBgColor = Color3.fromRGB(219, 244, 255)
+		UiButColor = Color3.new(0, 0, 0)
+		ButtonCol = Color3.fromRGB(192, 191, 211)
+		ButtonSelectCol = Color3.fromRGB(255, 255, 255)
+	elseif theme == "LightPurple" then
+		BgColor = Color3.fromRGB(137, 165, 255)
+		ScrollBgColor = Color3.fromRGB(219, 244, 255)
+		UiButColor = Color3.new(0, 0, 0)
+		ButtonCol = Color3.fromRGB(192, 191, 211)
+		ButtonSelectCol = Color3.fromRGB(255, 255, 255)
 	elseif theme == "LightYellow" then
 		BgColor = Color3.fromRGB(255, 250, 112)
+		ScrollBgColor = Color3.fromRGB(219, 244, 255)
+		UiButColor = Color3.new(0, 0, 0)
+		ButtonCol = Color3.fromRGB(192, 191, 211)
+		ButtonSelectCol = Color3.fromRGB(255, 255, 255)
 	elseif theme == "Black" then
 		BgColor = Color3.fromRGB(65, 65, 65)
 		ScrollBgColor = Color3.fromRGB(20, 20, 20)
-		UiButColor = Color3.new(1, 1, 1) -- Color of GUI's buttons and Texts
-		ButtonCol = Color3.fromRGB(65, 65, 65) -- R6 Button Color
-		ButtonSelectCol = Color3.fromRGB(129, 129, 129) -- R6 Button darker color (idk how to make it just darker BgColor yet)
+		UiButColor = Color3.new(1, 1, 1)
+		ButtonCol = Color3.fromRGB(65, 65, 65)
+		ButtonSelectCol = Color3.fromRGB(129, 129, 129)
 	end
 
 	local function AddHoverText(Object, Text)
@@ -1124,7 +1152,6 @@ local function CreateGui()
 	HotkeysEditOption.Text = "Edit Hotkeys..."
 	HotkeysEditOption.Font = Enum.Font.SourceSans
 	HotkeysEditOption.Parent = SettingsStuff
-	AddHoverText(HotkeysEditOption, "Coming Soon i guess")
 
 	local UIListLayout7 = Instance.new("UIListLayout")
 	UIListLayout7.FillDirection = Enum.FillDirection.Horizontal
@@ -1251,6 +1278,9 @@ local function CreateGui()
 	AddHotkey(SearchHotkey, "SearchHotkey", "Search")
 	AddHotkey(CloseHotkey, "CloseHotkey", "Close/Open Gui")
 	AddHotkey(SitHotkey, "SitHotkey", "Ragdoll-like falling")
+	AddHotkey(SettingsHotkey, "SettingsHotkey", "Open Settings")
+	--[[AddHotkey(SwitchAnimHotkey, "SwitchAnimHotkey", "Switch Anim Setting")
+	AddHotkey(AnimFadeHotkey, "AnimFadeHotkey", "Animation Fade Setting")]]
 
 	local MoreButtonsFrame = Instance.new("Frame")
 	MoreButtonsFrame.Parent = SettingsFrame
@@ -1415,7 +1445,13 @@ local function CreateGui()
 			ConfAnimSwitchMode = AnimSwitchMode,
 			ConfAnimSmoothFade = AnimSmoothFade,
 			ConfTheme = theme,
-			ConfHotkeysEnabled = HotkeysEnabled
+			ConfHotkeysEnabled = HotkeysEnabled,
+			ConfSearchHotkey = SearchHotkey.Value,
+			ConfCloseHotkey = CloseHotkey.Value,
+			ConfSitHotkey = SitHotkey.Value,
+			ConfSwitchAnimHotkey = SwitchAnimHotkey.Value,
+			ConfAnimFadeHotkey = AnimFadeHotkey.Value,
+			ConfSettingsHotkey = SettingsHotkey.Value
 		}
 		local encodedData = HttpService:JSONEncode(mySettings)
 		writefile("EmoterData/"..ConfigFileName, encodedData)
@@ -1769,7 +1805,7 @@ local function CreateGui()
 	end)
 
 	--Hotkey Functions
-	local input = UserInputService.InputBegan:Connect(function(input, processed)
+	UserInputService.InputBegan:Connect(function(input, processed)
 		if input.KeyCode.Name == SearchHotkey.Value and HotkeysEnabled then
 			if MainFrame.Visible == true then
 				SearchBox:CaptureFocus()
@@ -1786,7 +1822,6 @@ local function CreateGui()
 			end
 		end
 	end)
-
 	UserInputService.InputBegan:Connect(function(input, processed)
 		if tostring(input.KeyCode.Name) == SitHotkey.Value and HotkeysEnabled then
 			if Humanoid.Sit == false then
@@ -1794,6 +1829,22 @@ local function CreateGui()
 			else
 				Humanoid.Sit = false
 			end
+		end
+	end)
+	UserInputService.InputBegan:Connect(function(input, processed)
+		if tostring(input.KeyCode.Name) == CloseHotkey.Value and HotkeysEnabled then
+			MainFrame.Visible = not MainFrame.Visible
+			SideFrame.Visible = not SideFrame.Visible
+			if MainFrame.Visible == true then
+				SideFrame.Position = MainFrame.Position
+			else
+				MainFrame.Position = SideFrame.Position
+			end
+		end
+	end)
+	UserInputService.InputBegan:Connect(function(input, processed)
+		if tostring(input.KeyCode.Name) == SettingsHotkey.Value and HotkeysEnabled then
+			SettingsFrame.Visible = not SettingsFrame.Visible
 		end
 	end)
 
@@ -1930,9 +1981,6 @@ local function CreateGui()
 		local Insane = Instance.new("TextButton")
 		CreateAnimButton(Insane, "Insane", "Insane", "R6", 4)
 		PlayAnim(Insane, "33796059", .1, 1e8, "PriorLow", true)
-		local WallHack = Instance.new("TextButton")
-		CreateAnimButton(WallHack, "WallHack", "Wall Hack", "R6", 4)
-		PlayAnim(WallHack, "204295235", .1, 1e4, "PriorLow", true)
 		local FullSwing = Instance.new("TextButton")
 		CreateAnimButton(FullSwing, "FullSwing", "Full Swing", "R6", 5)
 		PlayAnim(FullSwing, "218504594", .1, 1, "PriorHigh", false)
@@ -2312,11 +2360,14 @@ local function CreateGui()
 	if GuiPos ~= nil then
 		SideFrame.Position = GuiPos
 	end
-	if GuiClosed == true then
-		SideFrame.Visible = true
-	end
 	if GuiPos ~= nil then
 		MainFrame.Position = GuiPos
+	end
+	if SettingsPos ~= nil then
+		SettingsFrame.Position = SettingsPos
+	end
+	if GuiClosed == true then
+		SideFrame.Visible = true
 	end
 	if GuiClosed == true then
 		MainFrame.Visible = false
@@ -2324,6 +2375,9 @@ local function CreateGui()
 	if OptionsOpened == true then
 		OptionsFrame.Visible = true
 		OptionsFrame.Position = UDim2.new(0.5, 0, 1, 7)
+	end
+	if SettingsOpened == true then
+		SettingsFrame.Visible = true
 	end
 
 	if ScrollingFramePos ~= nil then
@@ -2347,6 +2401,10 @@ function OnRestart()
 		GuiClosed = true
 		GuiPos = GuiEmoter.SideFrame.Position
 	end
+	if GuiEmoter.SettingsFrame.Visible == true then
+		SettingsOpened = true
+	end
+	SettingsPos = GuiEmoter.SettingsFrame.Position
 	if (game:GetService"Players".LocalPlayer.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R15) then
 		ScrollingFramePos = GuiEmoter.MainFrame.ScrollingFrameR15.CanvasPosition
 	else
