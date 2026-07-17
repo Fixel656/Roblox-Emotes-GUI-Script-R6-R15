@@ -330,8 +330,6 @@ local function AddResult(Name, Id, Priority)
 	AddHoverText(SaveButton, "Save Animation to Export")
 end
 
-local KeyframeId = game.KeyframeSequenceProvider:RegisterKeyframeSequence(workspace.R15ToR6ConvertedAnimation)
-
 
 AnimIdDetector.Name = "AnimIdDetector"
 AnimIdDetector.DisplayOrder = 100
