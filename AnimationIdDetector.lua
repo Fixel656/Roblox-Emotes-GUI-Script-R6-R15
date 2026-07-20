@@ -1,4 +1,4 @@
---[[V2
+--[[V2.1
 AnimationIdDetector by Fixel
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
@@ -38,6 +38,8 @@ local ObjectModel = TargetAnimObjServices
 local CharOperationActive = false
 local ObjectOperationActive = false
 local DetectDefaultAnims = true
+
+game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Welcome to Anim Detector!", Text = "Wait for script to load", Duration = 5, Icon = "rbxassetid://88751076321975"})
 
 local function AddHoverText(Object, Text)
 	local TextLabel = nil
@@ -133,7 +135,7 @@ local function PlayAnim(Object, ID)
 	local Anim = Instance.new("Animation")
 	Anim.AnimationId = "rbxassetid://".. ID
 	local track = Player.Character:WaitForChild("Humanoid"):LoadAnimation(Anim)
-	
+
 	track.Priority = Enum.AnimationPriority.Action4
 
 	local AnimSpeed = nil
@@ -169,13 +171,13 @@ local function createUniqueObject(Object, Name, parent)
 	return Object
 end
 
-local function AddResult(Name, Id, Priority)
+local function AddResult(Name, Id, Priority, ObjectPath)
 	local ResultFrame = Instance.new("Frame")
 	local PriorityText = Instance.new("TextLabel")
 	local AnimNameText = Instance.new("TextBox")
 	local AnimIdText = Instance.new("TextBox")
-	
-	if Priority == nil then
+
+	if Priority == 0 then
 		ResultFrame.Parent = AnimObjResultsListFrame
 	else
 		ResultFrame.Parent = ResultsListFrame
@@ -219,7 +221,7 @@ local function AddResult(Name, Id, Priority)
 	AnimIdText.ClearTextOnFocus = false
 	AnimIdText.TextScaled = true
 	AnimIdText.Parent = ResultFrame
-	
+
 	PriorityText.Name = "PriorityText"
 	PriorityText.LayoutOrder = 2
 	PriorityText.Size = UDim2.new(0, 72, 0, 37)
@@ -234,7 +236,7 @@ local function AddResult(Name, Id, Priority)
 	PriorityText.Font = Enum.Font.SourceSansBold
 	PriorityText.TextScaled = true
 	PriorityText.Parent = ResultFrame
-	
+
 	local SaveButton = Instance.new("ImageButton")
 	SaveButton.Name = "SaveButton"
 	SaveButton.Parent = ResultFrame
@@ -275,7 +277,7 @@ local function AddResult(Name, Id, Priority)
 
 	local UIStroke1 = Instance.new("UIStroke")
 	UIStroke1.Parent = ResultFrame
-	
+
 	local UICorner = Instance.new("UICorner")
 	UICorner.TopLeftRadius = UDim.new(0, 5)
 	UICorner.CornerRadius = UDim.new(0, 5)
@@ -283,7 +285,7 @@ local function AddResult(Name, Id, Priority)
 	UICorner.BottomRightRadius = UDim.new(0, 5)
 	UICorner.BottomLeftRadius = UDim.new(0, 5)
 	UICorner.Parent = SaveButton
-	
+
 	local UIStroke = Instance.new("UIStroke")
 	UIStroke.Parent = SaveButton
 
@@ -296,10 +298,12 @@ local function AddResult(Name, Id, Priority)
 
 	AnimNameText.Text = Name
 	AnimIdText.Text = Id
-	if Priority ~= nil then
+	if Priority ~= 0 then
 		PriorityText.Text = Priority
+	elseif ObjectPath ~= nil then
+		PriorityText.Text = "[Path]"
 	end
-	
+
 	SaveButton.MouseButton1Click:Connect(function()
 		if game:GetService("RunService"):IsStudio() then
 			if not workspace:FindFirstChild("AnimsFolder") then
@@ -328,6 +332,9 @@ local function AddResult(Name, Id, Priority)
 
 	PlayAnim(ResultFrame, Id)
 	AddHoverText(SaveButton, "Save Animation to Export")
+	if ObjectPath ~= nil then
+		AddHoverText(PriorityText, ObjectPath)
+	end
 end
 
 
@@ -654,8 +661,8 @@ for _, UiPart in ipairs(AnimIdDetector:GetDescendants()) do
 	end
 end
 
--- Functions
 
+-- Functions
 DestroyGUI.MouseButton1Click:connect(function()
 	AnimIdDetector:Destroy()
 end)
@@ -693,16 +700,17 @@ local function DetectPlayingAnimations()
 
 			local IdNumberString = string.match(animationObject.AnimationId, "%d+") 
 			local SameResult = false
-			
+
 			for i, Result in ipairs(ResultsListFrame:GetDescendants()) do
 				if Result.Name == "AnimIdText" and Result.Text == IdNumberString then
 					SameResult = true
 					break
 				end
 			end
-			
+
 			if SameResult == false then
 				AddResult(track.Name, IdNumberString, track.Priority.Name)
+				wait(0.05)
 			end
 
 		end
@@ -729,7 +737,8 @@ local function DetectAnimationObjects()
 					end
 
 					if SameResult == false then
-						AddResult(Object.Name, IdNumberString)
+						AddResult(Object.Name, IdNumberString, 0, Object:GetFullName())
+						wait(0.05)
 					end
 
 				end
@@ -750,7 +759,8 @@ local function DetectAnimationObjects()
 				end
 
 				if SameResult == false then
-					AddResult(Object.Name, IdNumberString)
+					AddResult(Object.Name, IdNumberString, 0, Object:GetFullName())
+					wait(0.05)
 				end
 
 			end
@@ -779,16 +789,14 @@ local targetServices = {
 
 local function findObjectByName(name)
 	for _, service in ipairs(targetServices) do
-		-- GetDescendants проверяет вообще все объекты внутри сервиса на всех уровнях вложенности
 		for _, v in ipairs(service:GetDescendants()) do
 			if v.Name == name and v:IsA("Model") and v:FindFirstChild("Humanoid") then
 				return v
 			end
 		end
 	end
-	return nil -- Если ничего не нашли
+	return nil
 end
-
 
 local function findObjectByPath(pathString, IsObjectModel)
 	local pathStringChanged = string.gsub(pathString, "^%s*(.-)%s*$", "%1")
@@ -813,11 +821,11 @@ local function findObjectByPath(pathString, IsObjectModel)
 		if not nextObject and currentObject == game and (nextName == "workspace" or nextName == "Workspace") then
 			nextObject = game:GetService("Workspace")
 		end
-		
+
 		if currentObject == game.Players and nextName == "LocalPlayer" then
 			nextObject = game.Players.LocalPlayer
 		end
-		
+
 		if not nextObject then
 			warn("Can't find: '" .. nextName .. "' in " .. currentObject:GetFullName())
 			return nil
@@ -825,15 +833,15 @@ local function findObjectByPath(pathString, IsObjectModel)
 
 		currentObject = nextObject
 	end
-	
-	
+
+
 	if currentObject:IsA("Model") and currentObject:FindFirstChild("Humanoid") then
 		return currentObject
 	elseif IsObjectModel == true then
 		return currentObject
 	end
-	
-	return nil -- Если ничего не нашли
+
+	return nil
 end
 
 
@@ -841,19 +849,20 @@ CharStartButton.MouseButton1Click:connect(function()
 	CharOperationActive = not CharOperationActive
 	if CharOperationActive then
 		CharStartButton.Image = "rbxassetid://99514193135085"
-		
+
 		local pathInput = ModelValue.Text
 		if pathInput == "" then
 			Character = Player.Character or Player.CharacterAdded:Wait()
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Start", Text = "Searching for animations...", Duration = 3})
 			return
 		end
 		local foundObject = findObjectByPath(pathInput)
 
 		if foundObject then
-			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Changed", Text = "Character changed to ".. foundObject.Name, Duration = 3})
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Start", Text = "Searching for animations...", Duration = 3})
 			Character = foundObject
 		else
-			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error", Text = "No such Object!", Duration = 3})
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error", Text = "No such Character!", Duration = 3})
 		end
 	else
 		CharStartButton.Image = "rbxassetid://8215093320"
@@ -868,12 +877,13 @@ ObjectStartButton.MouseButton1Click:connect(function()
 		local pathInput = ObjectModelValue.Text
 		if pathInput == "" then
 			ObjectModel = TargetAnimObjServices
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Start", Text = "Searching for animations...", Duration = 3})
 			return
 		end
 		local foundModelObject = findObjectByPath(pathInput, true)
 
 		if foundModelObject then
-			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Changed", Text = "Model changed to ".. foundModelObject.Name, Duration = 3})
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Start", Text = "Searching for animations...", Duration = 3})
 			ObjectModel = foundModelObject
 		else
 			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error", Text = "No such Object!", Duration = 3})
@@ -891,7 +901,7 @@ ExportButton.MouseButton1Click:connect(function()
 	}
 	local synsaveinstance = loadstring(game:HttpGet(Params.RepoURL .. Params.SSI .. ".luau", true), Params.SSI)()
 	local Options = {
-		ReadMe = true, -- Default: true,
+		ReadMe = false,
 		SafeMode = false, -- Kicks you before Saving, which prevents you from being detected in any game. Default: false
 		AntiIdle = true,
 		mode = "invalid",
