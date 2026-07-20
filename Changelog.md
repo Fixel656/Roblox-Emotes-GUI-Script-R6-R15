@@ -56,3 +56,8 @@ V3
 - Added Custom Animation player
   
 <img width="720" height="357" alt="image" src="https://github.com/user-attachments/assets/ada667c4-50fe-4215-a0e0-6419ac5dc734" />
+
+V3.1:
+- Fixed Custom Animation Player and changed how it works: now it adds a new animation button to start of Gui (instead of just playing it)
+- Fixed check for Preview Frame if character has "Animate" script
+- Some other fixes
