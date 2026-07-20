@@ -1,4 +1,4 @@
---V3
+--V3.1
 --[[Script by Fixel656, based on Energize GUI by illremember
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
@@ -24,12 +24,12 @@ local SwitchAnimHotkey = Instance.new("StringValue")
 local AnimFadeHotkey = Instance.new("StringValue")
 local SettingsHotkey = Instance.new("StringValue")
 
-SearchHotkey.Value = "Y"
 CloseHotkey.Value = "T"
+SettingsHotkey.Value = "Y"
+SearchHotkey.Value = "H"
 SitHotkey.Value = "G"
-SwitchAnimHotkey.Value = "V"
-AnimFadeHotkey.Value = "B"
-SettingsHotkey.Value = "H"
+SwitchAnimHotkey.Value = "V" --Unused
+AnimFadeHotkey.Value = "B" --Unused
 
 local BgColor = Color3.fromRGB(137, 165, 255)
 local ScrollBgColor = Color3.fromRGB(219, 244, 255)
@@ -54,7 +54,6 @@ local PrevCustomAnimId = ""
 local DefaultAnimsNameList = {"Animation1", "Animation2", "Animation3", "ClimbAnim", "FallAnim", "JumpAnim", "RunAnim", "SitAnim", "ToolNoneAnim", "WalkAnim", "CheerAnim", "LaughAnim", "PointAnim", "Swim", "SwimIdle", "ToolLungeAnim", "ToolSlashAnim", "WaveAnim"}
 
 local ConfigFileName = "EmoterConfig.json"
-
 if not game:GetService("RunService"):IsStudio() then
 	if isfile("EmoterData/"..ConfigFileName) then
 		local rawData = readfile("EmoterData/"..ConfigFileName)
@@ -66,12 +65,12 @@ if not game:GetService("RunService"):IsStudio() then
 		AnimSmoothFade = decodedSettings.ConfAnimSmoothFade
 		theme = decodedSettings.ConfTheme
 		HotkeysEnabled = decodedSettings.ConfHotkeysEnabled
-		SearchHotkey.Value = decodedSettings.ConfSearchHotkey
-		CloseHotkey.Value = decodedSettings.ConfCloseHotkey
-		SitHotkey.Value = decodedSettings.ConfSitHotkey
-		SwitchAnimHotkey.Value = decodedSettings.ConfSwitchAnimHotkey
-		AnimFadeHotkey.Value = decodedSettings.ConfAnimFadeHotkey
-		SettingsHotkey.Value = decodedSettings.ConfSettingsHotkey
+		SearchHotkey.Value = tostring(decodedSettings.ConfSearchHotkey)
+		CloseHotkey.Value = tostring(decodedSettings.ConfCloseHotkey)
+		SitHotkey.Value = tostring(decodedSettings.ConfSitHotkey)
+		SwitchAnimHotkey.Value = tostring(decodedSettings.ConfSwitchAnimHotkey)
+		AnimFadeHotkey.Value = tostring(decodedSettings.ConfAnimFadeHotkey)
+		SettingsHotkey.Value = tostring(decodedSettings.ConfSettingsHotkey)
 	end
 end
 
@@ -80,6 +79,14 @@ local function CreateGui()
 	local SpeedNum --Value, adding to default speed of animation
 	local Humanoid = nil
 	local ClonedChar = nil
+	local RigType = nil
+	if (game:GetService"Players".LocalPlayer.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R15) then
+		RigType = "R15"
+	elseif (game:GetService"Players".LocalPlayer.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R6) then
+		RigType = "R6"
+	else
+		RigType = "R15"
+	end
 
 	local Emoter = Instance.new("ScreenGui") -- The actual GUI
 	local MainFrame = Instance.new("Frame") -- All of the stuff on the main frame
@@ -246,7 +253,8 @@ local function CreateGui()
 		VPFcam.CameraType = Enum.CameraType.Scriptable
 
 		local targetPosition = nil
-		if (game:GetService"Players".LocalPlayer.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R15) then
+		targetPosition = Vector3.new(4.6, 0.2, 12)
+		if RigType == "R15" then
 			targetPosition = Vector3.new(4.6, 0.2, 12) -- if R15
 		else
 			targetPosition = Vector3.new(4.6, -1, 12)
@@ -261,8 +269,8 @@ local function CreateGui()
 		ClonedChar.Name = "VPFCharacter"
 		ClonedChar.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
 		ClonedChar.Parent = WorldModel
-		if ClonedChar.Animate then
-			ClonedChar.Animate:Destroy()
+		if ClonedChar:FindFirstChild("Animate") then
+			ClonedChar:FindFirstChild("Animate"):Destroy()
 		end
 		if ClonedChar:FindFirstChildOfClass("Tool") then
 			ClonedChar:FindFirstChildOfClass("Tool"):Destroy()
@@ -569,7 +577,7 @@ local function CreateGui()
 	Title.BackgroundColor3 = Color3.new(1, 1, 1)
 	Title.BackgroundTransparency = 1
 	Title.Size = UDim2.new(0, 119, 0, 31)
-	Title.Text = "Emotes GUI"
+	Title.Text = "Emoter GUI"
 	Title.Font = Enum.Font.SourceSansBold
 	Title.TextColor3 = Color3.new(1, 1, 1)
 	Title.TextSize = 24
@@ -599,7 +607,7 @@ local function CreateGui()
 	SFLayout.Parent = SpeedFrame
 	SFLayout.FillDirection = Enum.FillDirection.Vertical
 	SFLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	SFLayout.CellSize = UDim2.new(0, 90, 0, 31)
+	SFLayout.CellSize = UDim2.new(0, 90, 0, 29)
 	SFLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 
 	OptionsButton.Parent = GuiBottomFrame
@@ -922,9 +930,9 @@ local function CreateGui()
 	PlayAnimButton.BackgroundColor3 = ButtonCol
 	PlayAnimButton.ScaleType = Enum.ScaleType.Fit
 	PlayAnimButton.ImageColor3 = UiButColor
-	PlayAnimButton.Image = "rbxassetid://8215093320"
+	PlayAnimButton.Image = "rbxassetid://15081504003"
 	PlayAnimButton.Parent = CustomAnimFrame
-	AddHoverText(PlayAnimButton, "Play animation")
+	AddHoverText(PlayAnimButton, "Add animation (On start of Gui)")
 
 
 	--SettingsFrame
@@ -1438,7 +1446,6 @@ local function CreateGui()
 	end)
 
 	SaveSettingsButton.MouseButton1Click:Connect(function()
-		print(1)
 		local mySettings = {
 			ConfAnimPreviewEnable = AnimPreviewEnable,
 			ConfToolAnimHighPrior = ToolAnimHighPrior,
@@ -1455,7 +1462,7 @@ local function CreateGui()
 		}
 		local encodedData = HttpService:JSONEncode(mySettings)
 		writefile("EmoterData/"..ConfigFileName, encodedData)
-		print(2)
+		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Saved", Text = "Succesfully saved settings!", Duration = 3})
 	end)
 
 	LaunchIdDetectorButton.MouseButton1Click:Connect(function()
@@ -1468,18 +1475,19 @@ local function CreateGui()
 
 	GithubLinkButton.MouseButton1Click:Connect(function()
 		setclipboard("https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/tree/main")
+		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Copied", Text = "Copied link to your clipboard!", Duration = 3})
 	end)
 
-	if (game:GetService"Players".LocalPlayer.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R15) then
+	if RigType == "R15" then
 		ScrollingFrame.Visible = false
 		ScrollingFrameR15.Visible = true
-		Title.Text = "Emotes GUI (R15)"
-		SideFrameTitle.Text = "Emotes GUI (R15)"
+		Title.Text = "Emoter GUI (R15)"
+		SideFrameTitle.Text = "Emoter GUI (R15)"
 	else
 		ScrollingFrame.Visible = true
 		ScrollingFrameR15.Visible = false
-		Title.Text = "Emotes GUI (R6)"
-		SideFrameTitle.Text = "Emotes GUI (R6)"
+		Title.Text = "Emoter GUI (R6)"
+		SideFrameTitle.Text = "Emoter GUI (R6)"
 
 	end
 
@@ -1561,7 +1569,7 @@ local function CreateGui()
 	end)
 
 
-	--CustomAnimSearch
+	--Custom Anim Search
 	local CustomAnimButtonClick = true
 	CustomAnimButton.MouseButton1Click:Connect(function()
 		if CustomAnimButtonClick == true then
@@ -1589,42 +1597,37 @@ local function CreateGui()
 			CustomAnimButtonClick = true
 		end
 	end)
-
-	local CustomAnim = Instance.new("Animation")
-	CustomAnim.Name = "CustomAAnimation"
-	local track = nil
-	local CustomAnimACTIVE = false
+	
 	PlayAnimButton.MouseButton1Click:Connect(function()
-		CustomAnim.AnimationId = "rbxassetid://"..IdBox.Text
-		if track == nil then
-			track = Player.Character:WaitForChild("Humanoid"):LoadAnimation(CustomAnim)
+		if IdBox.Text == "" or string.match(IdBox.Text, "%a") then
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error", Text = "Anim Id is empty or has letters", Duration = 3})
+		return end
+		
+		local SameResult = false
+		
+		for _, Frame in ipairs(ScrollingFramesList) do
+			for i, Result in ipairs(Frame:GetDescendants()) do
+				if Result:IsA("TextButton") and Result.Name == IdBox.Text then
+					SameResult = true
+					game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error", Text = "There's already Anim with this Id", Duration = 3})
+					break
+				end
+			end
 		end
-		if CustomAnim.AnimationId == "rbxassetid://" then return end
-		track.Priority = Enum.AnimationPriority.Action3
 
-		local PauseAnimsOption = false
-
-		CustomAnimACTIVE = not CustomAnimACTIVE
-		if CustomAnimACTIVE then
-			PlayAnimButton.Image = "rbxassetid://99514193135085"
-			if AnimSmoothFade == true then
-				track:Play(.1, 1, 1 + SpeedNum)
+		if SameResult == false then
+			local Anim = Instance.new("TextButton")
+			if RigType == "R6" then
+				CreateAnimButton(Anim, IdBox.Text, IdBox.Text, "R6", 0)
 			else
-				track:Play(0, 1, 1 + SpeedNum)
+				CreateAnimButton(Anim, IdBox.Text, IdBox.Text, "R15", 0)
 			end
-
-			if PauseAnimsOption then
-				track:AdjustSpeed(0)
-			end
-
-		else
-			PlayAnimButton.Image = "rbxassetid://8215093320"
-			if AnimSmoothFade == false then
-				track:Stop(0)
-			end
-			track:Stop()
-			track:Destroy()
+			PlayAnim(Anim, IdBox.Text, .1, 1, "PriorLow", false)
+			local UiStroke = Instance.new("UIStroke")
+			UiStroke.Parent = Anim
+			UiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 		end
+		
 	end)
 
 	if CustomAnimOpened == true then
@@ -1878,7 +1881,7 @@ local function CreateGui()
 	CreateDivideFrame("Attack", 6, "R15")
 
 	-- R6 Emotes
-	if (game:GetService"Players".LocalPlayer.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R6) then
+	if RigType == "R6" then
 		local Dance1 = Instance.new("TextButton")
 		CreateAnimButton(Dance1, "Dance1", "Dance 1", "R6", 1)
 		PlayAnim(Dance1, "182491037", .1, 1, "PriorLow", true)
@@ -2008,7 +2011,7 @@ local function CreateGui()
 	end
 
 	--R15 Emotes
-	if (game:GetService"Players".LocalPlayer.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R15) then
+	if RigType == "R15" then
 		local Dance1 = Instance.new("TextButton")
 		CreateAnimButton(Dance1, "Dance1", "Dance 1", "R15", 1)
 		PlayAnim(Dance1, "507771955", .1, 1, "PriorLow", true)
@@ -2403,6 +2406,8 @@ function OnRestart()
 	end
 	if GuiEmoter.SettingsFrame.Visible == true then
 		SettingsOpened = true
+	else
+		SettingsOpened = false
 	end
 	SettingsPos = GuiEmoter.SettingsFrame.Position
 	if (game:GetService"Players".LocalPlayer.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R15) then
