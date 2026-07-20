@@ -62,6 +62,10 @@ local function AddHoverText(Object, Text)
 		UIPadding.PaddingBottom = UDim.new(0, 2)
 		UIPadding.Parent = TextLabel
 
+		local UISizeConstraint = Instance.new("UISizeConstraint")
+		UISizeConstraint.Parent = TextLabel
+		UISizeConstraint.MaxSize = Vector2.new(300, 3000)
+
 		local UserInputService = game:GetService("UserInputService")
 		local mouse = Player:GetMouse()
 		TextLabel.Position = UDim2.new(0, mouse.X, 0, mouse.Y + 25)
