@@ -1,19 +1,11 @@
 {
   "CustomEmotes": [
-    	["Diggin out", "Diggin out", "R6", 1, "18886065814", 0.1, 1, "PriorLow", false],
-	["laxed1", "laxed1", "R6", 1, "75647669693840", 0.1, 1, "PriorLow", false],
-	["INTRO RIG", "INTRO RIG", "R6", 1, "115509603980568", 0.1, 1, "PriorLow", false],
-	["Untitled1", "Untitled1", "R6", 1, "102332849201255", 0.1, 1, "PriorLow", true],
-	["rambunctious1", "rambunctious1", "R6", 1, "134229395028226", 0.1, 1, "PriorLow", true],
-	["Cool pose", "Cool pose", "R6", 1, "80383984466125", 0.1, 1, "PriorLow", false],
-	["Praying", "Start Praying", "R6", 1, "127491355272189", 0.1, 1, "PriorLow", false],
-	["Praying", "Praying", "R6", 1, "129590492517737", 0.1, 1, "PriorLow", false],
-	["Running", "Running", "R6", 1, "136252471123500", 0.1, 1, "PriorLow", false]
+
   ],
   "DefaultAnims": 
     [],
   "ToolActionAnims": 
-    [104346486636049, 97515610375937, 91449068245117, 87657274257308, 86694530630728, 79706339461226, 72270656710889, 137084281954748, 136579150929627, 130164726362915, 118244995522202, 106779785928420, 98456918873918, 106776364623742, 18885909645, 18885919947, 18885915433, 116618003477002],
+    [],
   "ToolIdleAnims": 
     []
 }
