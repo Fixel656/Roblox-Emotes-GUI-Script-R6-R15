@@ -9,6 +9,7 @@
 	["StartPraying", "Start Praying", "Spec", 2, "127491355272189", 0.1, 1, "PriorLow", false],
 	["Praying", "Praying", "Spec", 2, "129590492517737", 0.1, 1, "PriorLow", true],
 	["Running", "Running", "Spec", 3, "136252471123500", 0.1, 1, "PriorLow", true],
+	["C00lkiddRunning", "Coolkidd Running", "Spec", 3, "96571077893813", 0.1, 1, "PriorLow", true],
 	["Static", "Static", "Spec", 1, "94425494947119", 0.1, 1, "PriorLow", true],
 	["Swaying", "Swaying", "Spec", 5, "73853033197617", 0.1, 1, "PriorLow", true],
 	["Lonely", "Lonely Dance", "Spec", 1, "138019937280193", 0.1, 1, "PriorLow", true],
