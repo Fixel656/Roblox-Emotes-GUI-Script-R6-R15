@@ -1,6 +1,6 @@
 {
 	"CustomEmotes": [
-	["DigginOut", "Diggin out", "Spec", 2, "18886065814", 0.1, 1, "PriorLow", false],
+	["DigginOut", "Digginп out", "Spec", 2, "18886065814", 0.1, 1, "PriorLow", false],
 	["Idle", "Idle", "Spec", 5, "75647669693840", 0.1, 1, "PriorLow", true],
 	["StrangeInvisible", "Invisibility", "Spec", 4, "115509603980568", 0.1, 1, "PriorLowPause", true],
 	["Mesmerizer", "Mesmerizer", "Spec", 1, "102332849201255", 0.1, 1, "PriorLow", true],
@@ -9,6 +9,7 @@
 	["StartPraying", "Start Praying", "Spec", 2, "127491355272189", 0.1, 1, "PriorLow", false],
 	["Praying", "Praying", "Spec", 2, "129590492517737", 0.1, 1, "PriorLow", true],
 	["Running", "Running", "Spec", 3, "136252471123500", 0.1, 1, "PriorLow", true],
+	["C00lkiddRunning", "Coolkidd Running", "Spec", 3, "96571077893813", 0.1, 1, "PriorLow", true],
 	["Static", "Static", "Spec", 1, "94425494947119", 0.1, 1, "PriorLow", true],
 	["Swaying", "Swaying", "Spec", 5, "73853033197617", 0.1, 1, "PriorLow", true],
 	["Lonely", "Lonely Dance", "Spec", 1, "138019937280193", 0.1, 1, "PriorLow", true],
@@ -29,6 +30,7 @@
 	["RussianKick", "Russian Kick", "Spec", 1, "83225211078144", 0.1, 1, "PriorLow", true],
 	["Subject3", "Subject3 Dance", "Spec", 1, "75193609204744", 0.1, 1, "PriorLow", true],
 	["Backflip", "Backflip", "Spec", 3, "136079742365611", 0.1, 1, "PriorLow", true],
+	["Frontflip", "Frontlip", "Spec", 3, "136079742365611", 0.1, -1, "PriorLow", true],
 	["StockDance", "Stock Dance", "Spec", 1, "133140863961315", 0.1, 1, "PriorLow", true],
 	["TheHero", "The Hero", "Spec", 1, "133160365635320", 0.1, 1, "PriorLow", true],
 	["Assumptions", "Assumptions Dance", "Spec", 1, "128492573270955", 0.1, 1, "PriorLow", true],
@@ -51,7 +53,9 @@
 	"DefaultAnims": 
 		[],
 	"ToolActionAnims": 
-		[104346486636049, 97515610375937, 91449068245117, 87657274257308, 86694530630728, 79706339461226, 72270656710889, 137084281954748, 136579150929627, 130164726362915, 118244995522202, 106779785928420, 98456918873918, 106776364623742, 18885909645, 18885919947, 18885915433, 116618003477002],
+		[107339108383093, 139321362207112, 81533966558979, 135884061951801, 114356208094580, 92243093913547, 94039555054855, 126896426760253, 139835501033932, 91758760621955, 104346486636049, 97515610375937, 91449068245117, 87657274257308, 86694530630728, 79706339461226, 72270656710889, 137084281954748, 136579150929627, 130164726362915, 118244995522202, 106779785928420, 98456918873918, 106776364623742, 18885909645, 18885919947, 18885915433, 116618003477002],
 	"ToolIdleAnims": 
-		[]
+		[],
+	"EmoteWheelEmotes": 
+	["R6Wave", "SpecFrontflip", "SpecRambunctious", "SpecRussianKick", "SpecBunnyHop", "SpecSwaying", "SpecParanormalSwag", "SpecChickenDance"]
 }
