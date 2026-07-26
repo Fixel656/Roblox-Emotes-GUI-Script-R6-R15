@@ -1,6 +1,6 @@
 {
 	"CustomEmotes": [
-	["DigginOut", "Diggin out", "Spec", 2, "18886065814", 0.1, 1, "PriorLow", false],
+	["DigginOut", "Digginп out", "Spec", 2, "18886065814", 0.1, 1, "PriorLow", false],
 	["Idle", "Idle", "Spec", 5, "75647669693840", 0.1, 1, "PriorLow", true],
 	["StrangeInvisible", "Invisibility", "Spec", 4, "115509603980568", 0.1, 1, "PriorLowPause", true],
 	["Mesmerizer", "Mesmerizer", "Spec", 1, "102332849201255", 0.1, 1, "PriorLow", true],
@@ -29,6 +29,7 @@
 	["RussianKick", "Russian Kick", "Spec", 1, "83225211078144", 0.1, 1, "PriorLow", true],
 	["Subject3", "Subject3 Dance", "Spec", 1, "75193609204744", 0.1, 1, "PriorLow", true],
 	["Backflip", "Backflip", "Spec", 3, "136079742365611", 0.1, 1, "PriorLow", true],
+	["Frontflip", "Frontlip", "Spec", 3, "136079742365611", 0.1, -1, "PriorLow", true],
 	["StockDance", "Stock Dance", "Spec", 1, "133140863961315", 0.1, 1, "PriorLow", true],
 	["TheHero", "The Hero", "Spec", 1, "133160365635320", 0.1, 1, "PriorLow", true],
 	["Assumptions", "Assumptions Dance", "Spec", 1, "128492573270955", 0.1, 1, "PriorLow", true],
