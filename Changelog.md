@@ -50,7 +50,7 @@ V2.9.5:
 - Added Search
 - Maded some values positions to save on restart
 
-V3
+V3:
 - Added SAVEABLE Settings (Moved PreviewEnabled button along with it)
 - Added Ragdoll fall function
 - Added Custom Animation player
@@ -61,3 +61,26 @@ V3.1:
 - Fixed Custom Animation Player and changed how it works: now it adds a new animation button to start of Gui (instead of just playing it)
 - Fixed check for Preview Frame if character has "Animate" script
 - Some other fixes
+
+V4:
+- Added more hotkeys
+- Added more settings
+- Added Section with Animations for some separate games. It will be places with emotes available in these places specifically.<br/>
+I will add it manually and you could add files for yourself in your files folder. I will type available ones in README.<br/>
+(You can add a pull request or issue and send me your specific game list so i can add it to Github)<br/>
+- Emote wheel (Activate by ",", You can't edit emotes for it in Gui utself (at least for now), You'll need to edit files in EmoterData folder. (Gonna add a guide later).
+- Now you can disable UICorners and UIGradients
+- Made ScrollBgColor more white for White themes
+- Fixed Black theme by making more Ui elements black
+- Optimised code by deleting unnecessary strings and making it in right order
+- Made settings scrollable and made HotkeysFrame smaller
+- Added ReverseAnim option
+
+  <img width="554" height="660" alt="image" src="https://github.com/user-attachments/assets/311e8754-e8d2-45e2-a71f-07fa96d73dbd" />
+  <img width="496" height="493" alt="image" src="https://github.com/user-attachments/assets/2172a07a-6be2-460d-a588-422ef495af50" />
+
+
+V4.1:
+- Separated ToolAnim Priority setting specifically for Idle and Action anims
+- Optimised PlayAnim function
+- Binded UIGradient and UICorner settings to save
