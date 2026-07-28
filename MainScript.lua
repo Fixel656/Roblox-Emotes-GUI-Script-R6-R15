@@ -1,4 +1,4 @@
---V4 
+--V4.1
 --[[Script by Fixel656, based on Energize GUI by illremember
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
@@ -13,6 +13,8 @@ local ContextActionService = game:GetService("ContextActionService")
 
 --Settings
 local ToolAnimHighPrior = false
+local ToolIdleAnimHighPrior = false
+local ToolActionAnimHighPrior = false
 local AnimPreviewEnable = true
 local AnimSwitchMode = false
 local AnimSmoothFade = true
@@ -32,9 +34,9 @@ local EmoteWheelHotkey = Instance.new("StringValue")
 CloseHotkey.Value = "T"
 SettingsHotkey.Value = "Y"
 SearchHotkey.Value = "H"
-SitHotkey.Value = "G"
-SwitchAnimHotkey.Value = "V" --Unused
-AnimFadeHotkey.Value = "B" --Unused
+SitHotkey.Value = "J"
+SwitchAnimHotkey.Value = "V"
+AnimFadeHotkey.Value = "B"
 EmoteWheelHotkey.Value = "Comma" --Not affected by "Hotkeys Enabled" setting
 
 local BgColor = Color3.fromRGB(137, 165, 255)
@@ -87,12 +89,15 @@ if not IsInStudio then
 		local rawData = readfile("EmoterData/"..ConfigFileName)
 		local decodedSettings = HttpService:JSONDecode(rawData)
 		-- Accessing the loaded data
+		ToolIdleAnimHighPrior = decodedSettings.ConfToolIdleAnimHighPrior
+		ToolActionAnimHighPrior = decodedSettings.ConfToolActionAnimHighPrior
 		AnimPreviewEnable = decodedSettings.ConfAnimPreviewEnable
-		ToolAnimHighPrior = decodedSettings.ConfToolAnimHighPrior
 		AnimSwitchMode = decodedSettings.ConfAnimSwitchMode
 		AnimSmoothFade = decodedSettings.ConfAnimSmoothFade
 		theme = decodedSettings.ConfTheme
 		HotkeysEnabled = decodedSettings.ConfHotkeysEnabled
+		UIGradientEnabled = decodedSettings.ConfUIGradientEnabled
+		UICornerEnabled = decodedSettings.ConfUICornerEnabled
 		SearchHotkey.Value = tostring(decodedSettings.ConfSearchHotkey)
 		CloseHotkey.Value = tostring(decodedSettings.ConfCloseHotkey)
 		SitHotkey.Value = tostring(decodedSettings.ConfSitHotkey)
@@ -120,7 +125,7 @@ local function CreateGui()
 
 	local DefaultAnimsNameList = {"Animation1", "Animation2", "Animation3", "ClimbAnim", "FallAnim", "JumpAnim", "RunAnim", "SitAnim", "ToolNoneAnim", "WalkAnim", "CheerAnim", "LaughAnim", "PointAnim", "Swim", "SwimIdle", "ToolLungeAnim", "ToolSlashAnim", "WaveAnim"}
 	local ToolIdleAnimsList = {"ToolNoneAnim", "507768375", "182393478"}
-	local ToolActionAnimsList = {"ToolLungeAnim", "ToolSlashAnim", "522638767", "522635514"}
+	local ToolActionAnimsList = {"ToolLungeAnim", "ToolSlashAnim", "522638767", "522635514", "129967390", "129967478"}
 
 	local Emoter = Instance.new("ScreenGui") --The actual GUI
 	local MainFrame = Instance.new("Frame") --All of the stuff on the main frame
@@ -376,98 +381,79 @@ local function CreateGui()
 		local PauseAnimsOption = false
 		local SwitchModeFactor = false
 		local AnimACTIVE = false
+		
+		local function StartAnim()
+			if AnimSwitchMode == true then
+				SwitchModeFactor = true
+				StopAnimsEvent:Fire()
+				AnimACTIVE = true
+			end
 
+			local CurLooped = Object:GetAttribute("Looped")
+			if CurLooped == false then
+				track.Looped = false
+			elseif CurLooped == true then
+				track.Looped = true
+			end
+
+			if AnimSmoothFade == true then
+				track:Play(FadeTime, 1, (Speed + SpeedNum) * NegativeNumber)
+			else
+				track:Play(0, 1, (Speed + SpeedNum) * NegativeNumber)
+			end
+
+			if PauseAnimsOption then
+				track:AdjustSpeed(0)
+			end
+			AnimSpeed = Speed + SpeedNum
+			ViewportFrame.Visible = false
+			Object.BackgroundColor3 = ButtonSelectCol
+			Object.UIStroke.Thickness = 2
+			Object.UIStroke.Color = Color3.new(0.0392157, 0.501961, 1)
+			if Type:find("Pause") then
+				local PauseTask = task.spawn(function()
+					wait(1)
+					track:AdjustSpeed(0)
+					AnimSpeed = 0
+				end)
+				while wait() do
+					if AnimACTIVE == false then
+						task.cancel(PauseTask)
+						return
+					end
+				end
+			end
+			CurSpeedText.Text = Speed + SpeedNum
+		end
+		local function StopAnim()
+			if AnimSmoothFade == false then
+				track:Stop(0)
+			end
+			track:Stop()
+			Object.BackgroundColor3 = ButtonCol
+			Object.UIStroke.Thickness = 1
+			Object.UIStroke.Color = Color3.new(0, 0, 0)
+			CurSpeedText.Text = ""
+		end
+		
 		Object.MouseButton1Click:connect(function()
 			AnimACTIVE = not AnimACTIVE
 			if AnimACTIVE then
-
-				if AnimSwitchMode == true then
-					SwitchModeFactor = true
-					StopAnimsEvent:Fire()
-					AnimACTIVE = true
-				end
-
-				local CurLooped = Object:GetAttribute("Looped")
-				if CurLooped == false then
-					track.Looped = false
-				elseif CurLooped == true then
-					track.Looped = true
-				end
-
-				if AnimSmoothFade == true then
-					track:Play(FadeTime, 1, (Speed + SpeedNum) * NegativeNumber)
-				else
-					track:Play(0, 1, (Speed + SpeedNum) * NegativeNumber)
-				end
-
-				if PauseAnimsOption then
-					track:AdjustSpeed(0)
-				end
-				AnimSpeed = Speed + SpeedNum
-				ViewportFrame.Visible = false
-				Object.BackgroundColor3 = ButtonSelectCol
-				Object.UIStroke.Thickness = 2
-				Object.UIStroke.Color = Color3.new(0.0392157, 0.501961, 1)
-				CurSpeedText.Text = Speed + SpeedNum
-				if Type:find("Pause") then
-					local PauseTask = task.spawn(function()
-						wait(1)
-						track:AdjustSpeed(0)
-						AnimSpeed = 0
-					end)
-					while wait() do
-						if AnimACTIVE == false then
-							task.cancel(PauseTask)
-							return
-						end
-					end
-				end
+				StartAnim()
 			else
-				if AnimSmoothFade == false then
-					track:Stop(0)
-				end
-				track:Stop()
-				Object.BackgroundColor3 = ButtonCol
-				Object.UIStroke.Thickness = 1
-				Object.UIStroke.Color = Color3.new(0, 0, 0)
-				CurSpeedText.Text = ""
+				StopAnim()
 			end
 		end)
-
 		Object.MouseButton2Click:connect(function()
 			local CurLooped = Object:GetAttribute("Looped")
 			if CurLooped == false then
 				AnimACTIVE = not AnimACTIVE
 				if AnimACTIVE then
-					if AnimSwitchMode == true then
-						SwitchModeFactor = true
-						StopAnimsEvent:Fire()
-						AnimACTIVE = true
-					end
-
+					StartAnim()
 					track.Looped = true
-					if AnimSmoothFade == true then
-						track:Play(FadeTime, 1, (Speed + SpeedNum) * NegativeNumber)
-					else
-						track:Play(0, 1, (Speed + SpeedNum) * NegativeNumber)
-					end
-					if PauseAnimsOption then
-						track:AdjustSpeed(0)
-					end
-					AnimSpeed = Speed + SpeedNum
-					ViewportFrame.Visible = false
-					Object.BackgroundColor3 = ButtonSelectCol
-					Object.UIStroke.Thickness = 2
 					Object.UIStroke.Color = Color3.new(0.972549, 0.670588, 0.0627451)
-					CurSpeedText.Text = Speed + SpeedNum
-
 				else
-					track:Stop()
-					track.Looped = false
-					Object.BackgroundColor3 = ButtonCol
-					Object.UIStroke.Thickness = 1
-					Object.UIStroke.Color = Color3.new(0, 0, 0)
-					CurSpeedText.Text = ""
+					StopAnim()
 				end
 			end
 		end)
@@ -486,57 +472,10 @@ local function CreateGui()
 		Object.Changed:connect(function()
 			if Object.BackgroundColor3 == ButtonCol and AnimACTIVE then
 				AnimACTIVE = false
-				if AnimSmoothFade == false then
-					track:Stop(0)
-				end
-				track:Stop()
-				Object.BackgroundColor3 = ButtonCol
-				Object.UIStroke.Thickness = 1
-				Object.UIStroke.Color = Color3.new(0, 0, 0)
-				CurSpeedText.Text = ""
+				StopAnim()
 			elseif Object.BackgroundColor3 == ButtonSelectCol and not AnimACTIVE then
 				AnimACTIVE = true
-				if AnimSwitchMode == true then
-					SwitchModeFactor = true
-					StopAnimsEvent:Fire()
-					AnimACTIVE = true
-				end
-
-				local CurLooped = Object:GetAttribute("Looped")
-				if CurLooped == false then
-					track.Looped = false
-				elseif CurLooped == true then
-					track.Looped = true
-				end
-
-				if AnimSmoothFade == true then
-					track:Play(FadeTime, 1, (Speed + SpeedNum) * NegativeNumber)
-				else
-					track:Play(0, 1, (Speed + SpeedNum) * NegativeNumber)
-				end
-
-				if PauseAnimsOption then
-					track:AdjustSpeed(0)
-				end
-				AnimSpeed = Speed + SpeedNum
-				ViewportFrame.Visible = false
-				Object.BackgroundColor3 = ButtonSelectCol
-				Object.UIStroke.Thickness = 2
-				Object.UIStroke.Color = Color3.new(0.0392157, 0.501961, 1)
-				CurSpeedText.Text = Speed + SpeedNum
-				if Type:find("Pause") then
-					local PauseTask = task.spawn(function()
-						wait(1)
-						track:AdjustSpeed(0)
-						AnimSpeed = 0
-					end)
-					while wait() do
-						if AnimACTIVE == false then
-							task.cancel(PauseTask)
-							return
-						end
-					end
-				end
+				StartAnim()
 			end
 		end)
 
@@ -555,10 +494,7 @@ local function CreateGui()
 			end
 			AnimACTIVE = false
 			PauseAnimsOption = false
-			track:Stop()
-			Object.BackgroundColor3 = ButtonCol
-			Object.UIStroke.Thickness = 1
-			Object.UIStroke.Color = Color3.new(0, 0, 0)
+			StopAnim()
 		end)
 
 		local VPFtrack = ClonedChar:WaitForChild("Humanoid"):LoadAnimation(Anim)
@@ -1475,7 +1411,8 @@ local function CreateGui()
 	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	UIListLayout.Parent = SettingsStuff
 
-	AddSettings(ToolAnimHighPrior, "ToolPriorityOption", "High priority on Tool anims", 0)
+	AddSettings(ToolIdleAnimHighPrior, "ToolIdlePriorityOption", "High priority on ToolIdle anims", 0)
+	AddSettings(ToolActionAnimHighPrior, "ToolActionPriorityOption", "High priority on ToolAction anims", 0)
 	AddSettings(AnimPreviewEnable, "PreviewOption", "Enable Animation Preview", 1)
 	AddSettings(AnimSwitchMode, "SwitchOption", "Anims Switch mode", 2)
 	AddSettings(AnimSmoothFade, "AnimFadeOption", "Anim smooth Start/Stop", 3)
@@ -1953,52 +1890,6 @@ local function CreateGui()
 			PauseAnimateButton.Interactable = true
 		end
 	end)
-
-	local Task = task.spawn(function()
-		while GuiActive == true do
-			if ToolAnimHighPrior == true then
-				local playingTracks = Humanoid:GetPlayingAnimationTracks()
-				local anyTrue = false
-				for _, ScrollFrame in ipairs(ScrollingFramesList) do
-					for _, item in ipairs(ScrollFrame:GetChildren()) do
-						if item:IsA("TextButton") and item.BackgroundColor3 == ButtonSelectCol then
-							anyTrue = true
-							break
-						end
-					end
-				end
-
-				if anyTrue then
-					for _, animtrack in ipairs(playingTracks) do
-						local animationObject = animtrack.Animation
-						local IdNumberString = string.match(animationObject.AnimationId, "%d+") 
-
-						if table.find(ToolIdleAnimsList, animtrack.Name) or table.find(ToolIdleAnimsList, IdNumberString) then
-							animtrack.Priority = Enum.AnimationPriority.Action4
-						end
-						if table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString) then
-							animtrack.Priority = Enum.AnimationPriority.Action4
-							animtrack:AdjustWeight(100)
-						end
-					end
-				else
-					for _, animtrack in ipairs(playingTracks) do
-						local animationObject = animtrack.Animation
-						local IdNumberString = string.match(animationObject.AnimationId, "%d+") 
-
-						if table.find(ToolIdleAnimsList, animtrack.Name) or table.find(ToolIdleAnimsList, IdNumberString) then
-							animtrack.Priority = Enum.AnimationPriority.Idle
-						end
-						if table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString) then
-							animtrack.Priority = Enum.AnimationPriority.Action
-							animtrack:AdjustWeight(1)
-						end
-					end
-				end
-			end
-			task.wait()
-		end
-	end)
 	
 	local AnimReversed = false
 	ReversePlayButton.MouseButton1Click:Connect(function()
@@ -2024,13 +1915,79 @@ local function CreateGui()
 	end)
 
 	--Settings buttons
-	local ToolAnimPriorityButton = SettingsStuff.ToolPriorityOption
-	ToolAnimPriorityButton.MouseButton1Click:Connect(function()
-		ToolAnimHighPrior = not ToolAnimHighPrior
-		if ToolAnimHighPrior == true then
-			ToolAnimPriorityButton.CheckImage.Image = "rbxassetid://130396712201457"
+	local ToolIdleAnimPriorityButton = SettingsStuff.ToolIdlePriorityOption
+	ToolIdleAnimPriorityButton.MouseButton1Click:Connect(function()
+		ToolIdleAnimHighPrior = not ToolIdleAnimHighPrior
+		if ToolIdleAnimHighPrior or ToolActionAnimHighPrior then
+			ToolAnimHighPrior = true
 		else
-			ToolAnimPriorityButton.CheckImage.Image = ""
+			ToolAnimHighPrior = false
+		end
+		
+		if ToolIdleAnimHighPrior == true then
+			ToolIdleAnimPriorityButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			ToolIdleAnimPriorityButton.CheckImage.Image = ""
+		end
+	end)
+	local ToolActionAnimPriorityButton = SettingsStuff.ToolActionPriorityOption
+	ToolActionAnimPriorityButton.MouseButton1Click:Connect(function()
+		ToolActionAnimHighPrior = not ToolActionAnimHighPrior
+		if ToolActionAnimHighPrior or ToolIdleAnimHighPrior then
+			ToolAnimHighPrior = true
+		else
+			ToolAnimHighPrior = false
+		end
+		
+		if ToolActionAnimHighPrior == true then
+			ToolActionAnimPriorityButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			ToolActionAnimPriorityButton.CheckImage.Image = ""
+		end
+	end)
+	local ToolAnimTask = task.spawn(function()
+		while GuiActive == true do
+			if ToolAnimHighPrior == true then
+				local playingTracks = Humanoid:GetPlayingAnimationTracks()
+				local anyTrue = false
+				for _, ScrollFrame in ipairs(ScrollingFramesList) do
+					for _, item in ipairs(ScrollFrame:GetChildren()) do
+						if item:IsA("TextButton") and item.BackgroundColor3 == ButtonSelectCol then
+							anyTrue = true
+							break
+						end
+					end
+				end
+
+				if anyTrue then
+					for _, animtrack in ipairs(playingTracks) do
+						local animationObject = animtrack.Animation
+						local IdNumberString = string.match(animationObject.AnimationId, "%d+") 
+
+						if (table.find(ToolIdleAnimsList, animtrack.Name) or table.find(ToolIdleAnimsList, IdNumberString)) and ToolIdleAnimHighPrior then
+							animtrack.Priority = Enum.AnimationPriority.Action4
+						end
+						if (table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString)) and ToolActionAnimHighPrior then
+							animtrack.Priority = Enum.AnimationPriority.Action4
+							animtrack:AdjustWeight(100)
+						end
+					end
+				else
+					for _, animtrack in ipairs(playingTracks) do
+						local animationObject = animtrack.Animation
+						local IdNumberString = string.match(animationObject.AnimationId, "%d+") 
+
+						if (table.find(ToolIdleAnimsList, animtrack.Name) or table.find(ToolIdleAnimsList, IdNumberString)) then
+							animtrack.Priority = Enum.AnimationPriority.Idle
+						end
+						if (table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString)) then
+							animtrack.Priority = Enum.AnimationPriority.Action
+							animtrack:AdjustWeight(1)
+						end
+					end
+				end
+			end
+			task.wait()
 		end
 	end)
 
@@ -2115,10 +2072,14 @@ local function CreateGui()
 		local mySettings = {
 			ConfAnimPreviewEnable = AnimPreviewEnable,
 			ConfToolAnimHighPrior = ToolAnimHighPrior,
+			ConfToolIdleAnimHighPrior = ToolIdleAnimHighPrior,
+			ConfToolActionAnimHighPrior = ToolActionAnimHighPrior,
 			ConfAnimSwitchMode = AnimSwitchMode,
 			ConfAnimSmoothFade = AnimSmoothFade,
 			ConfTheme = theme,
 			ConfHotkeysEnabled = HotkeysEnabled,
+			ConfUIGradientEnabled = UIGradientEnabled,
+			ConfUICornerEnabled = UICornerEnabled,
 			ConfSearchHotkey = SearchHotkey.Value,
 			ConfCloseHotkey = CloseHotkey.Value,
 			ConfSitHotkey = SitHotkey.Value,
