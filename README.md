@@ -15,18 +15,19 @@ and if summary is 0, animation will stuck on first frames.
 - You can loop unlooped anims by clicking RMB on them
 - You can preview Animation by hovering on anim button
 - Search animation you need (no need to follow the symbol case)
-- Cool options: Pausing all animations, stopping all default animations, pausing default "Animate" script
+- Cool options: Pausing all animations, stopping all default animations, pausing default "Animate" script, falling and reversing animations
 - Other color themes
 - Saveable settings and position
 - HotKeys
 - Ability to use animation by entering its ID
+- Added Section with Animations for some separate games. It will be places with emotes available in these places specifically.<br/>
+I will add it manually and you could add files for yourself in your files folder. I will type available ones in README.<br/>
+(You can add a pull request or issue and send me your specific game list so i can add it to Github)<br/>
+- Emote wheel (Activate by ",", You can't edit emotes for it in Gui utself (at least for now), You'll need to edit files in EmoterData folder. (Gonna add a guide later).
 
 To do:
 - More R15 animations (there`s no other good FE R6 anims left)
-- Section with Animations for some separate games. It will be places with emotes available in these places specifically.<br/>
-I will add it manually and you could add files for yourself in your files folder. I will type available ones in README.
-- "Saved Anims" Section
-- More Options sections (maybe)
+- More Options (maybe)
 - More<br/>
 <br/>
    This script was based on Energize by illremember. Original: https://github.com/IlikeyocutgHAH12/FEEGGEG/blob/main/%5BFE%5D%20Energize%20Animation%20Gui.txt<br/>
