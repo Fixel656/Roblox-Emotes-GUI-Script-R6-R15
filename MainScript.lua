@@ -270,10 +270,10 @@ local function CreateGui()
 
 			local UserInputService = game:GetService("UserInputService")
 			local mouse = Player:GetMouse()
-			TextLabel.Position = UDim2.new(0, mouse.X, 0, mouse.Y + 25)
+			TextLabel.Position = UDim2.new(0, mouse.X, 0, mouse.Y + 85)
 			TextLabel.Visible = true
 			mouse.Move:connect(function()
-				TextLabel.Position = UDim2.new(0, mouse.X, 0, mouse.Y + 25)
+				TextLabel.Position = UDim2.new(0, mouse.X, 0, mouse.Y + 85)
 			end)
 			-- Add hover text
 		end)
@@ -911,6 +911,7 @@ local function CreateGui()
 	CurAnimInfoTitle.Font = Enum.Font.SourceSansBold
 	CurAnimInfoTitle.TextScaled = true
 	CurAnimInfoTitle.TextStrokeTransparency = 0
+	CurAnimInfoTitle.Visible = false
 	CurAnimInfoTitle.Parent = GuiBottomFrame
 	AddHoverText(CurAnimInfoTitle, AnimInfo)
 
