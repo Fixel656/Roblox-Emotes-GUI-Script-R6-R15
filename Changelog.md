@@ -84,3 +84,10 @@ V4.1:
 - Separated ToolAnim Priority setting specifically for Idle and Action anims
 - Optimised PlayAnim function
 - Binded UIGradient and UICorner settings to save
+
+V4.2:
+- Changed Current speed value in Bottom Frame. Now it's Current Anim Info and you can see it by hovering on a "[info]" text. It will show you some info (Speed and Priority) of ALL currently playing animations.
+- Set IgnoreGuiInset to true
+
+<img width="277" height="225" alt="image" src="https://github.com/user-attachments/assets/9c82ef5f-567d-4569-af74-eac39444ce68" />
+
