@@ -1,4 +1,4 @@
---V4.1
+--V4.2
 --[[Script by Fixel656, based on Energize GUI by illremember
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
@@ -111,6 +111,7 @@ end
 local function CreateGui()
 
 	local SpeedNum --Value, adding to default speed of animation
+	local AnimInfo = Instance.new("StringValue")
 	local NegativeNumber = 1
 	local Humanoid = nil
 	local ClonedChar = nil
@@ -143,7 +144,7 @@ local function CreateGui()
 
 	local GuiBottomFrame = Instance.new("Frame") --Bottom of the main frame
 	local SpeedFrame = Instance.new("Frame") -- Frame of Speed Changer
-	local CurSpeedText = Instance.new("TextLabel")
+	local CurAnimInfoTitle = Instance.new("TextLabel")
 	local OptionsButton = Instance.new("ImageButton")
 
 	local ScrollingFrame = Instance.new("ScrollingFrame") --Scrolling frame of R6 animations
@@ -242,7 +243,6 @@ local function CreateGui()
 			TextLabel.Parent = Emoter
 			TextLabel.Visible = false
 			TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			TextLabel.Text = Text
 			TextLabel.AutomaticSize = Enum.AutomaticSize.XY
 			TextLabel.Size = UDim2.new(0, 5, 0, 17)
 			TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -250,6 +250,13 @@ local function CreateGui()
 			TextLabel.TextWrapped = true
 			TextLabel.Font = Enum.Font.SourceSans
 			TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+			
+			if Text.Value then
+				TextLabel.Text = Text.Value
+			else
+				TextLabel.Text = Text
+			end
 
 			local UIPadding = Instance.new("UIPadding")
 			UIPadding.PaddingLeft = UDim.new(0, 2)
@@ -259,7 +266,7 @@ local function CreateGui()
 
 			local UISizeConstraint = Instance.new("UISizeConstraint")
 			UISizeConstraint.Parent = TextLabel
-			UISizeConstraint.MaxSize = Vector2.new(300, 3000)
+			UISizeConstraint.MaxSize = Vector2.new(400, 3000)
 
 			local UserInputService = game:GetService("UserInputService")
 			local mouse = Player:GetMouse()
@@ -274,6 +281,42 @@ local function CreateGui()
 			TextLabel:Destroy()
 			-- Destroy hover text
 		end)
+	end
+	
+	local PlayingEmoteData = {}
+	local function updateTextLabel()
+		local TextTable = {}
+
+		for _, item in ipairs(PlayingEmoteData) do
+			table.insert(TextTable, item.Name .. ": " .. tostring(item.Speed) .. ", " .. item.Priotity)
+		end
+
+		AnimInfo.Value = table.concat(TextTable, "\n")
+		if AnimInfo.Value == "" then
+			CurAnimInfoTitle.Visible = false
+		else
+			CurAnimInfoTitle.Visible = true
+		end
+	end
+	local function AddEmote(EmoteName, SpeedValue, PriorityValue)
+		for index, item in ipairs(PlayingEmoteData) do
+			if item.Name == EmoteName then
+				table.remove(PlayingEmoteData, index)
+				break
+			end
+		end
+
+		table.insert(PlayingEmoteData, 1, {Name = EmoteName, Speed = SpeedValue, Priotity = PriorityValue})
+		updateTextLabel()
+	end
+	local function RemoveEmote(EmoteName)
+		for index, item in ipairs(PlayingEmoteData) do
+			if item.Name == EmoteName then
+				table.remove(PlayingEmoteData, index)
+				break
+			end
+		end
+		updateTextLabel()
 	end
 
 	local function CreateAnimButton(Object, Name, Text, Type, LayoutPos)
@@ -381,7 +424,7 @@ local function CreateGui()
 		local PauseAnimsOption = false
 		local SwitchModeFactor = false
 		local AnimACTIVE = false
-		
+
 		local function StartAnim()
 			if AnimSwitchMode == true then
 				SwitchModeFactor = true
@@ -423,7 +466,7 @@ local function CreateGui()
 					end
 				end
 			end
-			CurSpeedText.Text = Speed + SpeedNum
+			AddEmote(Object.Name, Speed + SpeedNum, track.Priority.Name)
 		end
 		local function StopAnim()
 			if AnimSmoothFade == false then
@@ -433,9 +476,9 @@ local function CreateGui()
 			Object.BackgroundColor3 = ButtonCol
 			Object.UIStroke.Thickness = 1
 			Object.UIStroke.Color = Color3.new(0, 0, 0)
-			CurSpeedText.Text = ""
+			RemoveEmote(Object.Name)
 		end
-		
+
 		Object.MouseButton1Click:connect(function()
 			AnimACTIVE = not AnimACTIVE
 			if AnimACTIVE then
@@ -484,7 +527,7 @@ local function CreateGui()
 			Object.BackgroundColor3 = ButtonCol
 			Object.UIStroke.Thickness = 1
 			Object.UIStroke.Color = Color3.new(0, 0, 0)
-			CurSpeedText.Text = ""
+			RemoveEmote(Object.Name)
 		end)
 
 		StopAnimsEvent.Event:Connect(function()
@@ -530,9 +573,6 @@ local function CreateGui()
 			end
 		end)
 	end
-	StopAnimsEvent.Event:Connect(function()
-		CurSpeedText.Text = ""
-	end)
 
 	local function AddSettings(Setting, Title, Text, LayoutOrder)
 		local OptionButton = Instance.new("TextButton")
@@ -664,6 +704,7 @@ local function CreateGui()
 	-- Creating Objects
 	Emoter.Name = "Emoter"
 	Emoter.ResetOnSpawn = false
+	Emoter.IgnoreGuiInset = true
 	if IsInStudio then --Made this as i test script mostly in Studio
 		Emoter.Parent = game.Players.LocalPlayer.PlayerGui
 		Emoter.DisplayOrder = 100
@@ -732,7 +773,7 @@ local function CreateGui()
 	MainFrame.BackgroundColor3 = BgColor
 	MainFrame.BackgroundTransparency = 1
 	MainFrame.Size = UDim2.new(0, 460, 0, 285)
-	MainFrame.Position = UDim2.new(0, 10, 0, 10)
+	MainFrame.Position = UDim2.new(0, 10, 0, 70)
 
 	local UIDragDetectorMainFrame = Instance.new("UIDragDetector")
 	UIDragDetectorMainFrame.Parent = MainFrame
@@ -857,27 +898,21 @@ local function CreateGui()
 	ValueText.Font = Enum.Font.SourceSansBold
 	ValueText.TextScaled = true
 
-	CurSpeedText.Name = "CurSpeedText"
-	CurSpeedText.AnchorPoint = Vector2.new(1, 0)
-	CurSpeedText.Size = UDim2.new(0, 0, 0, 35)
-	CurSpeedText.AutomaticSize = Enum.AutomaticSize.X
-	CurSpeedText.BackgroundTransparency = 1
-	CurSpeedText.Position = UDim2.new(1, 0, 0, -2)
-	CurSpeedText.TextColor3 = Color3.fromRGB(255, 255, 255)
-	CurSpeedText.Text = ""
-	CurSpeedText.TextXAlignment = Enum.TextXAlignment.Right
-	CurSpeedText.TextWrapped = true
-	CurSpeedText.Font = Enum.Font.SourceSansBold
-	CurSpeedText.TextScaled = true
-	CurSpeedText.TextStrokeTransparency = 0
-	CurSpeedText.Parent = GuiBottomFrame
-	AddHoverText(CurSpeedText, "Current anim speed")
-	SpeedValue.Changed:Connect(function()
-		SpeedNum = SpeedValue.Text
-		if SpeedValue.Text == "" then
-			SpeedNum = 0
-		end
-	end)
+	CurAnimInfoTitle.Name = "CurAnimInfoTitle"
+	CurAnimInfoTitle.AnchorPoint = Vector2.new(1, 0)
+	CurAnimInfoTitle.Size = UDim2.new(0, 0, 0, 35)
+	CurAnimInfoTitle.AutomaticSize = Enum.AutomaticSize.X
+	CurAnimInfoTitle.BackgroundTransparency = 1
+	CurAnimInfoTitle.Position = UDim2.new(1, 0, 0, 0)
+	CurAnimInfoTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+	CurAnimInfoTitle.Text = "[info]"
+	CurAnimInfoTitle.TextXAlignment = Enum.TextXAlignment.Right
+	CurAnimInfoTitle.TextWrapped = true
+	CurAnimInfoTitle.Font = Enum.Font.SourceSansBold
+	CurAnimInfoTitle.TextScaled = true
+	CurAnimInfoTitle.TextStrokeTransparency = 0
+	CurAnimInfoTitle.Parent = GuiBottomFrame
+	AddHoverText(CurAnimInfoTitle, AnimInfo)
 
 
 	--Scrolling Frames
@@ -985,7 +1020,7 @@ local function CreateGui()
 	PauseAnimateButton.Parent = OptionsFrame
 	PauseAnimateButton.ZIndex = 0
 	AddHoverText(PauseAnimateButton, "Pause Default Animate Script (will look like you're lagging)")
-	
+
 	ReversePlayButton.Parent = OptionsFrame
 	ReversePlayButton.Name = "ReversePlayButton"
 	ReversePlayButton.ZIndex = 0
@@ -1219,7 +1254,7 @@ local function CreateGui()
 	EmoteWheel.AnchorPoint = Vector2.new(0.5, 0.5)
 	EmoteWheel.Size = UDim2.new(0, 380, 0, 380)
 	EmoteWheel.BackgroundTransparency = 1
-	EmoteWheel.Position = UDim2.new(0.5, 0, 0.45)
+	EmoteWheel.Position = UDim2.new(0.5, 0, 0.5, 0)
 	EmoteWheel.Visible = false
 	local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
 	UIAspectRatioConstraint.Parent = EmoteWheel
@@ -1649,8 +1684,14 @@ local function CreateGui()
 		ScrollingFrameR15.Visible = false
 		Title.Text = "Emoter GUI (R6)"
 		SideFrameTitle.Text = "Emoter GUI (R6)"
-
 	end
+	
+	SpeedValue.Changed:Connect(function()
+		SpeedNum = SpeedValue.Text
+		if SpeedValue.Text == "" then
+			SpeedNum = 0
+		end
+	end)
 
 	local OptionsButtonClick = true
 	OptionsButton.MouseButton1Click:Connect(function()
@@ -1890,7 +1931,7 @@ local function CreateGui()
 			PauseAnimateButton.Interactable = true
 		end
 	end)
-	
+
 	local AnimReversed = false
 	ReversePlayButton.MouseButton1Click:Connect(function()
 		AnimReversed = not AnimReversed
@@ -1923,7 +1964,7 @@ local function CreateGui()
 		else
 			ToolAnimHighPrior = false
 		end
-		
+
 		if ToolIdleAnimHighPrior == true then
 			ToolIdleAnimPriorityButton.CheckImage.Image = "rbxassetid://130396712201457"
 		else
@@ -1938,7 +1979,7 @@ local function CreateGui()
 		else
 			ToolAnimHighPrior = false
 		end
-		
+
 		if ToolActionAnimHighPrior == true then
 			ToolActionAnimPriorityButton.CheckImage.Image = "rbxassetid://130396712201457"
 		else
@@ -2156,7 +2197,7 @@ local function CreateGui()
 			SettingsFrame.Visible = not SettingsFrame.Visible
 		end
 	end)
-	
+
 	UserInputService.InputBegan:Connect(function(input, processed)
 		if processed then return end
 		if tostring(input.KeyCode.Name) == SwitchAnimHotkey.Value and HotkeysEnabled then
@@ -2190,9 +2231,9 @@ local function CreateGui()
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
 			if EmoteWheel.Visible then
 				local mousePos = UserInputService:GetMouseLocation()
-				local guiObjects = Player.PlayerGui:GetGuiObjectsAtPosition(mousePos.X, mousePos.Y - 60)
+				local guiObjects = Player.PlayerGui:GetGuiObjectsAtPosition(mousePos.X, mousePos.Y)
 				if not IsInStudio then
-					guiObjects = game.CoreGui:GetGuiObjectsAtPosition(mousePos.X, mousePos.Y - 60)
+					guiObjects = game.CoreGui:GetGuiObjectsAtPosition(mousePos.X, mousePos.Y)
 				end
 
 				local clickedInside = false
@@ -3097,6 +3138,7 @@ local function CreateGui()
 
 	AddUiPadding("GuiBottomFrame",5,5)
 	AddUiPadding("SpeedValue",2,2)
+	AddUiPadding("CurAnimInfoTitle",0,0,1,5)
 	AddUiPadding("ScrollingFrame",5,16,7,10)
 	AddUiPadding("ScrollingFrameR15",5,16,7,10)
 	AddUiPadding("ScrollingFrameSpecific",5,16,7,10)
@@ -3126,7 +3168,7 @@ local function CreateGui()
 	wait()
 	SettingsFrame.Visible = false
 	HotkeysFrame.Visible = false
-	
+
 	if GuiPos ~= nil then
 		SideFrame.Position = GuiPos
 	end
