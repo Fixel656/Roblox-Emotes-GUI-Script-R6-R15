@@ -1,7 +1,8 @@
---V4.2
 --[[Script by Fixel656, based on Energize GUI by illremember
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
+
+local ScriptVersion = "V4.3"
 
 local GuiActive = true
 local GuiEmoter = nil
@@ -193,6 +194,7 @@ local function CreateGui()
 	local SettingsFrame = Instance.new("Frame") --Settings
 	local GuiName = Instance.new("TextLabel")
 	local AutorText = Instance.new("TextLabel")
+	local VersionText = Instance.new("TextLabel")
 	local SettingsStuff = Instance.new("ScrollingFrame")
 	local ThemeOption = Instance.new("Frame")
 	local ThemeOptionText = Instance.new("TextLabel")
@@ -251,7 +253,7 @@ local function CreateGui()
 			TextLabel.Font = Enum.Font.SourceSans
 			TextLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-			
+
 			if Text.Value then
 				TextLabel.Text = Text.Value
 			else
@@ -282,7 +284,7 @@ local function CreateGui()
 			-- Destroy hover text
 		end)
 	end
-	
+
 	local PlayingEmoteData = {}
 	local function updateTextLabel()
 		local TextTable = {}
@@ -452,7 +454,13 @@ local function CreateGui()
 			ViewportFrame.Visible = false
 			Object.BackgroundColor3 = ButtonSelectCol
 			Object.UIStroke.Thickness = 2
-			Object.UIStroke.Color = Color3.new(0.0392157, 0.501961, 1)
+			
+			if track.Looped == true then
+				Object.UIStroke.Color = Color3.new(0.0392157, 0.501961, 1)
+			else
+				Object.UIStroke.Color = Color3.new(0.972549, 0.670588, 0.0627451)
+			end
+			
 			if Type:find("Pause") then
 				local PauseTask = task.spawn(function()
 					wait(1)
@@ -494,7 +502,7 @@ local function CreateGui()
 				if AnimACTIVE then
 					StartAnim()
 					track.Looped = true
-					Object.UIStroke.Color = Color3.new(0.972549, 0.670588, 0.0627451)
+					Object.UIStroke.Color = Color3.new(0.0392157, 0.501961, 1)
 				else
 					StopAnim()
 				end
@@ -1431,6 +1439,21 @@ local function CreateGui()
 	AutorText.TextScaled = true
 	AutorText.TextColor3 = UiButColor
 	AutorText.Parent = SettingsFrame
+	
+	VersionText.Parent = SettingsFrame
+	VersionText.Name = "VersionText"
+	VersionText.AnchorPoint = Vector2.new(1, 0)
+	VersionText.Size = UDim2.new(0.2124352, 0, -0.025, 25)
+	VersionText.LayoutOrder = 1
+	VersionText.BackgroundTransparency = 1
+	VersionText.Position = UDim2.new(1, -2, 0, 0)
+	VersionText.TextSize = 14
+	VersionText.Text = ScriptVersion
+	VersionText.TextColor3 = Color3.fromRGB(147, 147, 147)
+	VersionText.TextWrapped = true
+	VersionText.Font = Enum.Font.SourceSans
+	VersionText.TextXAlignment = Enum.TextXAlignment.Right
+	VersionText.TextYAlignment = Enum.TextYAlignment.Top
 
 	SettingsStuff.Name = "SettingsStuff"
 	SettingsStuff.Size = UDim2.new(1, 0, 0.648, 0)
@@ -1686,7 +1709,7 @@ local function CreateGui()
 		Title.Text = "Emoter GUI (R6)"
 		SideFrameTitle.Text = "Emoter GUI (R6)"
 	end
-	
+
 	SpeedValue.Changed:Connect(function()
 		SpeedNum = SpeedValue.Text
 		if SpeedValue.Text == "" then
@@ -1987,51 +2010,6 @@ local function CreateGui()
 			ToolActionAnimPriorityButton.CheckImage.Image = ""
 		end
 	end)
-	local ToolAnimTask = task.spawn(function()
-		while GuiActive == true do
-			if ToolAnimHighPrior == true then
-				local playingTracks = Humanoid:GetPlayingAnimationTracks()
-				local anyTrue = false
-				for _, ScrollFrame in ipairs(ScrollingFramesList) do
-					for _, item in ipairs(ScrollFrame:GetChildren()) do
-						if item:IsA("TextButton") and item.BackgroundColor3 == ButtonSelectCol then
-							anyTrue = true
-							break
-						end
-					end
-				end
-
-				if anyTrue then
-					for _, animtrack in ipairs(playingTracks) do
-						local animationObject = animtrack.Animation
-						local IdNumberString = string.match(animationObject.AnimationId, "%d+") 
-
-						if (table.find(ToolIdleAnimsList, animtrack.Name) or table.find(ToolIdleAnimsList, IdNumberString)) and ToolIdleAnimHighPrior then
-							animtrack.Priority = Enum.AnimationPriority.Action4
-						end
-						if (table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString)) and ToolActionAnimHighPrior then
-							animtrack.Priority = Enum.AnimationPriority.Action4
-							animtrack:AdjustWeight(100)
-						end
-					end
-				else
-					for _, animtrack in ipairs(playingTracks) do
-						local animationObject = animtrack.Animation
-						local IdNumberString = string.match(animationObject.AnimationId, "%d+") 
-
-						if (table.find(ToolIdleAnimsList, animtrack.Name) or table.find(ToolIdleAnimsList, IdNumberString)) then
-							animtrack.Priority = Enum.AnimationPriority.Idle
-						end
-						if (table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString)) then
-							animtrack.Priority = Enum.AnimationPriority.Action
-							animtrack:AdjustWeight(1)
-						end
-					end
-				end
-			end
-			task.wait()
-		end
-	end)
 
 	local PreviewOptionButton = SettingsStuff.PreviewOption
 	PreviewOptionButton.MouseButton1Click:Connect(function()
@@ -2153,8 +2131,11 @@ local function CreateGui()
 
 	--Hotkey Functions
 	UserInputService.InputBegan:Connect(function(input, processed)
+		
+		if processed then return end
+		if not GuiActive then return end
+		
 		if input.KeyCode.Name == SearchHotkey.Value and HotkeysEnabled then
-			if processed then return end
 			if MainFrame.Visible == true then
 				SearchBox:CaptureFocus()
 				if SearchBox.Visible == false then
@@ -2169,38 +2150,21 @@ local function CreateGui()
 				end
 			end
 		end
-	end)
-	UserInputService.InputBegan:Connect(function(input, processed)
-		if processed then return end
-		if tostring(input.KeyCode.Name) == SitHotkey.Value and HotkeysEnabled then
-			if Humanoid.Sit == false then
-				Humanoid.Sit = true
-			else
-				Humanoid.Sit = false
-			end
-		end
-	end)
-	UserInputService.InputBegan:Connect(function(input, processed)
-		if processed then return end
+
 		if tostring(input.KeyCode.Name) == CloseHotkey.Value and HotkeysEnabled then
-			MainFrame.Visible = not MainFrame.Visible
-			SideFrame.Visible = not SideFrame.Visible
 			if MainFrame.Visible == true then
 				SideFrame.Position = MainFrame.Position
 			else
 				MainFrame.Position = SideFrame.Position
 			end
+			MainFrame.Visible = not MainFrame.Visible
+			SideFrame.Visible = not SideFrame.Visible
 		end
-	end)
-	UserInputService.InputBegan:Connect(function(input, processed)
-		if processed then return end
+
 		if tostring(input.KeyCode.Name) == SettingsHotkey.Value and HotkeysEnabled then
 			SettingsFrame.Visible = not SettingsFrame.Visible
 		end
-	end)
 
-	UserInputService.InputBegan:Connect(function(input, processed)
-		if processed then return end
 		if tostring(input.KeyCode.Name) == SwitchAnimHotkey.Value and HotkeysEnabled then
 			AnimSwitchMode = not AnimSwitchMode
 			if AnimSwitchMode == true then
@@ -2209,9 +2173,7 @@ local function CreateGui()
 				SwitchOptionButton.CheckImage.Image = ""
 			end
 		end
-	end)
-	UserInputService.InputBegan:Connect(function(input, processed)
-		if processed then return end
+
 		if tostring(input.KeyCode.Name) == AnimFadeHotkey.Value and HotkeysEnabled then
 			AnimSmoothFade = not AnimSmoothFade
 			if AnimSmoothFade == true then
@@ -2220,21 +2182,26 @@ local function CreateGui()
 				AnimFadeOptionButton.CheckImage.Image = ""
 			end
 		end
-	end)
 
-	UserInputService.InputBegan:Connect(function(input, processed)
-		if processed then return end
 		if tostring(input.KeyCode.Name) == EmoteWheelHotkey.Value then
 			EmoteWheel.Visible = not EmoteWheel.Visible
 		end
-	end)
-	UserInputService.InputBegan:Connect(function(input, gameProcessed)
+		
+		if tostring(input.KeyCode.Name) == SitHotkey.Value and HotkeysEnabled then
+			if Humanoid.Sit == false then
+				Humanoid.Sit = true
+			else
+				Humanoid.Sit = false
+			end
+		end
+		
+		--EmoteWheelClosing
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
 			if EmoteWheel.Visible then
 				local mousePos = UserInputService:GetMouseLocation()
-				local guiObjects = Player.PlayerGui:GetGuiObjectsAtPosition(mousePos.X, mousePos.Y)
+				local guiObjects = Player.PlayerGui:GetGuiObjectsAtPosition(mousePos.X, mousePos.Y - 60)
 				if not IsInStudio then
-					guiObjects = game.CoreGui:GetGuiObjectsAtPosition(mousePos.X, mousePos.Y)
+					guiObjects = game.CoreGui:GetGuiObjectsAtPosition(mousePos.X, mousePos.Y - 60)
 				end
 
 				local clickedInside = false
@@ -2486,6 +2453,12 @@ local function CreateGui()
 		local Dance3 = Instance.new("TextButton")
 		CreateAnimButton(Dance3, "Dance3", "Dance 3", "R15", 1)
 		PlayAnim(Dance3, "507777451", .1, 1, "PriorLow", true)
+		local FlossDance = Instance.new("TextButton")
+		CreateAnimButton(FlossDance, "FlossDance", "Floss Dance", "R15", 1)
+		PlayAnim(FlossDance, "10714340543", .1, 1, "PriorLow", true)
+		local Monkey = Instance.new("TextButton")
+		CreateAnimButton(Monkey, "Monkey", "Monkey", "R15", 1)
+		PlayAnim(Monkey, "10714388352", .1, 1, "PriorLow", true)
 		local SillyAnimals = Instance.new("TextButton")
 		CreateAnimButton(SillyAnimals, "SillyAnimals", "Silly Animals Dance", "R15", 1)
 		PlayAnim(SillyAnimals, "98943029911905", .1, 1, "PriorLow", true)
@@ -2549,9 +2522,79 @@ local function CreateGui()
 		local TakeTheL = Instance.new("TextButton")
 		CreateAnimButton(TakeTheL, "TakeTheL", "Take The L", "R15", 1)
 		PlayAnim(TakeTheL, "117865821073911", .1, 1, "PriorLow", true)
+		local JumpJacks = Instance.new("TextButton")
+		CreateAnimButton(JumpJacks, "JumpJacks", "Jump Jacks", "R15", 1)
+		PlayAnim(JumpJacks, "10714375667", .1, 1, "PriorLow", true)
+		
+		local Wave = Instance.new("TextButton")
+		CreateAnimButton(Wave, "Wave", "Wave", "R15", 2)
+		PlayAnim(Wave, "10714359093", .1, 1, "PriorLow", false)
+		local HighWave = Instance.new("TextButton")
+		CreateAnimButton(HighWave, "HighWave", "HighWave", "R15", 2)
+		PlayAnim(HighWave, "10714362852", .1, 1, "PriorLow", false)
 		local AwkwardWave = Instance.new("TextButton")
 		CreateAnimButton(AwkwardWave, "AwkwardWave", "Awkward Wave", "R15", 2)
 		PlayAnim(AwkwardWave, "86074172929360", .1, 1, "PriorLow", true)
+		local Point = Instance.new("TextButton")
+		CreateAnimButton(Point, "Point", "Point", "R15", 2)
+		PlayAnim(Point, "10714395441", .1, 1, "PriorLow", false)
+		local Beckon = Instance.new("TextButton")
+		CreateAnimButton(Beckon, "Beckon", "Beckon", "R15", 2)
+		PlayAnim(Beckon, "10713984554", .1, 1, "PriorLow", false)
+		local Happy = Instance.new("TextButton")
+		CreateAnimButton(Happy, "Happy", "Happy", "R15", 2)
+		PlayAnim(Happy, "10714352626", .1, 1, "PriorLow", false)
+		local Cheer = Instance.new("TextButton")
+		CreateAnimButton(Cheer, "Cheer", "Cheer", "R15", 2)
+		PlayAnim(Cheer, "507770677", .1, 1, "PriorLow", false)
+		local Celebrate = Instance.new("TextButton")
+		CreateAnimButton(Celebrate, "Celebrate", "Celebrate", "R15", 2)
+		PlayAnim(Celebrate, "10714016223", .1, 1, "PriorLow", false)
+		local Salute = Instance.new("TextButton")
+		CreateAnimButton(Salute, "Salute", "Salute", "R15", 2)
+		PlayAnim(Salute, "10714389988", .1, 1, "PriorLow", false)
+		local Shrug = Instance.new("TextButton")
+		CreateAnimButton(Shrug, "Shrug", "Shrug", "R15", 2)
+		PlayAnim(Shrug, "10714374484", .1, 1, "PriorLow", false)
+		local Thinking = Instance.new("TextButton")
+		CreateAnimButton(Thinking, "Thinking", "Thinking", "R15", 2)
+		PlayAnim(Thinking, "123167401858016", .1, 1, "PriorLow", false)
+		local Confused = Instance.new("TextButton")
+		CreateAnimButton(Confused, "Confused", "Confused", "R15", 2)
+		PlayAnim(Confused, "4940561610", .1, 1, "PriorLow", false)
+		local Agree = Instance.new("TextButton")
+		CreateAnimButton(Agree, "Agree", "Agree", "R15", 2)
+		PlayAnim(Agree, "10713954623", .1, 1, "PriorLow", false)
+		local Disagree = Instance.new("TextButton")
+		CreateAnimButton(Disagree, "Disagree", "Disagree", "R15", 2)
+		PlayAnim(Disagree, "10714065135", .1, 1, "PriorLow", false)
+		local DolphinBang = Instance.new("TextButton")
+		CreateAnimButton(DolphinBang, "DolphinBang", "Dolphin Bang", "R15", 2)
+		PlayAnim(DolphinBang, "10714068222", .1, 1, "PriorLow", false)
+		local FlowingBreeze = Instance.new("TextButton")
+		CreateAnimButton(FlowingBreeze, "FlowingBreeze", "Flowing Breeze", "R15", 2)
+		PlayAnim(FlowingBreeze, "10714342957", .1, 1, "PriorLow", false)
+		local Fashionable = Instance.new("TextButton")
+		CreateAnimButton(Fashionable, "Fashionable", "Fashionable", "R15", 2)
+		PlayAnim(Fashionable, "10714091938", .1, 1, "PriorLow", false)
+		local Curtsy = Instance.new("TextButton")
+		CreateAnimButton(Curtsy, "Curtsy", "Curtsy", "R15", 2)
+		PlayAnim(Curtsy, "10714061912", .1, 1, "PriorLow", false)
+		local Twirl = Instance.new("TextButton")
+		CreateAnimButton(Twirl, "Twirl", "Twirl", "R15", 2)
+		PlayAnim(Twirl, "10714293450", .1, 1, "PriorLow", false)
+		local HeroLanding = Instance.new("TextButton")
+		CreateAnimButton(HeroLanding, "HeroLanding", "Hero Landing", "R15", 2)
+		PlayAnim(HeroLanding, "10714360164", .1, 1, "PriorLow", false)
+		local Shy = Instance.new("TextButton")
+		CreateAnimButton(Shy, "Shy", "Shy", "R15", 2)
+		PlayAnim(Shy, "10714369325", .1, 1, "PriorLow", false)
+		local Coward = Instance.new("TextButton")
+		CreateAnimButton(Coward, "Coward", "Coward", "R15", 2)
+		PlayAnim(Coward, "4940563117", .1, 1, "PriorLow", false)
+		local Dizzy = Instance.new("TextButton")
+		CreateAnimButton(Dizzy, "Dizzy", "Dizzy", "R15", 2)
+		PlayAnim(Dizzy, "10714066964", .1, 1, "PriorLow", false)
 		local FingerGun = Instance.new("TextButton")
 		CreateAnimButton(FingerGun, "FingerGun", "Finger-Gun", "R15", 2)
 		PlayAnim(FingerGun, "73468073017890", .1, 1, "PriorLow", false)
@@ -2579,21 +2622,7 @@ local function CreateGui()
 		local FakeDeath = Instance.new("TextButton")
 		CreateAnimButton(FakeDeath, "FakeDeath", "FakeDeath", "R15", 2)
 		PlayAnim(FakeDeath, "88130117312312", .1, 1, "PriorLowPause", true)
-		local Wave = Instance.new("TextButton")
-		CreateAnimButton(Wave, "Wave", "Wave", "R15", 2)
-		PlayAnim(Wave, "10714359093", .1, 1, "PriorLow", false)
-		local Point = Instance.new("TextButton")
-		CreateAnimButton(Point, "Point", "Point", "R15", 2)
-		PlayAnim(Point, "10714395441", .1, 1, "PriorLow", false)
-		local Cheer = Instance.new("TextButton")
-		CreateAnimButton(Cheer, "Cheer", "Cheer", "R15", 2)
-		PlayAnim(Cheer, "507770677", .1, 1, "PriorLow", false)
-		local Salute = Instance.new("TextButton")
-		CreateAnimButton(Salute, "Salute", "Salute", "R15", 2)
-		PlayAnim(Salute, "10714389988", .1, 1, "PriorLow", false)
-		local Shrug = Instance.new("TextButton")
-		CreateAnimButton(Shrug, "Shrug", "Shrug", "R15", 2)
-		PlayAnim(Shrug, "10714374484", .1, 1, "PriorLow", false)
+		
 		local Tank = Instance.new("TextButton")
 		CreateAnimButton(Tank, "Tank", "Tank", "R15", 3)
 		PlayAnim(Tank, "115951523870527", .5, 1, "PriorLow", true)
@@ -2671,7 +2700,7 @@ local function CreateGui()
 		PlayAnim(BodyPhone, "73390669780316", .1, 0.8, "PriorLow", false)
 		local Spin = Instance.new("TextButton")
 		CreateAnimButton(Spin, "Spin", "Spin", "R15", 4)
-		PlayAnim(Spin, "110792133024438", .1, 1, "PriorLow", true)
+		PlayAnim(Spin, "110792133024438", .1, 1, "PriorHigh", true)
 		local SpinAround = Instance.new("TextButton")
 		CreateAnimButton(SpinAround, "SpinAround", "SpinAround", "R15", 4)
 		PlayAnim(SpinAround, "91004858616595", .1, 1, "PriorLow", true)
@@ -2960,6 +2989,51 @@ local function CreateGui()
 	--[[for index, id in ipairs(DefaultAnimsNameList) do
 		print("Номер: " .. index .. " | ID анимации: " .. id)
 	end]]
+	local ToolAnimTask = task.spawn(function()
+		while GuiActive == true do
+			if ToolAnimHighPrior == true then
+				local playingTracks = Humanoid:GetPlayingAnimationTracks()
+				local anyTrue = false
+				for _, ScrollFrame in ipairs(ScrollingFramesList) do
+					for _, item in ipairs(ScrollFrame:GetChildren()) do
+						if item:IsA("TextButton") and item.BackgroundColor3 == ButtonSelectCol then
+							anyTrue = true
+							break
+						end
+					end
+				end
+
+				if anyTrue then
+					for _, animtrack in ipairs(playingTracks) do
+						local animationObject = animtrack.Animation
+						local IdNumberString = string.match(animationObject.AnimationId, "%d+") 
+
+						if (table.find(ToolIdleAnimsList, animtrack.Name) or table.find(ToolIdleAnimsList, IdNumberString)) and ToolIdleAnimHighPrior then
+							animtrack.Priority = Enum.AnimationPriority.Action4
+						end
+						if (table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString)) and ToolActionAnimHighPrior then
+							animtrack.Priority = Enum.AnimationPriority.Action4
+							animtrack:AdjustWeight(100)
+						end
+					end
+				else
+					for _, animtrack in ipairs(playingTracks) do
+						local animationObject = animtrack.Animation
+						local IdNumberString = string.match(animationObject.AnimationId, "%d+") 
+
+						if (table.find(ToolIdleAnimsList, animtrack.Name) or table.find(ToolIdleAnimsList, IdNumberString)) then
+							animtrack.Priority = Enum.AnimationPriority.Idle
+						end
+						if (table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString)) then
+							animtrack.Priority = Enum.AnimationPriority.Action
+							animtrack:AdjustWeight(1)
+						end
+					end
+				end
+			end
+			task.wait()
+		end
+	end)
 
 	CreateDivideFrame("Dances", 0, "Spec")
 	CreateDivideFrame("Actions", 1, "Spec")
@@ -3164,6 +3238,8 @@ local function CreateGui()
 
 
 	--OnRestart things
+	Emoter.Enabled = true
+	
 	SettingsFrame.Visible = true --Made this so HotkeysFrame will be scrollable even if you scroll SettingsFrame before opening HotkeysFrame. Idk why it happens
 	HotkeysFrame.Visible = true
 	wait()
@@ -3218,7 +3294,6 @@ local function CreateGui()
 	IdBox.Text = PrevCustomAnimId
 	SpeedValue.Text = PrevAnimSpeedValue
 
-	Emoter.Enabled = true
 	GuiEmoter = Emoter
 end
 
