@@ -125,8 +125,8 @@ local function AddVPF()
 	ClonedChar.Name = "AIDVPFCharacter"
 	ClonedChar.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
 	ClonedChar.Parent = WorldModel
-	if ClonedChar.Animate then
-		ClonedChar.Animate:Destroy()
+	if ClonedChar:FindFirstChild("Animate") then
+		ClonedChar:FindFirstChild("Animate"):Destroy()
 	end
 	if ClonedChar:FindFirstChildOfClass("Tool") then
 		ClonedChar:FindFirstChildOfClass("Tool"):Destroy()
