@@ -91,3 +91,11 @@ V4.2:
 
 <img width="277" height="225" alt="image" src="https://github.com/user-attachments/assets/9c82ef5f-567d-4569-af74-eac39444ce68" />
 
+V4.3:
+- Fixed Adding Anims from file to ToolAnims lists
+- Added more R15 anims
+- Changed "algorythm" of UIStroke colors of AnimButtons
+- Added VersionText in settings
+- Fixed Hotkeys ScrollingFrame being not scrollable if you scroll Settings ScrollFrame
+- More fixes
+
