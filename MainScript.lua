@@ -15,7 +15,7 @@ local ContextActionService = game:GetService("ContextActionService")
 --Settings
 local ToolAnimHighPrior = false
 local ToolIdleAnimHighPrior = false
-local ToolActionAnimHighPrior = false
+local ToolActionAnimHighPrior = true
 local AnimPreviewEnable = true
 local AnimSwitchMode = false
 local AnimSmoothFade = true
@@ -1980,6 +1980,12 @@ local function CreateGui()
 	end)
 
 	--Settings buttons
+	if ToolIdleAnimHighPrior or ToolActionAnimHighPrior then
+		ToolAnimHighPrior = true
+	else
+		ToolAnimHighPrior = false
+	end
+	
 	local ToolIdleAnimPriorityButton = SettingsStuff.ToolIdlePriorityOption
 	ToolIdleAnimPriorityButton.MouseButton1Click:Connect(function()
 		ToolIdleAnimHighPrior = not ToolIdleAnimHighPrior
@@ -3010,8 +3016,7 @@ local function CreateGui()
 
 						if (table.find(ToolIdleAnimsList, animtrack.Name) or table.find(ToolIdleAnimsList, IdNumberString)) and ToolIdleAnimHighPrior then
 							animtrack.Priority = Enum.AnimationPriority.Action4
-						end
-						if (table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString)) and ToolActionAnimHighPrior then
+						elseif (table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString)) and ToolActionAnimHighPrior then
 							animtrack.Priority = Enum.AnimationPriority.Action4
 							animtrack:AdjustWeight(100)
 						end
@@ -3023,8 +3028,7 @@ local function CreateGui()
 
 						if (table.find(ToolIdleAnimsList, animtrack.Name) or table.find(ToolIdleAnimsList, IdNumberString)) then
 							animtrack.Priority = Enum.AnimationPriority.Idle
-						end
-						if (table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString)) then
+						elseif (table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString)) then
 							animtrack.Priority = Enum.AnimationPriority.Action
 							animtrack:AdjustWeight(1)
 						end
