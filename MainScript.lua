@@ -2812,17 +2812,23 @@ local function CreateGui()
 			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
 				print("[CustomAnims File]: Adding Default animations")
 				for _, id in ipairs(data["DefaultAnims"]) do
-					table.insert(DefaultAnimsNameList, tostring(id))
+					if not table.find(DefaultAnimsNameList, id) then
+						table.insert(DefaultAnimsNameList, tostring(id))
+					end
 				end
 			elseif categoryName == "ToolActionAnims" and #data["ToolActionAnims"] ~= 0 then
 				print("[CustomAnims File]: Adding ToolAction Animations")
 				for _, id in ipairs(data["ToolActionAnims"]) do
-					table.insert(ToolActionAnimsList, tostring(id))
+					if not table.find(ToolActionAnimsList, id) then
+						table.insert(ToolActionAnimsList, tostring(id))
+					end
 				end
 			elseif categoryName == "ToolIdleAnims" and #data["ToolIdleAnims"] ~= 0 then
 				print("[CustomAnims File]: Adding ToolIdle Animations")
 				for _, id in ipairs(data["ToolIdleAnims"]) do
-					table.insert(ToolIdleAnimsList, tostring(id))
+					if not table.find(ToolIdleAnimsList, id) then
+						table.insert(ToolIdleAnimsList, tostring(id))
+					end
 				end
 			elseif categoryName == "EmoteWheelEmotes" and #data["EmoteWheelEmotes"] ~= 0 then
 				print("[SpecGameAnims File]: Adding EmoteWhell Data")
@@ -2873,17 +2879,23 @@ local function CreateGui()
 			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
 				print("[SpecGameAnims Github]: Adding Default animations")
 				for _, id in ipairs(data["DefaultAnims"]) do
-					table.insert(DefaultAnimsNameList, tostring(id))
+					if not table.find(DefaultAnimsNameList, id) then
+						table.insert(DefaultAnimsNameList, tostring(id))
+					end
 				end
 			elseif categoryName == "ToolActionAnims" and #data["ToolActionAnims"] ~= 0 then
 				print("[SpecGameAnims Github]: Adding ToolAction Animations")
 				for _, id in ipairs(data["ToolActionAnims"]) do
-					table.insert(ToolActionAnimsList, tostring(id))
+					if not table.find(ToolActionAnimsList, id) then
+						table.insert(ToolActionAnimsList, tostring(id))
+					end
 				end
 			elseif categoryName == "ToolIdleAnims" and #data["ToolIdleAnims"] ~= 0 then
 				print("[SpecGameAnims Github]: Adding ToolIdle Animations")
 				for _, id in ipairs(data["ToolIdleAnims"]) do
-					table.insert(ToolIdleAnimsList, tostring(id))
+					if not table.find(ToolIdleAnimsList, id) then
+						table.insert(ToolIdleAnimsList, tostring(id))
+					end
 				end
 			elseif categoryName == "EmoteWheelEmotes" and #data["EmoteWheelEmotes"] ~= 0 then
 				print("[SpecGameAnims File]: Adding EmoteWhell Data")
@@ -2959,17 +2971,23 @@ local function CreateGui()
 			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
 				print("[SpecGameAnims File]: Adding Default animations")
 				for _, id in ipairs(data["DefaultAnims"]) do
-					table.insert(DefaultAnimsNameList, tostring(id))
+					if not table.find(DefaultAnimsNameList, id) then
+						table.insert(DefaultAnimsNameList, tostring(id))
+					end
 				end
 			elseif categoryName == "ToolActionAnims" and #data["ToolActionAnims"] ~= 0 then
 				print("[SpecGameAnims File]: Adding ToolAction Animations")
 				for _, id in ipairs(data["ToolActionAnims"]) do
-					table.insert(ToolActionAnimsList, tostring(id))
+					if not table.find(ToolActionAnimsList, id) then
+						table.insert(ToolActionAnimsList, tostring(id))
+					end
 				end
 			elseif categoryName == "ToolIdleAnims" and #data["ToolIdleAnims"] ~= 0 then
 				print("[SpecGameAnims File]: Adding ToolIdle Animations")
 				for _, id in ipairs(data["ToolIdleAnims"]) do
-					table.insert(ToolIdleAnimsList, tostring(id))
+					if not table.find(ToolIdleAnimsList, id) then
+						table.insert(ToolIdleAnimsList, tostring(id))
+					end
 				end
 			elseif categoryName == "EmoteWheelEmotes" and #data["EmoteWheelEmotes"] ~= 0 then
 				print("[SpecGameAnims File]: Adding EmoteWhell Data")
