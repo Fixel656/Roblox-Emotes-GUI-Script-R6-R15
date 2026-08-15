@@ -2,7 +2,7 @@
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
 
-local ScriptVersion = "V4.3"
+local ScriptVersion = "V4.3.5"
 
 local GuiActive = true
 local GuiEmoter = nil
@@ -2842,9 +2842,9 @@ local function CreateGui()
 
 	local function GithubSpecGameAnimsOperation()
 		local baseUrl = "https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/SpecificPlaceEmotes/"
-		local finalUrl = baseUrl .. tostring(game.PlaceId)
+		local finalUrl = baseUrl .. tostring(game.GameId)
 
-		print("[SpecGameAnims Github]: Searching Anims file in Github for game ".. game.PlaceId)
+		print("[SpecGameAnims Github]: Searching Anims file in Github for game ".. game.GameId)
 
 		local success, fileContent = pcall(function()
 			return game:HttpGet(finalUrl)
@@ -2903,7 +2903,7 @@ local function CreateGui()
 
 	local function FileSpecGameAnimsOperation()
 		print("[SpecGameAnims File]: Searching Specific GameAnims file")
-		local targetNumber = tostring(game.PlaceId)
+		local targetNumber = tostring(game.GameId)
 		local folderPath = "EmoterData/SpecificAnims"
 		local targetFilePath = nil
 		local fileFound = false
