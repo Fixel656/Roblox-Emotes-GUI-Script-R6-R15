@@ -2802,29 +2802,29 @@ local function CreateGui()
 		end
 		for categoryName, animationsList in pairs(data) do
 			--print("Loading category: " .. categoryName)
-			if categoryName == "CustomEmotes" then
+			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
 				print("[CustomAnims File]: Extracting Animations")
 				for _, info in ipairs(animationsList) do
 					local danceButton = Instance.new("TextButton")
 					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
 					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
 				end
-			elseif categoryName == "DefaultAnims" then
+			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
 				print("[CustomAnims File]: Adding Default animations")
 				for _, id in ipairs(data["DefaultAnims"]) do
 					table.insert(DefaultAnimsNameList, tostring(id))
 				end
-			elseif categoryName == "ToolActionAnims" then
+			elseif categoryName == "ToolActionAnims" and #data["ToolActionAnims"] ~= 0 then
 				print("[CustomAnims File]: Adding ToolAction Animations")
 				for _, id in ipairs(data["ToolActionAnims"]) do
 					table.insert(ToolActionAnimsList, tostring(id))
 				end
-			elseif categoryName == "ToolIdleAnims" then
+			elseif categoryName == "ToolIdleAnims" and #data["ToolIdleAnims"] ~= 0 then
 				print("[CustomAnims File]: Adding ToolIdle Animations")
 				for _, id in ipairs(data["ToolIdleAnims"]) do
 					table.insert(ToolIdleAnimsList, tostring(id))
 				end
-			elseif categoryName == "EmoteWheelEmotes" then
+			elseif categoryName == "EmoteWheelEmotes" and #data["EmoteWheelEmotes"] ~= 0 then
 				print("[SpecGameAnims File]: Adding EmoteWhell Data")
 				local info = data["EmoteWheelEmotes"]
 				EmoteWheelEmotes.Emote1 = info[1]
@@ -2863,29 +2863,29 @@ local function CreateGui()
 
 		for categoryName, animationsList in pairs(data) do
 			--print("[SpecGameAnims Github]: Loading category: " .. categoryName)
-			if categoryName == "CustomEmotes" then
+			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
 				print("[SpecGameAnims Github]: Extracting Animations")
 				for _, info in ipairs(animationsList) do
 					local danceButton = Instance.new("TextButton")
 					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
 					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
 				end
-			elseif categoryName == "DefaultAnims" then
+			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
 				print("[SpecGameAnims Github]: Adding Default animations")
 				for _, id in ipairs(data["DefaultAnims"]) do
 					table.insert(DefaultAnimsNameList, tostring(id))
 				end
-			elseif categoryName == "ToolActionAnims" then
+			elseif categoryName == "ToolActionAnims" and #data["ToolActionAnims"] ~= 0 then
 				print("[SpecGameAnims Github]: Adding ToolAction Animations")
 				for _, id in ipairs(data["ToolActionAnims"]) do
 					table.insert(ToolActionAnimsList, tostring(id))
 				end
-			elseif categoryName == "ToolIdleAnims" then
+			elseif categoryName == "ToolIdleAnims" and #data["ToolIdleAnims"] ~= 0 then
 				print("[SpecGameAnims Github]: Adding ToolIdle Animations")
 				for _, id in ipairs(data["ToolIdleAnims"]) do
 					table.insert(ToolIdleAnimsList, tostring(id))
 				end
-			elseif categoryName == "EmoteWheelEmotes" then
+			elseif categoryName == "EmoteWheelEmotes" and #data["EmoteWheelEmotes"] ~= 0 then
 				print("[SpecGameAnims File]: Adding EmoteWhell Data")
 				local info = data["EmoteWheelEmotes"]
 				EmoteWheelEmotes.Emote1 = info[1]
@@ -2949,29 +2949,29 @@ local function CreateGui()
 
 		for categoryName, animationsList in pairs(data) do
 			--print("Loading category: " .. categoryName)
-			if categoryName == "CustomEmotes" then
+			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
 				print("[SpecGameAnims File]: Extracting Animations")
 				for _, info in ipairs(animationsList) do
 					local danceButton = Instance.new("TextButton")
 					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
 					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
 				end
-			elseif categoryName == "DefaultAnims" then
+			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
 				print("[SpecGameAnims File]: Adding Default animations")
 				for _, id in ipairs(data["DefaultAnims"]) do
 					table.insert(DefaultAnimsNameList, tostring(id))
 				end
-			elseif categoryName == "ToolActionAnims" then
+			elseif categoryName == "ToolActionAnims" and #data["ToolActionAnims"] ~= 0 then
 				print("[SpecGameAnims File]: Adding ToolAction Animations")
 				for _, id in ipairs(data["ToolActionAnims"]) do
 					table.insert(ToolActionAnimsList, tostring(id))
 				end
-			elseif categoryName == "ToolIdleAnims" then
+			elseif categoryName == "ToolIdleAnims" and #data["ToolIdleAnims"] ~= 0 then
 				print("[SpecGameAnims File]: Adding ToolIdle Animations")
 				for _, id in ipairs(data["ToolIdleAnims"]) do
 					table.insert(ToolIdleAnimsList, tostring(id))
 				end
-			elseif categoryName == "EmoteWheelEmotes" then
+			elseif categoryName == "EmoteWheelEmotes" and #data["EmoteWheelEmotes"] ~= 0 then
 				print("[SpecGameAnims File]: Adding EmoteWhell Data")
 				local info = data["EmoteWheelEmotes"]
 				EmoteWheelEmotes.Emote1 = info[1]
