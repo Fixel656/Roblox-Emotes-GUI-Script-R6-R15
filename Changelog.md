@@ -95,6 +95,12 @@ V4.3:
 - Fixed Adding Anims from file to ToolAnims lists
 - Added more R15 anims
 - Changed "algorythm" of UIStroke colors of AnimButtons
+
+V4.3.5:
+- Now script uses GameId instead PlaceId
+- Now There won't be a message for a category if it's in the file but empty
+- Now there won't be duplicates of anims from SpecificGameAnims file if it was loaded from Github file already
+
 - Added VersionText in settings
 - Fixed Hotkeys ScrollingFrame being not scrollable if you scroll Settings ScrollFrame
 - More fixes
