@@ -454,13 +454,13 @@ local function CreateGui()
 			ViewportFrame.Visible = false
 			Object.BackgroundColor3 = ButtonSelectCol
 			Object.UIStroke.Thickness = 2
-			
+
 			if track.Looped == true then
 				Object.UIStroke.Color = Color3.new(0.0392157, 0.501961, 1)
 			else
 				Object.UIStroke.Color = Color3.new(0.972549, 0.670588, 0.0627451)
 			end
-			
+
 			if Type:find("Pause") then
 				local PauseTask = task.spawn(function()
 					wait(1)
@@ -1439,7 +1439,7 @@ local function CreateGui()
 	AutorText.TextScaled = true
 	AutorText.TextColor3 = UiButColor
 	AutorText.Parent = SettingsFrame
-	
+
 	VersionText.Parent = SettingsFrame
 	VersionText.Name = "VersionText"
 	VersionText.AnchorPoint = Vector2.new(1, 0)
@@ -1985,7 +1985,7 @@ local function CreateGui()
 	else
 		ToolAnimHighPrior = false
 	end
-	
+
 	local ToolIdleAnimPriorityButton = SettingsStuff.ToolIdlePriorityOption
 	ToolIdleAnimPriorityButton.MouseButton1Click:Connect(function()
 		ToolIdleAnimHighPrior = not ToolIdleAnimHighPrior
@@ -2137,10 +2137,10 @@ local function CreateGui()
 
 	--Hotkey Functions
 	UserInputService.InputBegan:Connect(function(input, processed)
-		
+
 		if processed then return end
 		if not GuiActive then return end
-		
+
 		if input.KeyCode.Name == SearchHotkey.Value and HotkeysEnabled then
 			if MainFrame.Visible == true then
 				SearchBox:CaptureFocus()
@@ -2192,7 +2192,7 @@ local function CreateGui()
 		if tostring(input.KeyCode.Name) == EmoteWheelHotkey.Value then
 			EmoteWheel.Visible = not EmoteWheel.Visible
 		end
-		
+
 		if tostring(input.KeyCode.Name) == SitHotkey.Value and HotkeysEnabled then
 			if Humanoid.Sit == false then
 				Humanoid.Sit = true
@@ -2200,7 +2200,7 @@ local function CreateGui()
 				Humanoid.Sit = false
 			end
 		end
-		
+
 		--EmoteWheelClosing
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
 			if EmoteWheel.Visible then
@@ -2531,7 +2531,7 @@ local function CreateGui()
 		local JumpJacks = Instance.new("TextButton")
 		CreateAnimButton(JumpJacks, "JumpJacks", "Jump Jacks", "R15", 1)
 		PlayAnim(JumpJacks, "10714375667", .1, 1, "PriorLow", true)
-		
+
 		local Wave = Instance.new("TextButton")
 		CreateAnimButton(Wave, "Wave", "Wave", "R15", 2)
 		PlayAnim(Wave, "10714359093", .1, 1, "PriorLow", false)
@@ -2628,7 +2628,7 @@ local function CreateGui()
 		local FakeDeath = Instance.new("TextButton")
 		CreateAnimButton(FakeDeath, "FakeDeath", "FakeDeath", "R15", 2)
 		PlayAnim(FakeDeath, "88130117312312", .1, 1, "PriorLowPause", true)
-		
+
 		local Tank = Instance.new("TextButton")
 		CreateAnimButton(Tank, "Tank", "Tank", "R15", 3)
 		PlayAnim(Tank, "115951523870527", .5, 1, "PriorLow", true)
@@ -2805,9 +2805,11 @@ local function CreateGui()
 			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
 				print("[CustomAnims File]: Extracting Animations")
 				for _, info in ipairs(animationsList) do
-					local danceButton = Instance.new("TextButton")
-					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
-					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
+					if not ((info[3] == "R6" and ScrollingFrame:FindFirstChild(info[1])) or (info[3] == "R15" and ScrollingFrameR15:FindFirstChild(info[1])) or (info[3] == "Spec" and ScrollingFrameSpecific:FindFirstChild(info[1]))) then
+						local danceButton = Instance.new("TextButton")
+						CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
+						PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
+					end
 				end
 			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
 				print("[CustomAnims File]: Adding Default animations")
@@ -2872,9 +2874,11 @@ local function CreateGui()
 			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
 				print("[SpecGameAnims Github]: Extracting Animations")
 				for _, info in ipairs(animationsList) do
-					local danceButton = Instance.new("TextButton")
-					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
-					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
+					if not ((info[3] == "R6" and ScrollingFrame:FindFirstChild(info[1])) or (info[3] == "R15" and ScrollingFrameR15:FindFirstChild(info[1])) or (info[3] == "Spec" and ScrollingFrameSpecific:FindFirstChild(info[1]))) then
+						local danceButton = Instance.new("TextButton")
+						CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
+						PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
+					end
 				end
 			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
 				print("[SpecGameAnims Github]: Adding Default animations")
@@ -2964,9 +2968,11 @@ local function CreateGui()
 			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
 				print("[SpecGameAnims File]: Extracting Animations")
 				for _, info in ipairs(animationsList) do
-					local danceButton = Instance.new("TextButton")
-					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
-					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
+					if not ((info[3] == "R6" and ScrollingFrame:FindFirstChild(info[1])) or (info[3] == "R15" and ScrollingFrameR15:FindFirstChild(info[1])) or (info[3] == "Spec" and ScrollingFrameSpecific:FindFirstChild(info[1]))) then
+						local danceButton = Instance.new("TextButton")
+						CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
+						PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
+					end
 				end
 			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
 				print("[SpecGameAnims File]: Adding Default animations")
@@ -3013,6 +3019,7 @@ local function CreateGui()
 	--[[for index, id in ipairs(DefaultAnimsNameList) do
 		print("Номер: " .. index .. " | ID анимации: " .. id)
 	end]]
+	
 	local ToolAnimTask = task.spawn(function()
 		while GuiActive == true do
 			if ToolAnimHighPrior == true then
@@ -3261,7 +3268,7 @@ local function CreateGui()
 
 	--OnRestart things
 	Emoter.Enabled = true
-	
+
 	SettingsFrame.Visible = true --Made this so HotkeysFrame will be scrollable even if you scroll SettingsFrame before opening HotkeysFrame. Idk why it happens
 	HotkeysFrame.Visible = true
 	wait()
