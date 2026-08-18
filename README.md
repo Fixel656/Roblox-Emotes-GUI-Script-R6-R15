@@ -30,7 +30,7 @@ and if summary is 0, animation will stuck on first frames.
 - Ability to use animation by entering its ID
 - Added SGA - SpecificGameAnimations: file with Animations for some games. It will be places with emotes available in these places specifically.<br/>
 I will add it manually and type available ones in README. Also you can add files for yourself in your files folder. More information [here](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20&%20Changelogs/Documentation%20&%20Tutorial.md). <br/>
-(You can add a pull request or issue and send me your SGA so i can add it to Github)<br/>
+(You can add your SGA in [Discussions](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/discussions/categories/your-sga-specific-game-animations) so i can add it to Github)<br/>
 - Emote wheel (Activate by <kbd>,</kbd> button. You can't edit emotes for it in Gui utself (at least for now), You'll need to edit files in EmoterData folder. (Gonna add a guide later).
 
 ### To do:
