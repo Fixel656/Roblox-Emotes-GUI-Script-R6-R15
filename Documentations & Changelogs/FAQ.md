@@ -1,3 +1,5 @@
+# FAQ
+
 - Is This Emotes GUI FE?<br>
 
   Yes, everyone can see emotes you using from this GUI
