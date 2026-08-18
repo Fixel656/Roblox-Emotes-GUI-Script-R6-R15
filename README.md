@@ -1,6 +1,11 @@
+#  Emoter GUI
+
 Made an FE Animations script with some features
 
-- Script: `loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/MainScript.lua",true))()`
+- Script:
+```lua
+ loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/MainScript.lua",true))()
+```
 
 <img width="720" height="357" alt="image" src="https://github.com/user-attachments/assets/011181d7-b8dc-4e56-bab1-fcddd4e49cf1" /><br/>
 
@@ -32,14 +37,17 @@ To do:
 <br/>
    This script was based on Energize by illremember. Original: https://github.com/IlikeyocutgHAH12/FEEGGEG/blob/main/%5BFE%5D%20Energize%20Animation%20Gui.txt<br/>
 <br/>
-<br/>
-<br/>
-  CREATED ANIMATION ID DETECTOR (Maded to get Id for Section with Animations for some separate games And other things)<br/>
-<br/>
-- Script: `loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/AnimationIdDetector.lua",true))()`
+
+# AnimId Detector
+  Animation Id detector made to look and add Animations for games and other things.<br/>
+<br>
+
+- Script:
+```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/AnimationIdDetector.lua",true))()
+```
 
 <img width="488" height="294" alt="image" src="https://github.com/user-attachments/assets/707e7d25-17d2-4ebe-9172-6c36988fab24" /> <img width="487" height="294" alt="image" src="https://github.com/user-attachments/assets/0c2901da-9b65-4c95-a884-cef52aaa7af5" />
-
 
 What this Gui can do:
 - Detect animation Character currently playing or Animation object (Name, Id and Priority if detecting from Character)
@@ -48,7 +56,10 @@ What this Gui can do:
 - Preview detected anims
 - Name and Id are copyable so you dont need to write it yourself
 - Save and EXPORT anims to file as KeyframeSequences (KeyframeSequence will have it's Animation Id as Attribute)
+- Easily add animations to Emoter files
+<br/>
+<br/>
+I made those scripts for myself, so it may be not fully suitable for you. You can change it if you want, but it would be cool if you will credit me and original author!<br/>
+<br/>
 
-I made those scripts for myself, so it may be not fully suitable for you, especially on section with separate places. You can change it if you want, but it would be cool if you will credit me and original author!
-
-Hope you like it! 
+**Hope you like it!**
