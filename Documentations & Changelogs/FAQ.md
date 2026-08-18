@@ -17,17 +17,15 @@
 
 - How to made my own SGA?
 
-  Look in my [Documentation & Tutorial](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20&%20Changelogs/Documentation%20&%20Tutorial.md).
-<br>
+  Look in my [Documentation & Tutorial](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20&%20Changelogs/Documentation%20&%20Tutorial.md).<br>
 
 - What if want add animations from Marketplace and want it to be in all R15 games?
   
-  You can add these animations to CustomAnims.lua file in EmoterData folder inside you Workspace file folder of your executor. More information [here](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20&%20Changelogs/Documentation%20&%20Tutorial.md).
-<br>
+  You can add these animations to CustomAnims.lua file in EmoterData folder inside you Workspace file folder of your executor. More information [here](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20&%20Changelogs/Documentation%20&%20Tutorial.md).<br>
   
 - What if i want to recommend something to author of this script (like new functions, settings or other advice)?
 
-  You can always do it in Issues section.<br>
+  You can always do it in [Discussions](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/discussions/categories/ideas).<br>
 
 - You have Emote wheel in your GUI. How can i change emotes for it?
 
