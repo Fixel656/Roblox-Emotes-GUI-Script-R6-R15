@@ -1,4 +1,6 @@
-#  Emoter GUI
+<p align="center">
+ <img width="250" height="140" alt="EmoterLogo4" src="https://github.com/user-attachments/assets/310058f6-c9ed-4321-84ed-853f696ba468" />
+</p>
 
 Made an FE Animations script with some features
 
@@ -11,7 +13,7 @@ Made an FE Animations script with some features
 <br>
 
 ### What this Gui can do?
-- Play FE animations, of course (**43** R6 animations AND **88** R15 animations)
+- Play FE animations, of course (**43** R6 animations AND more than **100** R15 animations)
 - Highly configurable Button and animation functions
 - Abibily to change animation speed. The number you write in the window is adding to the default speed, 
 if you type negative number, it will make animation slower, but if summary speed will be negative, animation won't work, 
