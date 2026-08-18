@@ -36,6 +36,7 @@ I will add it manually and type available ones in README. Also you can add files
 ### To do:
 - Update AutoPause function for animation
 - Double Hotkey
+- "HigherPriority" Setting for games that use Action4 animation priority
 - More R15 animations (there`s no other good FE R6 anims left)
 - More Options (maybe)
 - More<br/>
