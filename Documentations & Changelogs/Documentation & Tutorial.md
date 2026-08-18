@@ -101,4 +101,7 @@ To find out which part is responsible for what, you can just hover on it<br>
 <img width="174" height="70" alt="image" src="https://github.com/user-attachments/assets/eee2dd7d-e01f-4548-9232-c044cee52e83" /><br>
 <br>
 With this function you don't need to add files and animations through files. It creates file with Id and game's name automatically!<br>
-The only problem is the fact that it doesn't support CustomAnims.lua file. You'll need to do everything for it manually
+The only problem is the fact that it doesn't support CustomAnims.lua file. You'll need to do everything for it manually.<br>
+<br>
+### Comunication
+After you make a file, you can always send it to [Discussions](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/discussions/categories/your-sga-specific-game-animations) so i can add it to Github!
