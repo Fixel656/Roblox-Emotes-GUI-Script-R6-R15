@@ -6,10 +6,11 @@ Made an FE Animations script with some features
 ```lua
  loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/MainScript.lua",true))()
 ```
+<br>
+<img width="548" height="354" alt="image" src="https://github.com/user-attachments/assets/485b95cf-0898-487a-aa8b-b3205c4f5fa0" /><br>
+<br>
 
-<img width="720" height="357" alt="image" src="https://github.com/user-attachments/assets/011181d7-b8dc-4e56-bab1-fcddd4e49cf1" /><br/>
-
-What this Gui can do:
+### What this Gui can do?
 - Play FE animations, of course (**43** R6 animations AND **88** R15 animations)
 - Highly configurable Button and animation functions
 - Abibily to change animation speed. The number you write in the window is adding to the default speed, 
@@ -25,12 +26,14 @@ and if summary is 0, animation will stuck on first frames.
 - Saveable settings and position
 - HotKeys
 - Ability to use animation by entering its ID
-- Added Section with Animations for some separate games. It will be places with emotes available in these places specifically.<br/>
-I will add it manually and you could add files for yourself in your files folder. I will type available ones in README.<br/>
-(You can add a pull request or issue and send me your specific game list so i can add it to Github)<br/>
-- Emote wheel (Activate by ",", You can't edit emotes for it in Gui utself (at least for now), You'll need to edit files in EmoterData folder. (Gonna add a guide later).
+- Added SGA - SpecificGameAnimations: file with Animations for some games. It will be places with emotes available in these places specifically.<br/>
+I will add it manually and type available ones in README. Also you can add files for yourself in your files folder. More information [here](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20&%20Changelogs/Documentation%20&%20Tutorial.md). <br/>
+(You can add a pull request or issue and send me your SGA so i can add it to Github)<br/>
+- Emote wheel (Activate by <kbd>,</kbd> button. You can't edit emotes for it in Gui utself (at least for now), You'll need to edit files in EmoterData folder. (Gonna add a guide later).
 
-To do:
+### To do:
+- Update AutoPause function for animation
+- Double Hotkey
 - More R15 animations (there`s no other good FE R6 anims left)
 - More Options (maybe)
 - More<br/>
@@ -49,7 +52,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emote
 
 <img width="488" height="294" alt="image" src="https://github.com/user-attachments/assets/707e7d25-17d2-4ebe-9172-6c36988fab24" /> <img width="487" height="294" alt="image" src="https://github.com/user-attachments/assets/0c2901da-9b65-4c95-a884-cef52aaa7af5" />
 
-What this Gui can do:
+### What this Gui can do?
 - Detect animation Character currently playing or Animation object (Name, Id and Priority if detecting from Character)
 - Choose Character do detect anims from By entering it's Name or write a path to it (game.workspace.Rig)
 - Chose a path to search for Anim Objects in
