@@ -9,17 +9,19 @@
 
 - What is SGA (Specific Game Animations) function?
 
-  This is a feature that allows you to add animations made by developers in games made by them. All data stored in separate files (one file for one game). You can find these files in SpecificGameAnimations folder in my Github repository.
-  But you can also madefor yourself, as i'm not playing ALL roblox games. <br>
-  ALSO!!! If you want, you can make a request to add your SGA file to my Github so other users will be much easier!<br>
+  This is a feature that allows you to add animations made by developers in games made by them. All data stored in separate files (one file for one game). You can find these files in [SpecificGameAnimations folder in my Github repository](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/tree/main/SpecificGameAnimations).
+  But you can also made for yourself, as i'm not playing ALL roblox games. You can see how to do it [here](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20&%20Changelogs/Documentation%20&%20Tutorial.md). <br>
+  ALSO!!! If you want, you can make a request to add your SGA file to my Github!<br>
 
 - How to made my own SGA?
 
-  Look in Documentations file in Documentations folder in my repository.<br>
+  Look in my [Documentation & Tutorial](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20&%20Changelogs/Documentation%20&%20Tutorial.md).
+<br>
 
 - What if want add animations from Marketplace and want it to be in all R15 games?
   
-  You can add these animations to CustomAnims.lua file in EmoterData folder inside you Workspace file folder of your executor. More in Documentations folder in my repository.<br>
+  You can add these animations to CustomAnims.lua file in EmoterData folder inside you Workspace file folder of your executor. More information [here](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20&%20Changelogs/Documentation%20&%20Tutorial.md).
+<br>
   
 - What if i want to recommend something to author of this script (like new functions, settings or other advice)?
 
@@ -27,4 +29,4 @@
 
 - You have Emote wheel in your GUI. How can i change emotes for it?
 
-  You can't do it inside GUI itself, you can only do it in files. More information in Documentations folder in my repository
+  You can't do it inside GUI itself, you can only do it in files. More information [here](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20&%20Changelogs/Documentation%20&%20Tutorial.md).
