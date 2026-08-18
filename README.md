@@ -38,12 +38,13 @@ and if summary is 0, animation will stuck on first frames.
 - Added SGA - SpecificGameAnimations: file with Animations for some games. It will be places with emotes available in these places specifically.<br/>
 I will add it manually and type available ones in README. Also you can add files for yourself in your files folder. More information [here](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/wiki/SpecificGameAnimations-and-how-to-make-your-own-SGA). <br/>
 (You can add your SGA in [Discussions](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/discussions/categories/your-sga-specific-game-animations) so i can add it to Github)<br/>
-- Emote wheel (Activate by <kbd>,</kbd> button. You can't edit emotes for it in Gui utself (at least for now), You'll need to edit files in EmoterData folder. (Gonna add a guide later).
+- Emote wheel (Activate by <kbd>,</kbd> button. You can't edit emotes for it in Gui itself (at least for now), You'll need to edit files in EmoterData folder. (Gonna add a guide later).
 
 ### To do:
 - Update AutoPause function for animation
 - Double Hotkey
 - "HigherPriority" Setting for games that use Action4 animation priority
+- "Running" type for animations to have AnimationSpeed changing depending on the character's speed
 - More R15 animations (there`s no other good FE R6 anims left)
 - More Options (maybe)
 - More<br/>
