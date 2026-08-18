@@ -1,3 +1,5 @@
+# Documentation & Tutorial
+
 - How does SGA Works?<br>
 
 All data stored in:
@@ -42,13 +44,29 @@ CustomEmotes:<br>
 Each Emote in this category looks like this:<br>
 <img width="1025" height="99" alt="Безымянный" src="https://github.com/user-attachments/assets/72daf536-23ef-4341-9927-5e047917ddd4" /><br>
 
-1.Name of button in GUI. Needed for EmoteWheel and other things (Highly reccomended to have special name to avoid errors)<br>
-2.Text shown on Button in GUI.<br>
-3.Type of ScrollingFrame on which the button will be located: R6, R15, or Spec (Specific). R6 and R15 ScrollingFrames are frames with default emotes or emotes playable on ALL games. Not recommended for SGA, better use it for CustomAnims.lua file. 
+1.ButtonName: Name of button in GUI. Needed for EmoteWheel and other things (Highly reccomended to have special name to avoid errors)<br>
+
+2.ButtonText: Text shown on Button in GUI.<br>
+
+3.ScrollingFrameType: Type of ScrollingFrame on which the button will be located: R6, R15, or Spec (Specific). R6 and R15 ScrollingFrames are frames with default emotes or emotes playable on ALL games. Not recommended for SGA, better use it for CustomAnims.lua file. 
 Spec is Scrolling frame made specially for SGA <br>
-4.<br>
-5.<br>
-6.<br>
-7.<br>
-8.<br>
-9.<br>
+
+4.LayoutOrder: Layout Order of GUI, Group of Emotes in which animation will be located (1 - Dances, 2 - Actions, 3 - Walk&Run, 4 - Weird, 5 - Poses&Idles, 6 - Attack) <br>
+
+5.AnimationId: Id of animation you want to add. Make sure its not made and added to Roblox by you;<br>
+
+6.FadeTime: Fade time of animation (if set to 0, animation will start playing instantly) <br>
+
+7.AnimationSpeed: Speed of animation<br>
+
+8.AnimationType: Type of animation. It's actually kinda complicated, because words in it works like tags.<br>
+ - Priority: "PriorLow" sets priority to Action3, "PriorHigh" sets priority to Action4. If you don't know what that means, go to official Roblox documentation: https://create.roblox.com/docs/reference/engine/classes/AnimationTrack<br>
+ - Pause: If you type "Pause" word in string, it will pause animation after 1 second, whick is useful for some animations (Used in DeathRagdoll for R15 and Scared for R6). the problem is that there's a lot of animations that need other time to pause, so maybe i will update it someday<br>
+
+9.AnimationLoop: Loop value of animation. if set to false, you can loop it by right mouse button.<br>
+
+"DefaultAnims", "ToolActionAnims" and "ToolIdleAnims" Categories only need AnimationId<br>
+
+EmoteWheelEmotes:<br>
+
+To set emotes for Emote Wheel you need to type ButtonName and ScrollinFrameType without spaces like this:
