@@ -2,7 +2,7 @@
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
 
-local ScriptVersion = "V4.3.5"
+local ScriptVersion = "V4.3.6"
 
 local GuiActive = true
 local GuiEmoter = nil
@@ -22,6 +22,7 @@ local AnimSmoothFade = true
 local theme = "LightPurple"
 local UIGradientEnabled = true
 local UICornerEnabled = true
+local LoadGithubSGAEnabled = true
 
 local HotkeysEnabled = true
 local SearchHotkey = Instance.new("StringValue")
@@ -1401,9 +1402,9 @@ local function CreateGui()
 	SettingsFrame.Parent = Emoter
 	SettingsFrame.Name = "SettingsFrame"
 	SettingsFrame.AnchorPoint = Vector2.new(0.5, 0)
-	SettingsFrame.Size = UDim2.new(0, 193, 0, 286)
+	SettingsFrame.Size = UDim2.new(0, 220, 0, 286)
 	SettingsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	SettingsFrame.Position = MainFrame.Position + UDim2.new(0, 575, 0, 0)
+	SettingsFrame.Position = MainFrame.Position + UDim2.new(0, 590, 0, 0)
 	SettingsFrame.BorderSizePixel = 0
 	SettingsFrame.BackgroundColor3 = ScrollBgColor
 	SettingsFrame.Visible = false
@@ -1478,6 +1479,7 @@ local function CreateGui()
 	AddSettings(HotkeysEnabled, "HotkeysOption", "Enable Hotkeys", 5)
 	AddSettings(UICornerEnabled, "UICornerOption", "Enable UICorners", 6)
 	AddSettings(UIGradientEnabled, "UIGradientOption", "Enable UIGradients", 7)
+	AddSettings(LoadGithubSGAEnabled, "LoadGithubSGAOption", "Load SpecificGameAnims from Github", 8)
 
 	ThemeOption.Name = "ThemeOption"
 	ThemeOption.Size = UDim2.new(1, 0, 0, 25)
@@ -2091,6 +2093,16 @@ local function CreateGui()
 			UIGradientOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
 		else
 			UIGradientOptionButton.CheckImage.Image = ""
+		end
+	end)
+	
+	local LoadGithubSGAOptionButton = SettingsStuff.LoadGithubSGAOption
+	LoadGithubSGAOptionButton.MouseButton1Click:Connect(function()
+		LoadGithubSGAEnabled = not LoadGithubSGAEnabled
+		if LoadGithubSGAEnabled == true then
+			LoadGithubSGAOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			LoadGithubSGAOptionButton.CheckImage.Image = ""
 		end
 	end)
 
@@ -2832,7 +2844,18 @@ local function CreateGui()
 						table.insert(ToolIdleAnimsList, tostring(id))
 					end
 				end
-			elseif categoryName == "EmoteWheelEmotes" and #data["EmoteWheelEmotes"] ~= 0 then
+			elseif categoryName == "R6EmoteWheelEmotes" and #data["EmoteWheelEmotes"] ~= 0 and RigType == "R6" then
+				print("[SpecGameAnims File]: Adding EmoteWhell Data")
+				local info = data["EmoteWheelEmotes"]
+				EmoteWheelEmotes.Emote1 = info[1]
+				EmoteWheelEmotes.Emote2 = info[2]
+				EmoteWheelEmotes.Emote3 = info[3]
+				EmoteWheelEmotes.Emote4 = info[4]
+				EmoteWheelEmotes.Emote5 = info[5]
+				EmoteWheelEmotes.Emote6 = info[6]
+				EmoteWheelEmotes.Emote7 = info[7]
+				EmoteWheelEmotes.Emote8 = info[8]
+			elseif categoryName == "R15EmoteWheelEmotes" and #data["EmoteWheelEmotes"] ~= 0 and RigType == "R15" then
 				print("[SpecGameAnims File]: Adding EmoteWhell Data")
 				local info = data["EmoteWheelEmotes"]
 				EmoteWheelEmotes.Emote1 = info[1]
@@ -2851,7 +2874,8 @@ local function CreateGui()
 	local function GithubSpecGameAnimsOperation()
 		local baseUrl = "https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/SpecificPlaceEmotes/"
 		local finalUrl = baseUrl .. tostring(game.GameId)
-
+		
+		if not LoadGithubSGAEnabled then return end
 		print("[SpecGameAnims Github]: Searching Anims file in Github for game ".. game.GameId)
 
 		local success, fileContent = pcall(function()
