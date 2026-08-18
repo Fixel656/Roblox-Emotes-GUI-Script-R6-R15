@@ -24,3 +24,7 @@
 - What if i want to recommend something to author of this script (like new functions, settings or other advice)?
 
   You can always do it in Issues section.<br>
+
+- You have Emote wheel in your GUI. How can i change emotes for it?
+
+  You can't do it inside GUI itself, you can only do it in files. More information in Documentations folder in my repository
