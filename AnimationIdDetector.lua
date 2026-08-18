@@ -1,4 +1,4 @@
---[[V3
+--[[V3.1
 AnimationIdDetector by Fixel
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
@@ -363,6 +363,7 @@ end
 
 AnimIdDetector.Name = "AnimIdDetector"
 AnimIdDetector.DisplayOrder = 100
+AnimIdDetector.ResetOnSpawn = false
 if game:GetService("RunService"):IsStudio() then --Made this as i test script mostly in Studio
 	AnimIdDetector.Parent = game.Players.LocalPlayer.PlayerGui
 else
@@ -1271,7 +1272,7 @@ end)
 local function FormatJSON(data)
 	local result = "{\n"
 
-	-- 1. Обработка CustomEmotes
+	-- 1. Processing CustomEmotes
 	local customEmotes = data["CustomEmotes"] or {}
 	result = result .. '\t"CustomEmotes": [\n'
 	for j, item in ipairs(customEmotes) do
@@ -1289,7 +1290,7 @@ local function FormatJSON(data)
 	end
 	result = result .. "\t],\n"
 
-	-- 2. Обработка DefaultAnims
+	-- 2. Processing DefaultAnims
 	local defaultAnims = data["DefaultAnims"] or {}
 	result = result .. '\t"DefaultAnims": \n\t\t['
 	for j, id in ipairs(defaultAnims) do
@@ -1298,7 +1299,7 @@ local function FormatJSON(data)
 	end
 	result = result .. "],\n"
 
-	-- 3. Обработка ToolActionAnims
+	-- 3. Processing ToolActionAnims
 	local toolAction = data["ToolActionAnims"] or {}
 	result = result .. '\t"ToolActionAnims": \n\t\t['
 	for j, id in ipairs(toolAction) do
@@ -1307,7 +1308,7 @@ local function FormatJSON(data)
 	end
 	result = result .. "],\n"
 
-	-- 4. Обработка ToolIdleAnims
+	-- 4. Processing ToolIdleAnims
 	local toolIdle = data["ToolIdleAnims"] or {}
 	result = result .. '\t"ToolIdleAnims": \n\t\t['
 	for j, id in ipairs(toolIdle) do
@@ -1316,26 +1317,25 @@ local function FormatJSON(data)
 	end
 	result = result .. "],\n"
 
-	-- 5. Обработка EmoteWheelEmotes
+	-- 5. Processing EmoteWheelEmotes
 	local EmoteWheel = data["EmoteWheelEmotes"] or {}
 	result = result .. '\t"EmoteWheelEmotes": \n\t\t['
 	for j, id in ipairs(EmoteWheel) do
 		result = result .. '"' .. tostring(id) .. '"'
 		if j < #EmoteWheel then result = result .. ", " end
 	end
-	result = result .. "]\n" -- Без запятой, так как это последний элемент
+	result = result .. "]\n" --No comma since it's the last element
 
 	result = result .. "}"
 	return result
 end
 
--- Функция добавления новой анимации (обновленная)
 local function AddNewEmote(Category, ButtonName, ButtonText, ScrollFrameType, LayoutOrder, AnimId, FadeTime, AnimSpeed, AnimType, Looped)
 	local targetNumber = tostring(game.GameId)
 	local folderPath = "EmoterData/SpecificAnims"
 	local targetFilePath = nil
 	local fileFound = false
-	
+
 	if AnimId == "" or AnimId == nil then
 		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error!", Text = "You need to have AnimId to add new animation!", Duration = 3})
 		return
@@ -1383,20 +1383,23 @@ local function AddNewEmote(Category, ButtonName, ButtonText, ScrollFrameType, La
 		local successDecode, decoded = pcall(function() return HttpService:JSONDecode(fileContent) end)
 		if successDecode and decoded then 
 			data = decoded 
+		else
+			warn("[AnimId Detector]: Error in JSON structure in file. Please fix an error and try again.")
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error", Text = "Error in JSON structure in file. Please fix an error and try again", Duration = 3})
+			return
 		end
 	else
-		print("[AnimId Detector]: Файл dances.txt не найден. Создаю новый файл...")
+		warn("[AnimId Detector]: File hasn't found. Creating a new one...")
 	end
 
 	local animIdStr = tostring(AnimId)
 	local FinalName = ButtonName
-	--Поиск дубликата по ID анимации
 
+	--Searching for Id dublicate
 	local SameId = false
-
 	if Category == "Emote" then
 		for _, emote in ipairs(data["CustomEmotes"]) do
-			if emote[5] == animIdStr then
+			if emote[5] == tonumber(animIdStr) then
 				warn(string.format("[AnimId Detector]: There's already anim with Id %s named '%s'", animIdStr, emote[1]))
 				SameId = true
 				break
@@ -1429,23 +1432,22 @@ local function AddNewEmote(Category, ButtonName, ButtonText, ScrollFrameType, La
 	end
 	if SameId then return end
 
-	--[ПРОВЕРКА 2]: Поиск дубликата по имени и авто-прибавление числа
+	--Find duplicates by name and auto-add numbers
 	local nameExists = true
 	local counter = 0
 	if Category == "Emote" then
 		while nameExists do
 			nameExists = false
-			-- Если это не первая итерация, собираем новое имя (например: Имя1, Имя2)
+			-- If not first iteration, collect a new name
 			if counter > 0 then
 				FinalName = ButtonName .. tostring(counter)
 			end
 
-			-- Проверяем, занято ли получившееся имя
 			for _, emote in ipairs(data["CustomEmotes"]) do
 				if emote[1] == FinalName then
 					nameExists = true
 					counter = counter + 1
-					break -- Выходим из внутреннего цикла, чтобы проверить новое имя в while
+					break
 				end
 			end
 		end
@@ -1455,13 +1457,12 @@ local function AddNewEmote(Category, ButtonName, ButtonText, ScrollFrameType, La
 		print("[AnimId Detector]: There's already anim with this name, changing to: " .. FinalName)
 	end
 
-	-- Собираем новую строчку, используя уникальное FinalName
 	local newEmoteArray = {
 		FinalName, 
 		ButtonText,
 		ScrollFrameType, 
 		LayoutOrder, 
-		AnimId, 
+		animIdStr, 
 		FadeTime, 
 		AnimSpeed, 
 		AnimType, 
@@ -1469,16 +1470,12 @@ local function AddNewEmote(Category, ButtonName, ButtonText, ScrollFrameType, La
 	}
 
 	if Category == "Emote" then
-		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Saving as Emote...", Text = "Adding Emote to SpecAnims file", Duration = 3})
 		table.insert(data["CustomEmotes"], newEmoteArray)
 	elseif Category == "DefaultAnim" then
-		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Saving as DefaultAnim...", Text = "Adding DefaultAnim to SpecAnims file", Duration = 3})
 		table.insert(data["DefaultAnims"], animIdStr)
 	elseif Category == "ToolActionAnim" then
-		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Saving as ToolActionAnim...", Text = "Adding ToolActionAnim to SpecAnims file", Duration = 3})
 		table.insert(data["ToolActionAnims"], animIdStr)
 	elseif Category == "ToolIdleAnim" then
-		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Saving as ToolIdleAnim...", Text = "Adding ToolIdleAnim to SpecAnims file", Duration = 3})
 		table.insert(data["ToolIdleAnims"], animIdStr)
 	end
 
@@ -1489,9 +1486,20 @@ local function AddNewEmote(Category, ButtonName, ButtonText, ScrollFrameType, La
 	end)
 
 	if successWrite then
-		print("[AnimId Detector]: Animation '" .. FinalName .. "' Successfully Added")
+		print("[AnimId Detector]: Animation '" ..FinalName.." and Id " ..animIdStr.. "' Successfully Added")
+
+		if Category == "Emote" then
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Saved as Emote!", Text = "Added Emote to SpecAnims file", Duration = 3})
+		elseif Category == "DefaultAnim" then
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Saved as DefaultAnim!", Text = "Added DefaultAnim to SpecAnims file", Duration = 3})
+		elseif Category == "ToolActionAnim" then
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Saved as ToolActionAnim!", Text = "Added ToolActionAnim to SpecAnims file", Duration = 3})
+		elseif Category == "ToolIdleAnim" then
+			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Saved as ToolIdleAnim!", Text = "Added ToolIdleAnim to SpecAnims file", Duration = 3})
+		end
 	else
 		warn("[AnimId Detector]: An error occured while saving: " .. tostring(errWrite))
+		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error", Text = "An error occured while saving", Duration = 3})
 	end
 end
 
@@ -1509,8 +1517,19 @@ ToolActionSaveButton.MouseButton1Click:Connect(function()
 end)
 
 local function DetectPlayingAnimations()
-	local Humanoid = Character:WaitForChild("Humanoid")
-	local playingTracks = Humanoid.Animator:GetPlayingAnimationTracks()
+
+	local Humanoid = nil
+	local Animator = nil
+
+	if Character:FindFirstChild("Humanoid") then
+		Humanoid = Character:FindFirstChild("Humanoid")
+		Animator = Humanoid:FindFirstChild("Animator")
+	else
+		CharStartButton.Image = "rbxassetid://8215093320"
+		CharOperationActive = false
+		return
+	end
+	local playingTracks = Animator:GetPlayingAnimationTracks()
 	CharFunctionActive = false
 
 	for i, track in ipairs(playingTracks) do
