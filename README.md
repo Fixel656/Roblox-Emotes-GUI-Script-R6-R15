@@ -2,7 +2,14 @@
  <img width="250" height="140" alt="EmoterLogo4" src="https://github.com/user-attachments/assets/310058f6-c9ed-4321-84ed-853f696ba468" />
 </p>
 
-Emoter is a FE GUI with a lot of animations you can play while moving, sitting or other things.
+- [FAQ](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20%26%20Changelogs/FAQ.md)
+- [Wiki](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/wiki)
+- [SGA Wiki](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/wiki/SpecificGameAnimations-and-how-to-make-your-own-SGA)
+- [Emoter Changelog](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20%26%20Changelogs/Emoter%20Changelog.md)
+- [AnimIdDetector Changelog](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20%26%20Changelogs/AnimId%20Detector%20Changelog.md)
+<br>
+Emoter is a FE GUI with a lot of animations you can play while moving, sitting or other things.<br>
+<br>
 
 - Script:
 ```lua
@@ -29,7 +36,7 @@ and if summary is 0, animation will stuck on first frames.
 - HotKeys
 - Ability to use animation by entering its ID
 - Added SGA - SpecificGameAnimations: file with Animations for some games. It will be places with emotes available in these places specifically.<br/>
-I will add it manually and type available ones in README. Also you can add files for yourself in your files folder. More information [here](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20&%20Changelogs/Documentation%20&%20Tutorial.md). <br/>
+I will add it manually and type available ones in README. Also you can add files for yourself in your files folder. More information [here](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/wiki/SpecificGameAnimations-and-how-to-make-your-own-SGA). <br/>
 (You can add your SGA in [Discussions](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/discussions/categories/your-sga-specific-game-animations) so i can add it to Github)<br/>
 - Emote wheel (Activate by <kbd>,</kbd> button. You can't edit emotes for it in Gui utself (at least for now), You'll need to edit files in EmoterData folder. (Gonna add a guide later).
 
