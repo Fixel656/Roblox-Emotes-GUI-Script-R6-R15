@@ -2,7 +2,7 @@
  <img width="250" height="140" alt="EmoterLogo4" src="https://github.com/user-attachments/assets/310058f6-c9ed-4321-84ed-853f696ba468" />
 </p>
 
-Made an FE Animations script with some features
+Emoter is a FE GUI with a lot of animations you can play while moving, sitting or other things.
 
 - Script:
 ```lua
