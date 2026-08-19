@@ -8,7 +8,9 @@
 - [Emoter Changelog](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20%26%20Changelogs/Emoter%20Changelog.md)
 - [AnimIdDetector Changelog](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20%26%20Changelogs/AnimId%20Detector%20Changelog.md)
 <br>
-Emoter is a FE GUI with a lot of animations you can play while moving, sitting or other things.<br>
+
+**Emoter** is a FE GUI with a lot of animations you can play while moving, sitting or other things. This GUI doesn't give you any Advantages and made to have fun.<br>
+Dance without any problems and restrictions!<br>
 <br>
 
 - Script:
