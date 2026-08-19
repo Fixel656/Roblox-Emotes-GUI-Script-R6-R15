@@ -45,6 +45,7 @@ I will add it manually and type available ones in README. Also you can add files
 - Double Hotkey
 - "HigherPriority" Setting for games that use Action4 animation priority
 - "Running" type for animations to have AnimationSpeed changing depending on the character's speed
+- Make size changing setting
 - More R15 animations (there`s no other good FE R6 anims left)
 - More Options (maybe)
 - More<br/>
