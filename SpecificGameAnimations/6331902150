@@ -50,7 +50,7 @@
 	["Moonwalk", "Moonwalk", "Spec", 3, "92806215347393", 0.1, 1, "PriorLow", true],
 	["BagUp", "Bag Up", "Spec", 1, "117853129871362", 0.1, 1, "PriorLow", true],
 	["NosferatuRun", "Nosferatu Run", "Spec", 3, "125580704385106", 0.1, 1, "PriorLow", true],
-	["NosferatuFly", "Nosferatu Fly", "Spec", 3, "103995840833619", 0.1, 1, "PriorLow", true]
+	["NosferatuFly", "Nosferatu Fly", "Spec", 3, "103995840833619", 0.1, 1, "PriorHighRunning", true]
 	],
 	"DefaultAnims": 
 		[],
