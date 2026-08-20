@@ -1395,12 +1395,13 @@ local function AddNewEmote(Category, ButtonName, ButtonText, ScrollFrameType, La
 	local animIdStr = tostring(AnimId)
 	local FinalName = ButtonName
 
-	--Searching for Id dublicate
+	--Searching for Id and name dublicate
 	local SameId = false
 	if Category == "Emote" then
 		for _, emote in ipairs(data["CustomEmotes"]) do
 			if emote[5] == tonumber(animIdStr) then
 				warn(string.format("[AnimId Detector]: There's already anim with Id %s named '%s'", animIdStr, emote[1]))
+				game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error", Text = "There's already anim with Id "..animIdStr.." named "..emote[1], Duration = 3})
 				SameId = true
 				break
 			end
@@ -1409,6 +1410,7 @@ local function AddNewEmote(Category, ButtonName, ButtonText, ScrollFrameType, La
 		for _, emote in ipairs(data["DefaultAnims"]) do
 			if emote == animIdStr then
 				warn(string.format("[AnimId Detector]: There's already anim with Id %s", animIdStr))
+				game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error", Text = "There's already anim with Id "..animIdStr, Duration = 3})
 				SameId = true
 				break
 			end
@@ -1417,6 +1419,7 @@ local function AddNewEmote(Category, ButtonName, ButtonText, ScrollFrameType, La
 		for _, emote in ipairs(data["ToolActionAnims"]) do
 			if emote == animIdStr then
 				warn(string.format("[AnimId Detector]: There's already anim with Id %s", animIdStr))
+				game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error", Text = "There's already anim with Id "..animIdStr, Duration = 3})
 				SameId = true
 				break
 			end
@@ -1425,6 +1428,7 @@ local function AddNewEmote(Category, ButtonName, ButtonText, ScrollFrameType, La
 		for _, emote in ipairs(data["ToolIdleAnims"]) do
 			if emote == animIdStr then
 				warn(string.format("[AnimId Detector]: There's already anim with Id %s", animIdStr))
+				game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error", Text = "There's already anim with Id "..animIdStr, Duration = 3})
 				SameId = true
 				break
 			end
