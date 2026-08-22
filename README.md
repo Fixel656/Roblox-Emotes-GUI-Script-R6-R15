@@ -5,6 +5,7 @@
 - [FAQ](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20%26%20Changelogs/FAQ.md)
 - [Wiki](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/wiki)
 - [SGA Wiki](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/wiki/SpecificGameAnimations-and-how-to-make-your-own-SGA)
+- [Supported SpecificGameAnims](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/SpecificGameAnimations/Games%20list.md)
 - [Emoter Changelog](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20%26%20Changelogs/Emoter%20Changelog.md)
 - [AnimIdDetector Changelog](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20%26%20Changelogs/AnimId%20Detector%20Changelog.md)
 <br>
