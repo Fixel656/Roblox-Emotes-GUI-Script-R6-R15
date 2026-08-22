@@ -1276,7 +1276,7 @@ local function FormatJSON(data)
 	local customEmotes = data["CustomEmotes"] or {}
 	result = result .. '\t"CustomEmotes": [\n'
 	for j, item in ipairs(customEmotes) do
-		result = result .. "\t["
+		result = result .. "\t\t[" -- Добавил один таб для красивого выравнивания внутри массива
 		for k, val in ipairs(item) do
 			if type(val) == "string" then
 				result = result .. '"' .. val .. '"'
@@ -1317,14 +1317,36 @@ local function FormatJSON(data)
 	end
 	result = result .. "],\n"
 
-	-- 5. Processing EmoteWheelEmotes
+	-- 5. Processing EmoteWheelEmotes (Добавлена запятая в конце, так как теперь это не последний элемент!)
 	local EmoteWheel = data["EmoteWheelEmotes"] or {}
 	result = result .. '\t"EmoteWheelEmotes": \n\t\t['
 	for j, id in ipairs(EmoteWheel) do
 		result = result .. '"' .. tostring(id) .. '"'
 		if j < #EmoteWheel then result = result .. ", " end
 	end
-	result = result .. "]\n" --No comma since it's the last element
+	result = result .. "],\n" 
+
+	-- 6. Processing AdditionalData (В одну строку)
+	local additional = data["AdditionalData"] or {}
+	result = result .. '\t"AdditionalData": {\n\t\t'
+	
+	-- Сначала собираем все пары ключ-значение во временный массив
+	local pairsList = {}
+	for key, val in pairs(additional) do
+		local valueStr = ""
+		if type(val) == "string" then
+			valueStr = '"' .. val .. '"'
+		elseif type(val) == "boolean" then
+			valueStr = val and "true" or "false"
+		else
+			valueStr = tostring(val)
+		end
+		table.insert(pairsList, '"' .. tostring(key) .. '": ' .. valueStr)
+	end
+	
+	-- Соединяем их через запятую с пробелом
+	result = result .. table.concat(pairsList, ", ")
+	result = result .. "\n\t}\n"
 
 	result = result .. "}"
 	return result
@@ -1395,7 +1417,7 @@ local function AddNewEmote(Category, ButtonName, ButtonText, ScrollFrameType, La
 	local animIdStr = tostring(AnimId)
 	local FinalName = ButtonName
 
-	--Searching for Id and name dublicate
+	--Searching for Id dublicate
 	local SameId = false
 	if Category == "Emote" then
 		for _, emote in ipairs(data["CustomEmotes"]) do
