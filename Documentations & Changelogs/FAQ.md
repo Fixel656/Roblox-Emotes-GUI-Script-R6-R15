@@ -1,4 +1,8 @@
+<div align="center">
+  
 # FAQ
+
+</div>
 
 - Is This Emotes GUI FE?<br>
 
