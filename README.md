@@ -23,24 +23,19 @@ Dance without any problems and restrictions!<br>
 <br>
 
 ### What this Gui can do?
-- Play FE animations, of course (**43** R6 animations AND more than **100** R15 animations)
+- Play FE animations (**43** R6 animations AND more than **100** R15 animations)
 - Highly configurable Button and animation functions
-- Abibily to change animation speed. The number you write in the window is adding to the default speed, 
-if you type negative number, it will make animation slower, but if summary speed will be negative, animation won't work, 
-and if summary is 0, animation will stuck on first frames. 
-- Gui will reappear on Player.CharacterAdded so it prevents Gui to disappear or stop working on death
+- Abibily to change animation speed
 - All anmations have Action3 or Action4 priority so it wont be replaced or conflicting with default animations
 - You can loop unlooped anims by clicking RMB on them
-- You can preview Animation by hovering on anim button
-- Search animation you need (no need to follow the symbol case)
+- Preview animation by hovering on it's anim button
 - Cool options: Pausing all animations, stopping all default animations, pausing default "Animate" script, falling and reversing animations
 - Other color themes
-- Saveable settings and position
 - Ability to use animation by entering its ID
 - Added SGA - SpecificGameAnimations: file with Animations for specific games. It will be places with emotes available in these places specifically.<br/>
 I will add it manually and type available ones in README. Also you can add files for yourself in your files folder. More information [here](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/wiki/SpecificGameAnimations-and-how-to-make-your-own-SGA). <br/>
 (You can add your SGA in [Discussions](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/discussions/categories/your-sga-specific-game-animations) so i can add it to Github)<br/>
-- Emote wheel (Activate by <kbd>,</kbd> button. You can't edit emotes for it in Gui itself (at least for now), You'll need to edit files in EmoterData folder. (Gonna add a guide later).
+- Emote wheel (Activate by <kbd>,</kbd> button. You can't edit emotes for it in Gui itself (at least for now), You'll need to edit files in EmoterData folder.
 
 ### To do:
 - Update AutoPause function for animation
