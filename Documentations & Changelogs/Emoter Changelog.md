@@ -1,4 +1,4 @@
-### V1:
+## V1:
 - Added abibily to change animation speed. The number you write in the window is adding to the default speed, 
 if you type negative number, it will make animation slower, but if summary speed will be negative, animation won't work, 
 and if summary is 0,animation will stuck on first frames. 
@@ -10,7 +10,7 @@ and if summary is 0,animation will stuck on first frames.
 
   <img width="476" height="299" alt="image" src="https://github.com/user-attachments/assets/60f24374-a56a-4e04-83f3-54ce7c427b31" />
   
-### V2:
+## V2:
 - Optimized script and made it easier to edit and add new emotes. Now it uses Functions for making anim buttons and playing anims insted of doing code for each button,
   which saved almost 1000 lines of code before i added more animations (Now it saves even more)
 - Made various types and functions for animations
@@ -50,7 +50,7 @@ and if summary is 0,animation will stuck on first frames.
 - Added Search
 - Maded some values positions to save on restart
 
-### V3:
+## V3:
 - Added SAVEABLE Settings (Moved PreviewEnabled button along with it)
 - Added Ragdoll fall function
 - Added Custom Animation player
@@ -62,7 +62,7 @@ and if summary is 0,animation will stuck on first frames.
 - Fixed check for Preview Frame if character has "Animate" script
 - Some other fixes
 
-### V4:
+## V4:
 - Added more hotkeys
 - Added more settings
 - Added Section with Animations for some separate games. It will be places with emotes available in these places specifically.<br/>
@@ -106,3 +106,21 @@ I will add it manually and you could add files for yourself in your files folder
 
 ### V4.3.6:
 - Added setting do disable loading SGA (Specific Game Anims) from Github
+
+## V5.0
+- Updated AutoPause function for animation. Now you can put a number right after "Pause" keyword. This number is time when animation should be paused. Also changed time logic
+- "HigherPriority" Setting for games that use Action4 animation priority. But sometimes animations looks kinda buggy with it (and i can't fix this), so better use it only when needed
+- **"Running" and "Idle" types for animations. "Running" type will change AnimationSpeed depending on the character's speed and stop when character isn't moving (staying). "Idle" type will play whed you're staying. It has a lot of configurations, so check more info on how to use it in my Wiki**
+- Made size changing setting
+- Added Hints for settings
+- Added More R15 animations (Mostly of "Running" and "Idle" types)
+- Changed icon when launching
+- Fixed a situation where a lot of errors appears in console when deleting/restarting GUI
+- Now you can Change priority of animation easily by **Alt+Click**
+- Added new category for SGA - "AdditionalData". It handles default walk speed for games (needed for "Running" type) and name of In-game Animation handler (like "Animate" script)
+- "Running" and "Idle" types for animations can be activated automatically after restarting GUI/character reappearing (made only for these types as i don't think it needs to be for every animation)
+- Updated ToolAnimPriority function: now it uses `Humanoid.AnimationPlayed()` instead of `while true do`
+- Moved some R15 useless (for me) animations to "AdditionalAnimations" Github file. you can disable it in settings
+- Swapped the "Poses & Idles" and "Weird" categories
+- Added "Stop all animations" hotkey
+- More fixes
