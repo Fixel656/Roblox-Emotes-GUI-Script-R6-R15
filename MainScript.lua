@@ -2,10 +2,10 @@
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
 
-local ScriptVersion = "V4.3.6"
-
+local ScriptVersion = "V5.0"
 local GuiActive = true
 local GuiEmoter = nil
+local AnimationHandler = "Animate"
 local Player = game.Players.LocalPlayer
 local IsInStudio = game:GetService("RunService"):IsStudio()
 local UserInputService = game:GetService("UserInputService")
@@ -13,24 +13,47 @@ local HttpService = game:GetService("HttpService")
 local ContextActionService = game:GetService("ContextActionService")
 
 --Settings
-local ToolAnimHighPrior = false
-local ToolIdleAnimHighPrior = false
-local ToolActionAnimHighPrior = true
-local AnimPreviewEnable = true
-local AnimSwitchMode = false
-local AnimSmoothFade = true
+local ToolAnimHighPriorEnabled = false
+local AnimPreviewEnabled = true
+local DebugInfoEnabled = false
+local AnalyticsEnabled = true
+local LoadAnimationsOnRestart = true
+
+local ToolIdleAnimHighPriorEnabled = false
+local ToolActionAnimHighPriorEnabled = true
+local AnimSwitchModeEnabled = false
+local AnimSwitchModeRunIdleExceptionEnabled = true
+local AnimSmoothFadeEnabled = true
+local HigherPriorityEnabled = false
+
+local IdleTypeEnabled = true
+local RunningTypeEnabled = true
+local RunningTypeStopStandingEnabled = true
+local RunningTypeCharSpeedEnabled = true
+local RunningTypeMinSpeedEnabled = true
+local RunningTypeStopJumpingEnabled = true
+local RunningTypeStopClimbingEnabled = true
+
 local theme = "LightPurple"
 local UIGradientEnabled = true
 local UICornerEnabled = true
+local XSize = 460
+local YSize = 285
+
 local LoadGithubSGAEnabled = true
+local LoadGithubCustomAnimsEnabled = true
+local LoadLocalSGAEnabled = true
+local LoadLocalCustomAnimsEnabled = true
 
 local HotkeysEnabled = true
+local DoubleHotkeyEnabled = false
 local SearchHotkey = Instance.new("StringValue")
 local CloseHotkey = Instance.new("StringValue")
 local SitHotkey = Instance.new("StringValue")
 local SwitchAnimHotkey = Instance.new("StringValue")
 local AnimFadeHotkey = Instance.new("StringValue")
 local SettingsHotkey = Instance.new("StringValue")
+local StopAnimsHotkey = Instance.new("StringValue")
 local EmoteWheelHotkey = Instance.new("StringValue")
 
 CloseHotkey.Value = "T"
@@ -38,8 +61,63 @@ SettingsHotkey.Value = "Y"
 SearchHotkey.Value = "H"
 SitHotkey.Value = "J"
 SwitchAnimHotkey.Value = "V"
+StopAnimsHotkey.Value = "N"
 AnimFadeHotkey.Value = "B"
+
 EmoteWheelHotkey.Value = "Comma" --Not affected by "Hotkeys Enabled" setting
+
+local ConfigFileName = "EmoterConfig.json"
+if not IsInStudio then
+	if isfile("EmoterData/"..ConfigFileName) then
+		local rawData = readfile("EmoterData/"..ConfigFileName)
+		local DecodedSettings = HttpService:JSONDecode(rawData)
+		-- Accessing the loaded data
+		AnimPreviewEnabled = DecodedSettings.ConfAnimPreviewEnabled
+		DebugInfoEnabled = DecodedSettings.ConfDebugInfoEnabled
+		AnalyticsEnabled = DecodedSettings.ConfAnalyticsEnabled
+		LoadAnimationsOnRestart = DecodedSettings.ConfLoadAnimationsOnRestart
+
+		ToolIdleAnimHighPriorEnabled = DecodedSettings.ConfToolIdleAnimHighPriorEnabled
+		ToolActionAnimHighPriorEnabled = DecodedSettings.ConfToolActionAnimHighPriorEnabled
+		AnimSwitchModeEnabled = DecodedSettings.ConfAnimSwitchModeEnabled
+		AnimSwitchModeRunIdleExceptionEnabled = DecodedSettings.ConfAnimSwitchModeRunIdleExceptionEnabled
+		AnimSmoothFadeEnabled = DecodedSettings.ConfAnimSmoothFadeEnabled
+		HigherPriorityEnabled = DecodedSettings.ConfHigherPriorityEnabled
+
+		IdleTypeEnabled = DecodedSettings.ConfIdleTypeEnabled
+		RunningTypeEnabled = DecodedSettings.ConfRunningTypeEnabled
+		RunningTypeStopStandingEnabled = DecodedSettings.ConfRunningTypeStopStandingEnabled
+		RunningTypeCharSpeedEnabled = DecodedSettings.ConfRunningTypeCharSpeedEnabled
+		RunningTypeMinSpeedEnabled = DecodedSettings.ConfRunningTypeMinSpeedEnabled
+		RunningTypeStopJumpingEnabled = DecodedSettings.ConfRunningTypeStopJumpingEnabled
+		RunningTypeStopClimbingEnabled = DecodedSettings.ConfRunningTypeStopClimbingEnabled
+
+		theme = DecodedSettings.ConfTheme
+		UIGradientEnabled = DecodedSettings.ConfUIGradientEnabled
+		UICornerEnabled = DecodedSettings.ConfUICornerEnabled
+		XSize = DecodedSettings.ConfXSize
+		YSize = DecodedSettings.ConfYSize
+
+		LoadGithubSGAEnabled = DecodedSettings.ConfLoadGithubSGAEnabled
+		LoadGithubCustomAnimsEnabled = DecodedSettings.ConfLoadGithubCustomAnimsEnabled
+		LoadLocalSGAEnabled = DecodedSettings.ConfLoadLocalSGAEnabled
+		LoadLocalCustomAnimsEnabled = DecodedSettings.ConfLoadLocalCustomAnimsEnabled
+
+		HotkeysEnabled = DecodedSettings.ConfHotkeysEnabled
+		DoubleHotkeyEnabled = DecodedSettings.ConfDoubleHotkeyEnabled
+		SearchHotkey.Value = tostring(DecodedSettings.ConfSearchHotkey)
+		CloseHotkey.Value = tostring(DecodedSettings.ConfCloseHotkey)
+		SitHotkey.Value = tostring(DecodedSettings.ConfSitHotkey)
+		SwitchAnimHotkey.Value = tostring(DecodedSettings.ConfSwitchAnimHotkey)
+		AnimFadeHotkey.Value = tostring(DecodedSettings.ConfAnimFadeHotkey)
+		SettingsHotkey.Value = tostring(DecodedSettings.ConfSettingsHotkey)
+		StopAnimsHotkey.Value = tostring(DecodedSettings.StopAnimsHotkey)
+		EmoteWheelHotkey.Value = tostring(DecodedSettings.ConfEmoteWheelHotkey)
+	end
+end
+
+if AnalyticsEnabled and not IsInStudio then task.spawn(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/Documentations%20%26%20Changelogs/CountHandler.lua",true))() end) end
+-- P.S. This CountHandler made to see how many people are using this script and does NOT collect any other data
 
 local BgColor = Color3.fromRGB(137, 165, 255)
 local ScrollBgColor = Color3.fromRGB(240, 255, 255)
@@ -56,12 +134,15 @@ local GuiClosed = false
 local OptionsOpened = false
 local SettingsOpened = false
 local CurrentSection = "Default"
+local AltPressed = false
 
 local PrevAnimSpeedValue = ""
 local SearchOpened = false
 local PrevSearchText = ""
 local CustomAnimOpened = false
 local PrevCustomAnimId = ""
+
+local RestartAnimations = {}
 
 local EmoteWheelEmotes = {Emote1 = nil, Emote2 = nil, Emote3 = nil, Emote4 = nil, Emote5 = nil, Emote6 = nil, Emote7 = nil, Emote8 = nil}
 
@@ -72,7 +153,7 @@ if (Player.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R1
 	EmoteWheelEmotes.Emote4 = "R15RussianKick"
 	EmoteWheelEmotes.Emote5 = "R15Rambunctious"
 	EmoteWheelEmotes.Emote6 = "R15Helicopter"
-	EmoteWheelEmotes.Emote7 = "R15ChibiWalk"
+	EmoteWheelEmotes.Emote7 = "R15MiniWalk"
 	EmoteWheelEmotes.Emote8 = "R15TakeTheL"
 else
 	EmoteWheelEmotes.Emote1 = "R6Dance1"
@@ -85,39 +166,19 @@ else
 	EmoteWheelEmotes.Emote8 = "R6Spinner"
 end
 
-local ConfigFileName = "EmoterConfig.json"
-if not IsInStudio then
-	if isfile("EmoterData/"..ConfigFileName) then
-		local rawData = readfile("EmoterData/"..ConfigFileName)
-		local decodedSettings = HttpService:JSONDecode(rawData)
-		-- Accessing the loaded data
-		ToolIdleAnimHighPrior = decodedSettings.ConfToolIdleAnimHighPrior
-		ToolActionAnimHighPrior = decodedSettings.ConfToolActionAnimHighPrior
-		AnimPreviewEnable = decodedSettings.ConfAnimPreviewEnable
-		AnimSwitchMode = decodedSettings.ConfAnimSwitchMode
-		AnimSmoothFade = decodedSettings.ConfAnimSmoothFade
-		theme = decodedSettings.ConfTheme
-		HotkeysEnabled = decodedSettings.ConfHotkeysEnabled
-		UIGradientEnabled = decodedSettings.ConfUIGradientEnabled
-		UICornerEnabled = decodedSettings.ConfUICornerEnabled
-		SearchHotkey.Value = tostring(decodedSettings.ConfSearchHotkey)
-		CloseHotkey.Value = tostring(decodedSettings.ConfCloseHotkey)
-		SitHotkey.Value = tostring(decodedSettings.ConfSitHotkey)
-		SwitchAnimHotkey.Value = tostring(decodedSettings.ConfSwitchAnimHotkey)
-		AnimFadeHotkey.Value = tostring(decodedSettings.ConfAnimFadeHotkey)
-		SettingsHotkey.Value = tostring(decodedSettings.ConfSettingsHotkey)
-		EmoteWheelHotkey.Value = tostring(decodedSettings.ConfEmoteWheelHotkey)
-	end
-end
 
 local function CreateGui()
+	print("Loading Emoter GUI...")
 
-	local SpeedNum --Value, adding to default speed of animation
+	local SpeedNum = 0 --Value, adding to default speed of animation
 	local AnimInfo = Instance.new("StringValue")
 	local NegativeNumber = 1
+	local DefaultWalkSpeed = 16
 	local Humanoid = nil
 	local ClonedChar = nil
 	local RigType = nil
+	local GuiLoaded = false
+	local GuiRestarted = false
 	if (Player.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R15) then
 		RigType = "R15"
 	elseif (Player.Character:WaitForChild("Humanoid").RigType == Enum.HumanoidRigType.R6) then
@@ -239,6 +300,64 @@ local function CreateGui()
 		ButtonSelectCol = Color3.fromRGB(129, 129, 129)
 	end
 
+	print("Checking functions...")
+	local function AddVPF()
+		ViewportFrame.Parent = MainFrame
+		ViewportFrame.Visible = false
+		ViewportFrame.AnchorPoint = Vector2.new(0, 0.5)
+		ViewportFrame.BackgroundTransparency = 1
+		ViewportFrame.Size = UDim2.new(0, 225, 0, 285)
+		ViewportFrame.Position = UDim2.new(1, 10, 0.5, 0)
+		ViewportFrame.BackgroundColor3 = Color3.fromRGB(166, 174, 175)
+		ViewportFrame.Ambient = Color3.fromRGB(175, 175, 175)
+		ViewportFrame.LightColor = Color3.fromRGB(208, 208, 208)
+		local UICorner = Instance.new("UICorner")
+		UICorner.Parent = ViewportFrame
+
+		local WorldModel = Instance.new("WorldModel")
+		WorldModel.Parent = ViewportFrame
+		local Character = nil
+		local function WaitForChar()
+			while wait() do 
+				if Player.Character:FindFirstChild("Humanoid") and Player.Character:FindFirstChild("HumanoidRootPart") then
+					Character = Player.Character or Player.CharacterAdded:Wait()
+					Humanoid = Character:FindFirstChild("Humanoid")
+					return
+				end
+			end
+		end
+		WaitForChar()
+		wait(0.5)
+		local VPFcam = Instance.new("Camera"); VPFcam.Parent = ViewportFrame
+		VPFcam.CameraType = Enum.CameraType.Scriptable
+
+		local targetPosition = nil
+		targetPosition = Vector3.new(4.6, 0.2, 12)
+		if RigType == "R15" then
+			targetPosition = Vector3.new(4.6, 0.2, 12) -- if R15
+		else
+			targetPosition = Vector3.new(4.6, -1, 12)
+		end
+
+		local targetRotation = CFrame.Angles(0, math.rad(20), 0)
+		VPFcam.CFrame = CFrame.new(targetPosition) * targetRotation
+		ViewportFrame.CurrentCamera = VPFcam
+		VPFcam.FieldOfView = 37
+		Character.Archivable = true
+		ClonedChar = Character:Clone()
+		ClonedChar.Name = "VPFCharacter"
+		ClonedChar.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+		ClonedChar.Parent = WorldModel
+		if ClonedChar:FindFirstChild(AnimationHandler) then
+			ClonedChar:FindFirstChild(AnimationHandler):Destroy()
+		end
+		if ClonedChar:FindFirstChildOfClass("Tool") then
+			ClonedChar:FindFirstChildOfClass("Tool"):Destroy()
+		end
+		ClonedChar:SetPrimaryPartCFrame(CFrame.new(Vector3.new(0,0,-0.4), Vector3.new(0,0,7)))
+	end
+	AddVPF()
+
 	local function AddHoverText(Object, Text)
 		local TextLabel = nil
 		Object.MouseEnter:connect(function()
@@ -249,10 +368,12 @@ local function CreateGui()
 			TextLabel.AutomaticSize = Enum.AutomaticSize.XY
 			TextLabel.Size = UDim2.new(0, 5, 0, 17)
 			TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			TextLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
 			TextLabel.TextSize = 17
 			TextLabel.TextWrapped = true
 			TextLabel.Font = Enum.Font.SourceSans
 			TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+			TextLabel.RichText = true
 
 
 			if Text.Value then
@@ -325,16 +446,28 @@ local function CreateGui()
 	local function CreateAnimButton(Object, Name, Text, Type, LayoutPos)
 		local Button = Object
 		Button.Name = Name
+
 		if Type == "R6" then
+			if ScrollingFrame:FindFirstChild(Name) then 
+				ScrollingFrame:FindFirstChild(Name):Destroy() 
+				--print("Found copy of anim: "..Name)
+			end
 			Button.Parent = ScrollingFrame
 		elseif Type == "R15" then
+			if ScrollingFrameR15:FindFirstChild(Name) then 
+				ScrollingFrameR15:FindFirstChild(Name):Destroy() 
+				--print("Found copy of anim: "..Name)
+			end
 			Button.Parent = ScrollingFrameR15
 		elseif Type == "Spec" then
+			if ScrollingFrameSpecific:FindFirstChild(Name) then 
+				ScrollingFrameSpecific:FindFirstChild(Name):Destroy() 
+				--print("Found copy of anim: "..Name)
+			end
 			Button.Parent = ScrollingFrameSpecific
 		end
 
 		Button.BackgroundColor3 = ButtonCol
-
 		Button.FontFace.Weight = Enum.FontWeight.Bold
 		Button.Size = UDim2.new(0, 100, 0, 30)
 		Button.TextColor3 = UiButColor
@@ -343,80 +476,35 @@ local function CreateGui()
 		Button.Text = "<b>" .. Text .. "</b>"
 		Button.TextScaled = true
 		Button.LayoutOrder = LayoutPos
+		
+		local UIStroke = Instance.new("UIStroke")
+		UIStroke.Parent = Button
+		UIStroke.Thickness = 1
+		UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
 		local ButtonPadding = Instance.new("UIPadding")
 		ButtonPadding.Parent = Button
 		ButtonPadding.PaddingLeft = UDim.new(0, 2)
 		ButtonPadding.PaddingRight = UDim.new(0, 2)
-
 	end
 
-	local function AddVPF()
-		ViewportFrame.Parent = MainFrame
-		ViewportFrame.Visible = false
-		ViewportFrame.BackgroundTransparency = 1
-		ViewportFrame.Size = UDim2.new(0, 225, 0, 285)
-		ViewportFrame.Position = UDim2.new(1, 10, 0, 0)
-		ViewportFrame.BackgroundColor3 = Color3.fromRGB(166, 174, 175)
-		ViewportFrame.Ambient = Color3.fromRGB(175, 175, 175)
-		ViewportFrame.LightColor = Color3.fromRGB(208, 208, 208)
-		local UICorner = Instance.new("UICorner")
-		UICorner.Parent = ViewportFrame
-
-		local WorldModel = Instance.new("WorldModel")
-		WorldModel.Parent = ViewportFrame
-		local Character = nil
-		local function WaitForChar()
-			while wait() do 
-				if Player.Character:FindFirstChild("Humanoid") and Player.Character:FindFirstChild("HumanoidRootPart") then
-					Character = Player.Character or Player.CharacterAdded:Wait()
-					Humanoid = Character:FindFirstChild("Humanoid")
-					return
-				end
-			end
+	local function PlayAnim(Button, ID, FadeTime, Speed, Type, LoopedVal, NeedPause) -- Types Tutorial on Emotes section
+		local Frame
+		if Button.Parent.Name == "ScrollingFrame" then Frame = "R6"
+		elseif Button.Parent.Name == "ScrollingFrameR15" then Frame = "R15"
+		elseif Button.Parent.Name == "ScrollingFrameSpecific" then Frame = "Spec"
 		end
-		WaitForChar()
-		wait(0.5)
-		local VPFcam = Instance.new("Camera"); VPFcam.Parent = ViewportFrame
-		VPFcam.CameraType = Enum.CameraType.Scriptable
-
-		local targetPosition = nil
-		targetPosition = Vector3.new(4.6, 0.2, 12)
-		if RigType == "R15" then
-			targetPosition = Vector3.new(4.6, 0.2, 12) -- if R15
-		else
-			targetPosition = Vector3.new(4.6, -1, 12)
-		end
-
-		local targetRotation = CFrame.Angles(0, math.rad(20), 0)
-		VPFcam.CFrame = CFrame.new(targetPosition) * targetRotation
-		ViewportFrame.CurrentCamera = VPFcam
-		VPFcam.FieldOfView = 37
-		Character.Archivable = true
-		ClonedChar = Character:Clone()
-		ClonedChar.Name = "VPFCharacter"
-		ClonedChar.Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
-		ClonedChar.Parent = WorldModel
-		if ClonedChar:FindFirstChild("Animate") then
-			ClonedChar:FindFirstChild("Animate"):Destroy()
-		end
-		if ClonedChar:FindFirstChildOfClass("Tool") then
-			ClonedChar:FindFirstChildOfClass("Tool"):Destroy()
-		end
-		ClonedChar:SetPrimaryPartCFrame(CFrame.new(Vector3.new(0,0,-0.4), Vector3.new(0,0,7)))
-	end
-	AddVPF()
-
-	local function PlayAnim(Object, ID, FadeTime, Speed, Type, LoopedVal, NeedPause) -- Types Tutorial on Emotes section
-		Object:SetAttribute("Looped", LoopedVal)
+		
+		Button:SetAttribute("Looped", LoopedVal)
 		if LoopedVal == false then
-			AddHoverText(Object, "Click RMB to loop")
+			AddHoverText(Button, "Click RMB to loop")
 		end
 
+		local Humanoid = Player.Character:WaitForChild("Humanoid")
 		local Anim = Instance.new("Animation")
 		Anim.Name = "AAnimation"
 		Anim.AnimationId = "rbxassetid://"..ID
-		local track = Player.Character:WaitForChild("Humanoid"):LoadAnimation(Anim)
+		local track = Humanoid:LoadAnimation(Anim)
 		if Type:find("PriorLow") then
 			track.Priority = Enum.AnimationPriority.Action3
 		elseif Type:find("PriorHigh") then
@@ -426,47 +514,97 @@ local function CreateGui()
 		local AnimSpeed = nil
 		local PauseAnimsOption = false
 		local SwitchModeFactor = false
+		local IsMoving = false
+		local IsPlaying = false
 		local AnimACTIVE = false
 
+		Button.Destroying:Connect(function()
+			track:Destroy()
+			Anim:Destroy()
+			Humanoid = nil
+		end)
+
 		local function StartAnim()
-			if AnimSwitchMode == true then
-				SwitchModeFactor = true
-				StopAnimsEvent:Fire()
-				AnimACTIVE = true
+			if DebugInfoEnabled then print(Button.Name.." - Id: "..string.match(track.Animation.AnimationId, "%d+")..", AnimLength: "..track.Length..", AnimSpeed: "..track.Speed..", AnimType: "..Type..", Looped: "..tostring(track.Looped)) end
+
+			if AnimSwitchModeEnabled == true then
+				if not (((Type:find("Running") and RunningTypeEnabled) or (Type:find("Idle") and IdleTypeEnabled)) and AnimSwitchModeRunIdleExceptionEnabled) then
+					SwitchModeFactor = true
+					StopAnimsEvent:Fire()
+					AnimACTIVE = true
+				end
 			end
 
-			local CurLooped = Object:GetAttribute("Looped")
+			local CurLooped = Button:GetAttribute("Looped")
 			if CurLooped == false then
 				track.Looped = false
 			elseif CurLooped == true then
 				track.Looped = true
 			end
 
-			if AnimSmoothFade == true then
-				track:Play(FadeTime, 1, (Speed + SpeedNum) * NegativeNumber)
-			else
-				track:Play(0, 1, (Speed + SpeedNum) * NegativeNumber)
+			local AnimWeight = 1
+			if HigherPriorityEnabled then
+				if Type:find("PriorHigh") then
+					AnimWeight = 20000
+				elseif Type:find("PriorLow") then
+					track.Priority = Enum.AnimationPriority.Action4
+					AnimWeight = 10000
+				end
 			end
+
+			if AltPressed then
+				track.Priority = Enum.AnimationPriority.Action4
+				if HigherPriorityEnabled then
+					AnimWeight = 20000
+				end
+			end
+
+			AnimSpeed = Speed + SpeedNum
+			ViewportFrame.Visible = false
+			Button.BackgroundColor3 = ButtonSelectCol
+			Button.UIStroke.Thickness = 2
+			AddEmote(Button.Name, Speed + SpeedNum, track.Priority.Name)
+
+			if Type:find("Running") and RunningTypeEnabled then
+				Button.UIStroke.Color = Color3.new(0, 0.898039, 0.478431)
+			elseif Type:find("Idle") and IdleTypeEnabled then
+				Button.UIStroke.Color = Color3.new(0.741176, 0, 0.890196)
+			elseif Type:find("Pause") then
+				Button.UIStroke.Color = Color3.new(0.835294, 0.85098, 0)
+			else
+				if track.Looped == true then
+					Button.UIStroke.Color = Color3.new(0.0392157, 0.501961, 1)
+				else
+					Button.UIStroke.Color = Color3.new(0.972549, 0.670588, 0.0627451)
+				end
+			end
+
+			if Type:find("Running") and RunningTypeEnabled and RunningTypeStopStandingEnabled and IsMoving == false then return end
+			if Type:find("Idle") and IdleTypeEnabled and IsMoving == true then return end
+
+			if AnimSmoothFadeEnabled == true then
+				track:Play(FadeTime, AnimWeight, (Speed + SpeedNum) * NegativeNumber)
+			else
+				track:Play(0, AnimWeight, (Speed + SpeedNum) * NegativeNumber)
+			end
+			IsPlaying = true
 
 			if PauseAnimsOption then
 				track:AdjustSpeed(0)
 			end
-			AnimSpeed = Speed + SpeedNum
-			ViewportFrame.Visible = false
-			Object.BackgroundColor3 = ButtonSelectCol
-			Object.UIStroke.Thickness = 2
-
-			if track.Looped == true then
-				Object.UIStroke.Color = Color3.new(0.0392157, 0.501961, 1)
-			else
-				Object.UIStroke.Color = Color3.new(0.972549, 0.670588, 0.0627451)
-			end
 
 			if Type:find("Pause") then
+				local NumberStr = string.match(Type, "Pause([%d%.]+)")
+				local Number = tonumber(NumberStr) or 1
 				local PauseTask = task.spawn(function()
-					wait(1)
-					track:AdjustSpeed(0)
-					AnimSpeed = 0
+					while wait() do
+						if track.TimePosition >= Number then
+							track:AdjustSpeed(0)
+							if DebugInfoEnabled then print("Paused at "..track.TimePosition) end
+							AnimSpeed = 0
+							return
+						end
+					end
 				end)
 				while wait() do
 					if AnimACTIVE == false then
@@ -475,20 +613,31 @@ local function CreateGui()
 					end
 				end
 			end
-			AddEmote(Object.Name, Speed + SpeedNum, track.Priority.Name)
 		end
-		local function StopAnim()
-			if AnimSmoothFade == false then
+		local function StopAnim(Reason)
+			if Type:find("PriorLow") then
+				track.Priority = Enum.AnimationPriority.Action3
+			elseif Type:find("PriorHigh") then
+				track.Priority = Enum.AnimationPriority.Action4
+			end	
+
+			if AnimSmoothFadeEnabled == false then
 				track:Stop(0)
+				track:Stop()
+			else
+				track:Stop(FadeTime)
 			end
-			track:Stop()
-			Object.BackgroundColor3 = ButtonCol
-			Object.UIStroke.Thickness = 1
-			Object.UIStroke.Color = Color3.new(0, 0, 0)
-			RemoveEmote(Object.Name)
+			IsPlaying = false
+			
+			if (Reason == "Destroy") then return end
+
+			Button.BackgroundColor3 = ButtonCol
+			Button.UIStroke.Thickness = 1
+			Button.UIStroke.Color = Color3.new(0, 0, 0)
+			RemoveEmote(Button.Name)
 		end
 
-		Object.MouseButton1Click:connect(function()
+		Button.MouseButton1Click:connect(function()
 			AnimACTIVE = not AnimACTIVE
 			if AnimACTIVE then
 				StartAnim()
@@ -496,14 +645,14 @@ local function CreateGui()
 				StopAnim()
 			end
 		end)
-		Object.MouseButton2Click:connect(function()
-			local CurLooped = Object:GetAttribute("Looped")
+		Button.MouseButton2Click:connect(function()
+			local CurLooped = Button:GetAttribute("Looped")
 			if CurLooped == false then
 				AnimACTIVE = not AnimACTIVE
 				if AnimACTIVE then
 					StartAnim()
 					track.Looped = true
-					Object.UIStroke.Color = Color3.new(0.0392157, 0.501961, 1)
+					Button.UIStroke.Color = Color3.new(0.0392157, 0.501961, 1)
 				else
 					StopAnim()
 				end
@@ -515,52 +664,258 @@ local function CreateGui()
 			if PauseAnimsOption then
 				track:AdjustSpeed(0)
 				PauseAnimsButton.BackgroundColor3 = ButtonSelectCol
+				if DebugInfoEnabled and AnimACTIVE then print("Paused at:"..track.TimePosition) end
 			else
-				track:AdjustSpeed(AnimSpeed)
+				track:AdjustSpeed((Speed + SpeedNum) * NegativeNumber)
 				PauseAnimsButton.BackgroundColor3 = ButtonCol
 			end
 		end)
 
-		Object.Changed:connect(function()
-			if Object.BackgroundColor3 == ButtonCol and AnimACTIVE then
+		Button.Changed:connect(function()
+			if GuiRestarted == true or GuiActive == false then return end
+			if Button.BackgroundColor3 == ButtonCol and AnimACTIVE then
 				AnimACTIVE = false
 				StopAnim()
-			elseif Object.BackgroundColor3 == ButtonSelectCol and not AnimACTIVE then
+			elseif Button.BackgroundColor3 == ButtonSelectCol and not AnimACTIVE then
 				AnimACTIVE = true
 				StartAnim()
 			end
 		end)
 
 		track.Ended:connect(function()
+			if (Type:find("Running") and RunningTypeEnabled) or (Type:find("Idle") and IdleTypeEnabled) then return end
 			AnimACTIVE = false
-			Object.BackgroundColor3 = ButtonCol
-			Object.UIStroke.Thickness = 1
-			Object.UIStroke.Color = Color3.new(0, 0, 0)
-			RemoveEmote(Object.Name)
+			Button.BackgroundColor3 = ButtonCol
+			Button.UIStroke.Thickness = 1
+			Button.UIStroke.Color = Color3.new(0, 0, 0)
+			RemoveEmote(Button.Name)
 		end)
 
-		StopAnimsEvent.Event:Connect(function()
+		StopAnimsEvent.Event:Connect(function(Reason)
+			if not (Reason == "Reset/Destroy" or Reason == "Forced") and AnimSwitchModeRunIdleExceptionEnabled and ((Type:find("Running") and RunningTypeEnabled) or (Type:find("Idle") and IdleTypeEnabled)) then return end
+			if AnimACTIVE == false then return end
+
+			if (Reason == "Reset/Destroy") and ((Type:find("Running") and RunningTypeEnabled) or (Type:find("Idle") and IdleTypeEnabled)) then
+				local Name = Button.Name
+				if AnimACTIVE then
+					table.insert(RestartAnimations, Frame..Name)
+				end
+			end
+
 			if SwitchModeFactor == true then 
 				SwitchModeFactor = false	
 				return 
 			end
+			if GuiActive == false or GuiRestarted == true then track:Destroy() end
+
 			AnimACTIVE = false
 			PauseAnimsOption = false
-			StopAnim()
+			if (Reason == "Reset/Destroy") then
+				StopAnim("Destroy")
+			else
+				StopAnim()
+			end
 		end)
+		
+		local MinWalkSpeedNumStr = string.match(Type, "Running([%d%.]+)")
+		local MinWalkSpeedNum = tonumber(MinWalkSpeedNumStr) or 0.5
+		if tonumber(MinWalkSpeedNumStr) ~= nil then AddHoverText(Button, "Minimal WalkSpeed to play:"..MinWalkSpeedNum) end
+		if Type:find("Running") then
+			if RunningTypeMinSpeedEnabled == false then
+				MinWalkSpeedNum = 0.5
+			end
+			Humanoid.Running:Connect(function(currentSpeed)
+				if GuiActive and GuiRestarted == false then
+					if currentSpeed > 0.5 then
+						IsMoving = true
+					else
+						IsMoving = false
+					end
+				end
+				if AnimACTIVE and RunningTypeEnabled and GuiActive and GuiRestarted == false then
+					if RunningTypeMinSpeedEnabled == false then
+						MinWalkSpeedNum = 0.5
+					end
+					if currentSpeed > 0.5 and Humanoid.WalkSpeed >= MinWalkSpeedNum then
+
+						local AnimWeight = 1
+						if HigherPriorityEnabled then
+							if Type:find("PriorHigh") then
+								AnimWeight = 250
+							elseif Type:find("PriorLow") then
+								track.Priority = Enum.AnimationPriority.Action4
+								AnimWeight = 100
+							end
+						end
+
+						if not IsPlaying then
+							if AnimSmoothFadeEnabled == true then
+								track:Play(FadeTime, AnimWeight, (Speed + SpeedNum) * NegativeNumber)
+							else
+								track:Play(0, AnimWeight, (Speed + SpeedNum) * NegativeNumber)
+							end
+							IsPlaying = true
+						end
+
+						local characterRelativeSpeed = currentSpeed / DefaultWalkSpeed
+						if RunningTypeStopStandingEnabled == false then
+							characterRelativeSpeed = Humanoid.WalkSpeed / DefaultWalkSpeed
+						end
+
+						local finalAnimationSpeed = characterRelativeSpeed * (Speed + SpeedNum) * NegativeNumber
+						if RunningTypeCharSpeedEnabled then
+							track:AdjustSpeed(finalAnimationSpeed)
+						end
+					else
+						if IsPlaying and RunningTypeStopStandingEnabled then
+							if AnimSmoothFadeEnabled == false then
+								track:Stop(0)
+								track:Stop()
+							else
+								track:Stop(FadeTime)
+							end
+							IsPlaying = false
+						end
+					end
+				elseif GuiActive and GuiRestarted == false then
+					if IsPlaying and RunningTypeEnabled then
+						if AnimSmoothFadeEnabled == false then
+							track:Stop(0)
+							track:Stop()
+						else
+							track:Stop(FadeTime)
+						end
+						IsPlaying = false
+					end
+				end
+			end)
+
+			Humanoid.Swimming:Connect(function()
+				if IsPlaying and RunningTypeEnabled then
+					track:Stop()
+					IsPlaying = false
+				end
+			end)
+			Humanoid.Jumping:Connect(function()
+				if IsPlaying and RunningTypeEnabled and RunningTypeStopJumpingEnabled then
+					track:Stop()
+					IsPlaying = false
+				end
+			end)
+			Humanoid.FreeFalling:Connect(function()
+				if IsPlaying and RunningTypeEnabled and RunningTypeStopJumpingEnabled then
+					track:Stop()
+					IsPlaying = false
+				end
+			end)
+			Humanoid.Climbing:Connect(function()
+				if IsPlaying and RunningTypeEnabled and RunningTypeStopClimbingEnabled then
+					track:Stop()
+					IsPlaying = false
+				end
+			end)
+		end
+
+		if Type:find("Idle") then
+			Humanoid.Running:Connect(function(currentSpeed)
+				if GuiActive then
+					if currentSpeed > 0.5 then
+						IsMoving = true
+					else
+						IsMoving = false
+					end
+				end
+				if AnimACTIVE and IdleTypeEnabled and GuiActive and GuiRestarted == false then
+					if currentSpeed > 0.5 then
+						if IsPlaying then
+							track:Stop()
+							IsPlaying = false
+						end
+					else
+						if IsPlaying == false then
+							local AnimWeight = 1
+							if HigherPriorityEnabled then
+								if Type:find("PriorHigh") then
+									AnimWeight = 250
+								elseif Type:find("PriorLow") then
+									track.Priority = Enum.AnimationPriority.Action4
+									AnimWeight = 100
+								end
+							end
+
+							if not IsPlaying then
+								if AnimSmoothFadeEnabled == true then
+									track:Play(FadeTime, AnimWeight, (Speed + SpeedNum) * NegativeNumber)
+								else
+									track:Play(0, AnimWeight, (Speed + SpeedNum) * NegativeNumber)
+								end
+								IsPlaying = true
+							end
+
+							IsPlaying = true
+						end
+					end
+				elseif GuiActive and GuiRestarted == false then
+					if IsPlaying and IdleTypeEnabled then
+						if AnimSmoothFadeEnabled == false then
+							track:Stop(0)
+							track:Stop()
+						else
+							track:Stop(FadeTime)
+						end
+						IsPlaying = false
+					end
+				end
+			end)
+
+			Humanoid.Swimming:Connect(function()
+				if IsPlaying and IdleTypeEnabled then
+					track:Stop()
+					IsPlaying = false
+				end
+			end)
+			Humanoid.Jumping:Connect(function()
+				if IsPlaying and IdleTypeEnabled then
+					track:Stop()
+					IsPlaying = false
+				end
+			end)
+			Humanoid.FreeFalling:Connect(function()
+				if IsPlaying and IdleTypeEnabled then
+					track:Stop()
+					IsPlaying = false
+				end
+			end)
+			Humanoid.Climbing:Connect(function()
+				if IsPlaying and IdleTypeEnabled then
+					track:Stop()
+					IsPlaying = false
+				end
+			end)
+			Humanoid.Seated:Connect(function()
+				if IsPlaying and IdleTypeEnabled then
+					track:Stop()
+					IsPlaying = false
+				end
+			end)
+		end
 
 		local VPFtrack = ClonedChar:WaitForChild("Humanoid"):LoadAnimation(Anim)
 		local VPFActive = false
-		Object.MouseEnter:connect(function()
-			if AnimPreviewEnable and not AnimACTIVE then
+		Button.MouseEnter:connect(function()
+			if AnimPreviewEnabled and not AnimACTIVE then
 				VPFActive = true
 				VPFtrack.Looped = true
 				VPFtrack:Play(0, 1, (Speed + SpeedNum) * NegativeNumber)
 				ViewportFrame.Visible = true
 				game.TweenService:Create(ViewportFrame, TweenInfo.new(.1), {BackgroundTransparency = 0}):Play()
+
 				if Type:find("Pause") then
+					local NumberStr = string.match(Type, "Pause([%d%.]+)")
+					local Number = tonumber(NumberStr) or 1
+
 					local PauseTask = task.spawn(function()
-						wait(1)
+						wait(Number)
 						VPFtrack:AdjustSpeed(0)
 					end)
 					while wait() do
@@ -573,14 +928,33 @@ local function CreateGui()
 			end
 		end)
 
-		Object.MouseLeave:connect(function()
-			if AnimPreviewEnable then
+		Button.MouseLeave:connect(function()
+			if AnimPreviewEnabled then
 				VPFActive = false
 				game.TweenService:Create(ViewportFrame, TweenInfo.new(.1), {BackgroundTransparency = 1}):Play()
 				ViewportFrame.Visible = false
 				VPFtrack:Stop()
 			end
 		end)
+		
+		for index, RestartedAnim in ipairs(RestartAnimations) do
+			local prefix, suffix
+			if string.match(RestartedAnim, "^R15") then
+				prefix, suffix = string.match(RestartedAnim, "^(R15)(.+)$")
+			elseif string.match(RestartedAnim, "^Spec") then
+				prefix, suffix = string.match(RestartedAnim, "^(Spec)(.+)$")
+			elseif string.match(RestartedAnim, "^R6") then
+				prefix, suffix = string.match(RestartedAnim, "^(R6)(.+)$")
+			end
+
+			if prefix == Frame and suffix == Button.Name then
+				task.spawn(function()
+					Button:WaitForChild("UIStroke")
+					AnimACTIVE = true
+					StartAnim()
+				end)
+			end
+		end
 	end
 
 	local function AddSettings(Setting, Title, Text, LayoutOrder)
@@ -699,18 +1073,81 @@ local function CreateGui()
 				end
 				return
 			end
-
-			--[[local function performCustomAction()
-				print("Keybind activated! Key pressed: " .. Hotkey.Value)
-			end
-			if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Hotkey then
-				performCustomAction()
-			end]]
 		end)
+	end
+
+	local function CreateDivideFrame(Title, LayoutOrder, Type)
+		local HasButton = false
+		if Type == "Spec" then
+			for _, v in pairs(ScrollingFrameSpecific:GetChildren()) do
+				if v:IsA("TextButton") then
+					if v.LayoutOrder == LayoutOrder + 1 then
+						HasButton = true
+						break
+					end
+				end		
+			end
+		else
+			HasButton = true
+		end
+		if HasButton == false then return end
+
+		local DivideFrame = Instance.new("Frame")
+		local Line = Instance.new("Frame")
+		local TextLabel = Instance.new("TextLabel")
+
+		DivideFrame.Name = "DivideFrame"
+		DivideFrame.Size = UDim2.new(0.98, 0, 0, 15)
+		DivideFrame.BackgroundTransparency = 1
+		DivideFrame.LayoutOrder = LayoutOrder
+
+		Line.Name = "Line"
+		Line.AnchorPoint = Vector2.new(0, 0.5)
+		Line.Size = UDim2.new(1, 0, 0, 3)
+		Line.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Line.Position = UDim2.new(0, 0, 0.5, 0)
+		Line.BorderSizePixel = 0
+		Line.BackgroundColor3 = UiButColor
+		Line.Parent = DivideFrame
+
+		TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+		TextLabel.AutomaticSize = Enum.AutomaticSize.X
+		TextLabel.Size = UDim2.new(0, 0, 0, 25)
+		TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+		TextLabel.BorderSizePixel = 0
+		TextLabel.BackgroundColor3 = ScrollBgColor
+		TextLabel.TextSize = 25
+		TextLabel.TextColor3 = UiButColor
+		TextLabel.Text = Title
+		TextLabel.Font = Enum.Font.SourceSansBold
+		TextLabel.Parent = DivideFrame
+
+		local UIPadding = Instance.new("UIPadding")
+		UIPadding.PaddingLeft = UDim.new(0, 8)
+		UIPadding.PaddingRight = UDim.new(0, 10)
+		UIPadding.Parent = TextLabel
+
+		if Type == "Settings" then
+			DivideFrame.Size = UDim2.new(0.98, 0, 0, 15)
+			Line.Size = UDim2.new(1, 0, 0, 2)
+			TextLabel.Size = UDim2.new(0, 50, 0, 20)
+			TextLabel.TextSize = 17
+		end
+
+		if Type == "R6" then
+			DivideFrame.Parent = ScrollingFrame
+		elseif Type == "R15" then
+			DivideFrame.Parent = ScrollingFrameR15
+		elseif Type == "Spec" then
+			DivideFrame.Parent = ScrollingFrameSpecific
+		elseif Type == "Settings" then
+			DivideFrame.Parent = SettingsStuff
+		end
 	end
 
 
 	-- Creating Objects
+	print("Creating Objects...")
 	Emoter.Name = "Emoter"
 	Emoter.ResetOnSpawn = false
 	Emoter.IgnoreGuiInset = true
@@ -781,7 +1218,7 @@ local function CreateGui()
 	MainFrame.Active = true
 	MainFrame.BackgroundColor3 = BgColor
 	MainFrame.BackgroundTransparency = 1
-	MainFrame.Size = UDim2.new(0, 460, 0, 285)
+	MainFrame.Size = UDim2.new(0, XSize, 0, YSize)
 	MainFrame.Position = UDim2.new(0, 10, 0, 70)
 
 	local UIDragDetectorMainFrame = Instance.new("UIDragDetector")
@@ -793,7 +1230,7 @@ local function CreateGui()
 	GuiTopFrame.Parent = MainFrame
 	GuiTopFrame.BackgroundColor3 = BgColor
 	GuiTopFrame.BorderColor3 = Color3.new(0.243137, 0.243137, 0.243137)
-	GuiTopFrame.Size = UDim2.new(0, 460, 0, 32)
+	GuiTopFrame.Size = UDim2.new(1, 0, 0, 32)
 
 	DestroyGUI.Name = "DestroyGUI"
 	DestroyGUI.Parent = GuiTopFrame
@@ -850,7 +1287,7 @@ local function CreateGui()
 	GuiBottomFrame.Name = "GuiBottomFrame"
 	GuiBottomFrame.Parent = MainFrame
 	GuiBottomFrame.AnchorPoint = Vector2.new(0, 1)
-	GuiBottomFrame.Size = UDim2.new(0, 460, 0, 35)
+	GuiBottomFrame.Size = UDim2.new(1, 0, 0, 35)
 	GuiBottomFrame.Position = UDim2.new(0, 0, 1, 1)
 	GuiBottomFrame.Active = true
 	GuiBottomFrame.BackgroundColor3 = BgColor
@@ -866,7 +1303,7 @@ local function CreateGui()
 	SFLayout.Parent = SpeedFrame
 	SFLayout.FillDirection = Enum.FillDirection.Vertical
 	SFLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	SFLayout.CellSize = UDim2.new(0, 90, 0, 29)
+	SFLayout.CellSize = UDim2.new(0, 90, 0, 28)
 	SFLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 
 	OptionsButton.Parent = GuiBottomFrame
@@ -930,7 +1367,7 @@ local function CreateGui()
 	ScrollingFrame.BackgroundColor3 = ScrollBgColor
 	ScrollingFrame.Position = UDim2.new(0, 0, 0, 34)
 	ScrollingFrame.ScrollBarImageColor3 = UiButColor
-	ScrollingFrame.Size = UDim2.new(0, 460, 0, 215)
+	ScrollingFrame.Size = UDim2.new(1, 0, 1, -69)
 	ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0.5, 10)
 	ScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 	ScrollingFrame.ScrollBarThickness = 10
@@ -948,7 +1385,7 @@ local function CreateGui()
 	ScrollingFrameR15.BackgroundColor3 = ScrollBgColor
 	ScrollingFrameR15.Position = UDim2.new(0, 0, 0, 34)
 	ScrollingFrameR15.ScrollBarImageColor3 = UiButColor
-	ScrollingFrameR15.Size = UDim2.new(0, 460, 0, 215)
+	ScrollingFrameR15.Size = UDim2.new(1, 0, 1, -69)
 	ScrollingFrameR15.CanvasSize = UDim2.new(0, 0, 0.5, 10)
 	ScrollingFrameR15.AutomaticCanvasSize = Enum.AutomaticSize.Y
 	ScrollingFrameR15.Visible = false
@@ -967,7 +1404,7 @@ local function CreateGui()
 	ScrollingFrameSpecific.BackgroundColor3 = ScrollBgColor
 	ScrollingFrameSpecific.Position = UDim2.new(0, 0, 0, 34)
 	ScrollingFrameSpecific.ScrollBarImageColor3 = UiButColor
-	ScrollingFrameSpecific.Size = UDim2.new(0, 460, 0, 215)
+	ScrollingFrameSpecific.Size = UDim2.new(1, 0, 1, -69)
 	ScrollingFrameSpecific.CanvasSize = UDim2.new(0, 0, 0.5, 10)
 	ScrollingFrameSpecific.AutomaticCanvasSize = Enum.AutomaticSize.Y
 	ScrollingFrameSpecific.Visible = false
@@ -1073,7 +1510,7 @@ local function CreateGui()
 	SearchFrame.AnchorPoint = Vector2.new(1, 0)
 	SearchFrame.Size = UDim2.new(0, 164, 0, 35)
 	SearchFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	SearchFrame.Position = UDim2.new(1, 31, 0.119, 0)
+	SearchFrame.Position = UDim2.new(1, 31, 0, 34)
 	SearchFrame.BorderSizePixel = 0
 	SearchFrame.BackgroundColor3 = BgColor
 
@@ -1140,7 +1577,7 @@ local function CreateGui()
 	CustomAnimFrame.AnchorPoint = Vector2.new(1, 0)
 	CustomAnimFrame.Size = UDim2.new(0, 194, 0, 35)
 	CustomAnimFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	CustomAnimFrame.Position = UDim2.new(1, 31, 0.119, 39)
+	CustomAnimFrame.Position = UDim2.new(1, 31, 0, 73)
 	CustomAnimFrame.BorderSizePixel = 0
 	CustomAnimFrame.BackgroundColor3 = BgColor
 
@@ -1225,7 +1662,7 @@ local function CreateGui()
 	DefaultSection.AnchorPoint = Vector2.new(1, 0)
 	DefaultSection.Size = UDim2.new(0, 52, 0, 32)
 	DefaultSection.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	DefaultSection.Position = UDim2.new(1.045, 30, 1, -104)
+	DefaultSection.Position = UDim2.new(1, 51, 1, -104)
 	DefaultSection.BorderSizePixel = 0
 	DefaultSection.BackgroundColor3 = BgColor
 	DefaultSection.TextSize = 26
@@ -1247,7 +1684,7 @@ local function CreateGui()
 	SpecGameSection.AnchorPoint = Vector2.new(1, 0)
 	SpecGameSection.Size = UDim2.new(0, 72, 0, 32)
 	SpecGameSection.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	SpecGameSection.Position = UDim2.new(1.0867392, 31, 1, -68)
+	SpecGameSection.Position = UDim2.new(1, 71, 1, -68)
 	SpecGameSection.BorderSizePixel = 0
 	SpecGameSection.BackgroundColor3 = BgColor
 	SpecGameSection.TextSize = 26
@@ -1399,6 +1836,12 @@ local function CreateGui()
 
 
 	--SettingsFrame
+	CreateDivideFrame("Animation", 1, "Settings")
+	CreateDivideFrame("Running & Idle", 2, "Settings")
+	CreateDivideFrame("Style", 3, "Settings")
+	CreateDivideFrame("Hotkeys", 4, "Settings")
+	CreateDivideFrame("Data", 5, "Settings")
+
 	SettingsFrame.Parent = Emoter
 	SettingsFrame.Name = "SettingsFrame"
 	SettingsFrame.AnchorPoint = Vector2.new(0.5, 0)
@@ -1471,19 +1914,9 @@ local function CreateGui()
 	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 	UIListLayout.Parent = SettingsStuff
 
-	AddSettings(ToolIdleAnimHighPrior, "ToolIdlePriorityOption", "High priority on ToolIdle anims", 0)
-	AddSettings(ToolActionAnimHighPrior, "ToolActionPriorityOption", "High priority on ToolAction anims", 0)
-	AddSettings(AnimPreviewEnable, "PreviewOption", "Enable Animation Preview", 1)
-	AddSettings(AnimSwitchMode, "SwitchOption", "Anims Switch mode", 2)
-	AddSettings(AnimSmoothFade, "AnimFadeOption", "Anim smooth Start/Stop", 3)
-	AddSettings(HotkeysEnabled, "HotkeysOption", "Enable Hotkeys", 5)
-	AddSettings(UICornerEnabled, "UICornerOption", "Enable UICorners", 6)
-	AddSettings(UIGradientEnabled, "UIGradientOption", "Enable UIGradients", 7)
-	AddSettings(LoadGithubSGAEnabled, "LoadGithubSGAOption", "Load SpecificGameAnims from Github", 8)
-
 	ThemeOption.Name = "ThemeOption"
 	ThemeOption.Size = UDim2.new(1, 0, 0, 25)
-	ThemeOption.LayoutOrder = 4
+	ThemeOption.LayoutOrder = 3
 	ThemeOption.BackgroundTransparency = 1
 	ThemeOption.Parent = SettingsStuff
 
@@ -1495,7 +1928,7 @@ local function CreateGui()
 	UIListLayout5.Parent = ThemeOption
 
 	ThemeOptionText.Name = "ThemeOptionText"
-	ThemeOptionText.Size = UDim2.new(0.6, -10, 0, 25)
+	ThemeOptionText.Size = UDim2.new(0, 124, 0, 25)
 	ThemeOptionText.BackgroundTransparency = 1
 	ThemeOptionText.TextSize = 14
 	ThemeOptionText.TextColor3 = UiButColor
@@ -1503,7 +1936,6 @@ local function CreateGui()
 	ThemeOptionText.Font = Enum.Font.SourceSans
 	ThemeOptionText.TextXAlignment = Enum.TextXAlignment.Left
 	ThemeOptionText.Parent = ThemeOption
-	AddHoverText(ThemeOption, "Change theme of Gui (Restart required)")
 
 	PurpleThemeColor.Name = "PurpleThemeColor"
 	PurpleThemeColor.Size = UDim2.new(0, 15, 0, 15)
@@ -1553,10 +1985,162 @@ local function CreateGui()
 	BlackThemeColor.Parent = ThemeOption
 	AddHoverText(BlackThemeColor, "Black theme")
 
+	local YSizeOption = Instance.new("Frame")
+	YSizeOption.Parent = SettingsStuff
+	YSizeOption.Name = "YSizeOptionOption"
+	YSizeOption.Size = UDim2.new(1, 0, 0, 25)
+	YSizeOption.LayoutOrder = 3
+	YSizeOption.BackgroundTransparency = 1
+
+	local UIListLayout = Instance.new("UIListLayout")
+	UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+	UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	UIListLayout.Padding = UDim.new(0, 5)
+	UIListLayout.Parent = YSizeOption
+
+	local YSizeOptionText = Instance.new("TextLabel")
+	YSizeOptionText.Name = "YSizeOptionText"
+	YSizeOptionText.Size = UDim2.new(0, 94, 0, 25)
+	YSizeOptionText.BackgroundTransparency = 1
+	YSizeOptionText.TextSize = 14
+	YSizeOptionText.TextColor3 = Color3.fromRGB(0, 0, 0)
+	YSizeOptionText.Text = "Vertical size"
+	YSizeOptionText.Font = Enum.Font.SourceSans
+	YSizeOptionText.TextXAlignment = Enum.TextXAlignment.Left
+	YSizeOptionText.Parent = YSizeOption
+
+	local UIPadding = Instance.new("UIPadding")
+	UIPadding.PaddingBottom = UDim.new(0, 2)
+	UIPadding.Parent = YSizeOptionText
+
+	local X05YSixe = Instance.new("TextButton")
+	X05YSixe.Name = "X05YSixe"
+	X05YSixe.Size = UDim2.new(0, 25, 0, 15)
+	X05YSixe.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	X05YSixe.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	X05YSixe.Text = "0.5x"
+	X05YSixe.Parent = YSizeOption
+
+	local X1YSize = Instance.new("TextButton")
+	X1YSize.Name = "X1YSize"
+	X1YSize.Size = UDim2.new(0, 20, 0, 15)
+	X1YSize.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	X1YSize.Position = UDim2.new(0.5861111, 0, 0.2, 0)
+	X1YSize.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	X1YSize.Text = "1x"
+	X1YSize.Parent = YSizeOption
+
+	local X15YSize = Instance.new("TextButton")
+	X15YSize.Name = "X15YSize"
+	X15YSize.Size = UDim2.new(0, 25, 0, 15)
+	X15YSize.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	X15YSize.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	X15YSize.Text = "1.5x"
+	X15YSize.Parent = YSizeOption
+
+	local X2YSize = Instance.new("TextButton")
+	X2YSize.Name = "X2YSize"
+	X2YSize.Size = UDim2.new(0, 20, 0, 15)
+	X2YSize.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	X2YSize.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	X2YSize.Text = "2x"
+	X2YSize.Parent = YSizeOption
+
+	local XSizeOption = Instance.new("Frame")
+	XSizeOption.Parent = SettingsStuff
+	XSizeOption.Name = "XSizeOption"
+	XSizeOption.Size = UDim2.new(1, 0, 0, 25)
+	XSizeOption.LayoutOrder = 3
+	XSizeOption.BackgroundTransparency = 1
+
+	local UIListLayout = Instance.new("UIListLayout")
+	UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+	UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	UIListLayout.Padding = UDim.new(0, 5)
+	UIListLayout.Parent = XSizeOption
+
+	local XSizeOptionText = Instance.new("TextLabel")
+	XSizeOptionText.Name = "XSizeOptionText"
+	XSizeOptionText.Size = UDim2.new(0, 104, 0, 25)
+	XSizeOptionText.BackgroundTransparency = 1
+	XSizeOptionText.TextSize = 14
+	XSizeOptionText.TextColor3 = Color3.fromRGB(0, 0, 0)
+	XSizeOptionText.Text = "Horizontal size"
+	XSizeOptionText.Font = Enum.Font.SourceSans
+	XSizeOptionText.TextXAlignment = Enum.TextXAlignment.Left
+	XSizeOptionText.Parent = XSizeOption
+
+	local UIPadding = Instance.new("UIPadding")
+	UIPadding.PaddingBottom = UDim.new(0, 2)
+	UIPadding.Parent = XSizeOptionText
+
+	local X2Size = Instance.new("TextButton")
+	X2Size.Name = "X2Sixe"
+	X2Size.Size = UDim2.new(0, 20, 0, 15)
+	X2Size.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	X2Size.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	X2Size.Text = "2x"
+	X2Size.Parent = XSizeOption
+
+	local X3Size = Instance.new("TextButton")
+	X3Size.Name = "X3Size"
+	X3Size.Size = UDim2.new(0, 20, 0, 15)
+	X3Size.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	X3Size.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	X3Size.Text = "3x"
+	X3Size.Parent = XSizeOption
+
+	local X4Size = Instance.new("TextButton")
+	X4Size.Name = "X4Size"
+	X4Size.Size = UDim2.new(0, 20, 0, 15)
+	X4Size.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	X4Size.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	X4Size.Text = "4x"
+	X4Size.Parent = XSizeOption
+
+	local X5Size = Instance.new("TextButton")
+	X5Size.Name = "X5Size"
+	X5Size.Size = UDim2.new(0, 20, 0, 15)
+	X5Size.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	X5Size.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	X5Size.Text = "5x"
+	X5Size.Parent = XSizeOption
+
+	AddSettings(AnimPreviewEnabled, "PreviewOption", "Enable Animation Preview", 0)
+	AddSettings(DebugInfoEnabled, "DebugInfoOption", "Show Debug information", 0)
+	AddSettings(AnalyticsEnabled, "AnalyticsOption", "Enable analytics (hover for info)", 0)
+	AddSettings(LoadAnimationsOnRestart, "LoadAnimationsOnRestartOption", "Play 'Running' & 'Idle' anims on reset", 0)
+
+	AddSettings(ToolIdleAnimHighPriorEnabled, "ToolIdlePriorityOption", "High priority on ToolIdle anims", 1)
+	AddSettings(ToolActionAnimHighPriorEnabled, "ToolActionPriorityOption", "High priority on ToolAction anims", 1)
+	AddSettings(AnimSwitchModeEnabled, "SwitchOption", "Anims Switch mode", 1)
+	AddSettings(AnimSwitchModeRunIdleExceptionEnabled, "SwitchRunIdleExceptionOption", "Exception for 'Running' and 'Idle'", 1)
+	AddSettings(AnimSmoothFadeEnabled, "AnimFadeOption", "Anim smooth Start/Stop", 1)
+	AddSettings(HigherPriorityEnabled, "HigherPriorityOption", "Animations Higher priority", 1)
+
+	AddSettings(IdleTypeEnabled, "IdleTypeOption", "Enable 'Idle' type", 2)
+	AddSettings(RunningTypeEnabled, "RunningTypeOption", "Enable 'Running' type", 2)
+	AddSettings(RunningTypeStopStandingEnabled, "RunningTypeStopStandingOption", "Stop animation while not running", 2)
+	AddSettings(RunningTypeCharSpeedEnabled, "RunningTypeCharSpeedOption", "AnimSpeed depends on character's", 2)
+	AddSettings(RunningTypeMinSpeedEnabled, "RunningTypeMinSpeedOption", "Enable 'MinimumSpeed' value", 2)
+	AddSettings(RunningTypeStopJumpingEnabled, "RunningTypeStopJumpingOption", "Stop animation while jumping", 2)
+	AddSettings(RunningTypeStopClimbingEnabled, "RunningTypeStopClimbingOption", "Stop animation while climbing", 2)
+
+	AddSettings(UICornerEnabled, "UICornerOption", "Enable UICorners", 3)
+	AddSettings(UIGradientEnabled, "UIGradientOption", "Enable UIGradients", 3)
+	AddSettings(HotkeysEnabled, "HotkeysOption", "Enable Hotkeys", 4)
+
+	AddSettings(LoadGithubSGAEnabled, "LoadGithubSGAOption", "Load SpecificGameAnims from Github", 5)
+	AddSettings(LoadGithubCustomAnimsEnabled, "LoadGithubCustomAnimOption", "Load AdditionalAnims from Github", 5)
+	AddSettings(LoadLocalSGAEnabled, "LoadLocalSGAOption", "Load SpecificGameAnims from local", 5)
+	AddSettings(LoadLocalCustomAnimsEnabled, "LoadLocalCustomAnimOption", "Load AdditionalAnims from local", 5)
+
 	HotkeysEditOption.Name = "HotkeysEditOption"
-	HotkeysEditOption.Size = UDim2.new(0.55, 0, 0, 22)
+	HotkeysEditOption.Size = UDim2.new(0.55, 0, 0, 20)
 	HotkeysEditOption.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	HotkeysEditOption.LayoutOrder = 5
+	HotkeysEditOption.LayoutOrder = 4
 	HotkeysEditOption.Position = UDim2.new(0, 0, 0.1558714, 0)
 	HotkeysEditOption.BorderSizePixel = 0
 	HotkeysEditOption.BackgroundColor3 = ButtonCol
@@ -1618,6 +2202,7 @@ local function CreateGui()
 	AddHotkey(SettingsHotkey, "SettingsHotkey", "Open Settings")
 	AddHotkey(SwitchAnimHotkey, "SwitchAnimHotkey", "Switch Anim Setting")
 	AddHotkey(AnimFadeHotkey, "AnimFadeHotkey", "Animation Fade Setting")
+	AddHotkey(StopAnimsHotkey, "StopAnimsHotkey", "Stop all Animations")
 	AddHotkey(EmoteWheelHotkey, "EmoteWheelHotkey", "Open Emote Wheel")
 
 	MoreButtonsFrame.Parent = SettingsFrame
@@ -1633,7 +2218,7 @@ local function CreateGui()
 	UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	UIListLayout.Padding = UDim.new(0, 12)
+	UIListLayout.Padding = UDim.new(0, 22)
 	UIListLayout.Parent = MoreButtonsFrame
 
 	SaveSettingsButton.Name = "SaveSettingsButton"
@@ -1676,14 +2261,15 @@ local function CreateGui()
 
 
 	-- Buttons and other functions
+	print("Loading buttons and other functions...")
 	DestroyGUI.MouseButton1Click:connect(function()
 		GuiActive = false
-		StopAnimsEvent:Fire()
+		StopAnimsEvent:Fire("Reset/Destroy")
 		Emoter:Destroy()
 	end)
 	SFDestroyGUI.MouseButton1Click:connect(function()
 		GuiActive = false
-		StopAnimsEvent:Fire()
+		StopAnimsEvent:Fire("Reset/Destroy")
 		Emoter:Destroy()
 	end)
 	OpenGUI.MouseButton1Click:connect(function()
@@ -1748,7 +2334,7 @@ local function CreateGui()
 			BackButton.Visible = true
 			SearchBox.Visible = true
 			SFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
-			game.TweenService:Create(SearchFrame, TweenInfo.new(.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Position = UDim2.new(1, 164, 0.119, 0)}):Play()
+			game.TweenService:Create(SearchFrame, TweenInfo.new(.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Position = UDim2.new(1, 164, 0, 34)}):Play()
 			wait(.3)
 			SearchButtonClick = true
 		end
@@ -1756,7 +2342,7 @@ local function CreateGui()
 	BackButton.MouseButton1Click:Connect(function()
 		if SearchButtonClick == true then
 			SearchButtonClick = false
-			game.TweenService:Create(SearchFrame, TweenInfo.new(.2, Enum.EasingStyle.Cubic, Enum.EasingDirection.In), {Position = UDim2.new(1, 31, 0.119, 0)}):Play()
+			game.TweenService:Create(SearchFrame, TweenInfo.new(.2, Enum.EasingStyle.Cubic, Enum.EasingDirection.In), {Position = UDim2.new(1, 31, 0, 34)}):Play()
 			wait(.2)
 			SFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
 			SearchButton.Visible = true
@@ -1771,7 +2357,7 @@ local function CreateGui()
 		BackButton.Visible = true
 		SearchBox.Visible = true
 		SFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
-		SearchFrame.Position = UDim2.new(1, 164, 0.119, 0)
+		SearchFrame.Position = UDim2.new(1, 164, 0, 34)
 	end
 
 	SearchBox.Changed:Connect(function()
@@ -1807,7 +2393,7 @@ local function CreateGui()
 			IdBox.Visible = true
 			PlayAnimButton.Visible = true
 			CAFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
-			game.TweenService:Create(CustomAnimFrame, TweenInfo.new(.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Position = UDim2.new(1, 194, 0.119, 39)}):Play()
+			game.TweenService:Create(CustomAnimFrame, TweenInfo.new(.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Position = UDim2.new(1, 194, 0, 73)}):Play()
 			wait(.3)
 			CustomAnimButtonClick = true
 		end
@@ -1815,7 +2401,7 @@ local function CreateGui()
 	CustomAnimBackButton.MouseButton1Click:Connect(function()
 		if CustomAnimButtonClick == true then
 			CustomAnimButtonClick = false
-			game.TweenService:Create(CustomAnimFrame, TweenInfo.new(.2, Enum.EasingStyle.Cubic, Enum.EasingDirection.In), {Position = UDim2.new(1, 31, 0.119, 39)}):Play()
+			game.TweenService:Create(CustomAnimFrame, TweenInfo.new(.2, Enum.EasingStyle.Cubic, Enum.EasingDirection.In), {Position = UDim2.new(1, 31, 0, 73)}):Play()
 			wait(.2)
 			CAFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
 			CustomAnimButton.Visible = true
@@ -1864,7 +2450,7 @@ local function CreateGui()
 		IdBox.Visible = true
 		PlayAnimButton.Visible = true
 		CAFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
-		CustomAnimFrame.Position = UDim2.new(1, 194, 0.119, 39)
+		CustomAnimFrame.Position = UDim2.new(1, 194, 0, 73)
 	end
 
 
@@ -1898,7 +2484,7 @@ local function CreateGui()
 		if PauseDefAnimsOption then
 			local playingTracks = Player.Character.Humanoid:GetPlayingAnimationTracks()
 			for _, animtrack in ipairs(playingTracks) do
-				if table.find(DefaultAnimsNameList, animtrack.Name) then
+				if animtrack.Name ~= "AAnimation" then
 					animtrack:AdjustSpeed(0)
 				end
 			end
@@ -1906,20 +2492,20 @@ local function CreateGui()
 
 			local playingTracks = Player.Character.Humanoid:GetPlayingAnimationTracks()
 			for _, animtrack in ipairs(playingTracks) do
-				if table.find(DefaultAnimsNameList, animtrack.Name) then
-					animtrack:AdjustSpeed(1) --Gonna fix it soon (maybe)
+				if animtrack.Name ~= "AAnimation" then
+					animtrack:AdjustSpeed(1) -- always playing at speed 1. Gonna fix it (maybe)
 				end
 			end
 		end
 	end)
 
-	local AnimateScript = Player.Character:FindFirstChild("Animate")
 	PauseAnimateButton.MouseButton1Click:Connect(function()
+		local AnimateScript = Player.Character:FindFirstChild(AnimationHandler)
 		if AnimateScript.Disabled == false then
 			AnimateScript.Disabled = true
 			PauseAnimateButton.BackgroundColor3 = ButtonSelectCol
 		else
-			StopAnimsEvent:Fire()
+			StopAnimsEvent:Fire("Forced")
 			AnimateScript.Disabled = false
 			PauseAnimateButton.BackgroundColor3 = ButtonCol
 			PauseDefAnimsOption = false
@@ -1946,7 +2532,7 @@ local function CreateGui()
 			PauseAnimateButton.ImageTransparency = 0.5
 			PauseAnimateButton.Interactable = false
 		else
-			StopAnimsEvent:Fire()
+			StopAnimsEvent:Fire("Forced")
 			Player.Character.Animate.Disabled = false
 			StopDefAnimsButton.BackgroundColor3 = ButtonCol
 
@@ -1982,47 +2568,10 @@ local function CreateGui()
 	end)
 
 	--Settings buttons
-	if ToolIdleAnimHighPrior or ToolActionAnimHighPrior then
-		ToolAnimHighPrior = true
-	else
-		ToolAnimHighPrior = false
-	end
-
-	local ToolIdleAnimPriorityButton = SettingsStuff.ToolIdlePriorityOption
-	ToolIdleAnimPriorityButton.MouseButton1Click:Connect(function()
-		ToolIdleAnimHighPrior = not ToolIdleAnimHighPrior
-		if ToolIdleAnimHighPrior or ToolActionAnimHighPrior then
-			ToolAnimHighPrior = true
-		else
-			ToolAnimHighPrior = false
-		end
-
-		if ToolIdleAnimHighPrior == true then
-			ToolIdleAnimPriorityButton.CheckImage.Image = "rbxassetid://130396712201457"
-		else
-			ToolIdleAnimPriorityButton.CheckImage.Image = ""
-		end
-	end)
-	local ToolActionAnimPriorityButton = SettingsStuff.ToolActionPriorityOption
-	ToolActionAnimPriorityButton.MouseButton1Click:Connect(function()
-		ToolActionAnimHighPrior = not ToolActionAnimHighPrior
-		if ToolActionAnimHighPrior or ToolIdleAnimHighPrior then
-			ToolAnimHighPrior = true
-		else
-			ToolAnimHighPrior = false
-		end
-
-		if ToolActionAnimHighPrior == true then
-			ToolActionAnimPriorityButton.CheckImage.Image = "rbxassetid://130396712201457"
-		else
-			ToolActionAnimPriorityButton.CheckImage.Image = ""
-		end
-	end)
-
 	local PreviewOptionButton = SettingsStuff.PreviewOption
 	PreviewOptionButton.MouseButton1Click:Connect(function()
-		AnimPreviewEnable = not AnimPreviewEnable
-		if AnimPreviewEnable == true then
+		AnimPreviewEnabled = not AnimPreviewEnabled
+		if AnimPreviewEnabled == true then
 			PreviewOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
 		else
 			ViewportFrame.Visible = false
@@ -2030,23 +2579,254 @@ local function CreateGui()
 		end
 	end)
 
+	local DebugInfoButton = SettingsStuff.DebugInfoOption
+	AddHoverText(DebugInfoButton, "Show debug information in Developer console (Animation data and other things)")
+	DebugInfoButton.MouseButton1Click:Connect(function()
+		DebugInfoEnabled = not DebugInfoEnabled
+		if DebugInfoEnabled == true then
+			DebugInfoButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			DebugInfoButton.CheckImage.Image = ""
+		end
+	end)
+
+	local AnalyticsButton = SettingsStuff.AnalyticsOption
+	AddHoverText(AnalyticsButton, "<b>DISCLAIMER</b>: these analytics are made only to see NUMBER of people using my script. I don't save or even share any personal data, UserId, Username and any other data")
+	AnalyticsButton.MouseButton1Click:Connect(function()
+		AnalyticsEnabled = not AnalyticsEnabled
+		if AnalyticsEnabled == true then
+			AnalyticsButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			AnalyticsButton.CheckImage.Image = ""
+		end
+	end)
+	
+	local LoadAnimationsOnRestartButton = SettingsStuff.LoadAnimationsOnRestartOption
+	AddHoverText(LoadAnimationsOnRestartButton, "Automatically plays 'Running' and 'Idle' animations when you restart GUI or when your character reappears")
+	LoadAnimationsOnRestartButton.MouseButton1Click:Connect(function()
+		LoadAnimationsOnRestart = not LoadAnimationsOnRestart
+		if LoadAnimationsOnRestart == true then
+			LoadAnimationsOnRestartButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			LoadAnimationsOnRestartButton.CheckImage.Image = ""
+		end
+	end)
+
+	if ToolIdleAnimHighPriorEnabled or ToolActionAnimHighPriorEnabled then
+		ToolAnimHighPriorEnabled = true
+	else
+		ToolAnimHighPriorEnabled = false
+	end
+
+	local function ToolAnimPriorityCheck()
+		if ToolAnimHighPriorEnabled == true then
+			local playingTracks = Player.Character:WaitForChild("Humanoid"):GetPlayingAnimationTracks()
+			local anyTrue = false
+			for _, ScrollFrame in ipairs(ScrollingFramesList) do
+				for _, item in ipairs(ScrollFrame:GetChildren()) do
+					if item:IsA("TextButton") and item.BackgroundColor3 == ButtonSelectCol then
+						anyTrue = true
+						break
+					end
+				end
+			end
+
+			if anyTrue then
+				for _, animtrack in ipairs(playingTracks) do
+					local animationObject = animtrack.Animation
+					local IdNumberString = string.match(animationObject.AnimationId, "%d+") 
+
+					if (table.find(ToolIdleAnimsList, animtrack.Name) or table.find(ToolIdleAnimsList, IdNumberString)) and animtrack.Name ~= "AAnimation" and ToolIdleAnimHighPriorEnabled then
+						animtrack.Priority = Enum.AnimationPriority.Action4
+						if HigherPriorityEnabled then
+							animtrack:AdjustWeight(30000)
+						end
+					elseif (table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString)) and animtrack.Name ~= "AAnimation" and ToolActionAnimHighPriorEnabled then
+						animtrack.Priority = Enum.AnimationPriority.Action4
+						animtrack:AdjustWeight(10000)
+						if HigherPriorityEnabled then
+							animtrack:AdjustWeight(40000)
+						else
+							animtrack:AdjustWeight(10000)
+						end
+					end
+				end
+			else
+				for _, animtrack in ipairs(playingTracks) do
+					local animationObject = animtrack.Animation
+					local IdNumberString = string.match(animationObject.AnimationId, "%d+") 
+
+					if (table.find(ToolIdleAnimsList, animtrack.Name) or table.find(ToolIdleAnimsList, IdNumberString)) and animtrack.Name ~= "AAnimation" then
+						animtrack.Priority = Enum.AnimationPriority.Idle
+						animtrack:AdjustWeight(1)
+					elseif (table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString)) and animtrack.Name ~= "AAnimation" then
+						animtrack.Priority = Enum.AnimationPriority.Action
+						animtrack:AdjustWeight(1)
+					end
+				end
+			end
+		end
+	end
+
+	Player.Character:WaitForChild("Humanoid").AnimationPlayed:Connect(function()
+		if GuiActive and GuiRestarted == false then
+			ToolAnimPriorityCheck()
+		end
+	end)
+
+	local ToolIdleAnimPriorityButton = SettingsStuff.ToolIdlePriorityOption
+	AddHoverText(ToolIdleAnimPriorityButton, "Makes tool <b>Idle</b> animations play even when your animations are playing (like white list). Doesn't work for ALL games and need to be configured. More information in my <b>Github</b>")
+	ToolIdleAnimPriorityButton.MouseButton1Click:Connect(function()
+		ToolIdleAnimHighPriorEnabled = not ToolIdleAnimHighPriorEnabled
+		if ToolIdleAnimHighPriorEnabled or ToolActionAnimHighPriorEnabled then
+			ToolAnimHighPriorEnabled = true
+		else
+			ToolAnimHighPriorEnabled = false
+		end
+
+		if ToolIdleAnimHighPriorEnabled == true then
+			ToolIdleAnimPriorityButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			ToolIdleAnimPriorityButton.CheckImage.Image = ""
+		end
+		ToolAnimPriorityCheck()
+	end)
+	local ToolActionAnimPriorityButton = SettingsStuff.ToolActionPriorityOption
+	AddHoverText(ToolActionAnimPriorityButton, "Makes tool <b>Action</b> or other <b>Action</b> animations play even when your animations are playing (like white list). Doesn't work for ALL games and need to be configured. More information in my <b>Github</b>")
+	ToolActionAnimPriorityButton.MouseButton1Click:Connect(function()
+		ToolActionAnimHighPriorEnabled = not ToolActionAnimHighPriorEnabled
+		if ToolActionAnimHighPriorEnabled or ToolIdleAnimHighPriorEnabled then
+			ToolAnimHighPriorEnabled = true
+		else
+			ToolAnimHighPriorEnabled = false
+		end
+
+		if ToolActionAnimHighPriorEnabled == true then
+			ToolActionAnimPriorityButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			ToolActionAnimPriorityButton.CheckImage.Image = ""
+		end
+		ToolAnimPriorityCheck()
+	end)
+
 	local SwitchOptionButton = SettingsStuff.SwitchOption
+	AddHoverText(SwitchOptionButton, "<b>Switching</b> animations instead of <b>layering</b>")
 	SwitchOptionButton.MouseButton1Click:Connect(function()
-		AnimSwitchMode = not AnimSwitchMode
-		if AnimSwitchMode == true then
+		AnimSwitchModeEnabled = not AnimSwitchModeEnabled
+		if AnimSwitchModeEnabled == true then
 			SwitchOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
 		else
 			SwitchOptionButton.CheckImage.Image = ""
 		end
 	end)
 
+	local SwitchRunIdleExceptionOptionButton = SettingsStuff.SwitchRunIdleExceptionOption
+	AddHoverText(SwitchRunIdleExceptionOptionButton, "Make an exception of Switch mode for 'Running' and 'Idle' animation types")
+	SwitchRunIdleExceptionOptionButton.MouseButton1Click:Connect(function()
+		AnimSwitchModeRunIdleExceptionEnabled = not AnimSwitchModeRunIdleExceptionEnabled
+		if AnimSwitchModeRunIdleExceptionEnabled == true then
+			SwitchRunIdleExceptionOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			SwitchRunIdleExceptionOptionButton.CheckImage.Image = ""
+		end
+	end)
+
 	local AnimFadeOptionButton = SettingsStuff.AnimFadeOption
+	AddHoverText(AnimFadeOptionButton, "Enables <b>FadeTime</b> of animation. If disabled, animations will play instantly")
 	AnimFadeOptionButton.MouseButton1Click:Connect(function()
-		AnimSmoothFade = not AnimSmoothFade
-		if AnimSmoothFade == true then
+		AnimSmoothFadeEnabled = not AnimSmoothFadeEnabled
+		if AnimSmoothFadeEnabled == true then
 			AnimFadeOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
 		else
 			AnimFadeOptionButton.CheckImage.Image = ""
+		end
+	end)
+
+	local HigherPriorityOptionButton = SettingsStuff.HigherPriorityOption
+	AddHoverText(HigherPriorityOptionButton, "Makes animations priority <b>higher</b>. This is made for games, where developers are making some or all of their animations with <b>Action4</b> priority (the highest one). Highly <b>not recommended</b> to use if not needed, as it uses high AnimWeight to overwrite animations, Which makes animations play not very good, especially if you play more than 1 animation")
+	HigherPriorityOptionButton.MouseButton1Click:Connect(function()
+		HigherPriorityEnabled = not HigherPriorityEnabled
+		if HigherPriorityEnabled == true then
+			HigherPriorityOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			HigherPriorityOptionButton.CheckImage.Image = ""
+		end
+	end)
+
+	local IdleTypeOptionButton = SettingsStuff.IdleTypeOption
+	AddHoverText(IdleTypeOptionButton, "Enables 'Idle' function of most of <b>idle-like</b> animations. With this function animation is playing only when your character isn't moving")
+	IdleTypeOptionButton.MouseButton1Click:Connect(function()
+		IdleTypeEnabled = not IdleTypeEnabled
+		if IdleTypeEnabled == true then
+			IdleTypeOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			IdleTypeOptionButton.CheckImage.Image = ""
+		end
+	end)
+
+	local RunningTypeOptionButton = SettingsStuff.RunningTypeOption
+	AddHoverText(RunningTypeOptionButton, "Enables 'Running' function of most of <b>running-like</b> animations. With this function animation speed is changing depending on the character's speed, and the animations themselves stop when your character stops")
+	RunningTypeOptionButton.MouseButton1Click:Connect(function()
+		RunningTypeEnabled = not RunningTypeEnabled
+		if RunningTypeEnabled == true then
+			RunningTypeOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			RunningTypeOptionButton.CheckImage.Image = ""
+		end
+	end)
+
+	local RunningTypeStopStandingOptionButton = SettingsStuff.RunningTypeStopStandingOption
+	AddHoverText(RunningTypeStopStandingOptionButton, "Stop animation when your character is <b>not moving (standing)</b> and play it again when your character is running")
+	RunningTypeStopStandingOptionButton.MouseButton1Click:Connect(function()
+		RunningTypeStopStandingEnabled = not RunningTypeStopStandingEnabled
+		if RunningTypeStopStandingEnabled == true then
+			RunningTypeStopStandingOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			RunningTypeStopStandingOptionButton.CheckImage.Image = ""
+		end
+	end)
+
+	local RunningTypeStopJumpingOptionButton = SettingsStuff.RunningTypeStopJumpingOption
+	AddHoverText(RunningTypeStopJumpingOptionButton, "Stop animation when your character is <b>jumping</b> and play it again when your character is running")
+	RunningTypeStopJumpingOptionButton.MouseButton1Click:Connect(function()
+		RunningTypeStopJumpingEnabled = not RunningTypeStopJumpingEnabled
+		if RunningTypeStopJumpingEnabled == true then
+			RunningTypeStopJumpingOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			RunningTypeStopJumpingOptionButton.CheckImage.Image = ""
+		end
+	end)
+
+	local RunningTypeStopClimbingOptionButton = SettingsStuff.RunningTypeStopClimbingOption
+	AddHoverText(RunningTypeStopClimbingOptionButton, "Stop animation when your character is <b>climbing</b> and play it again when your character is running")
+	RunningTypeStopClimbingOptionButton.MouseButton1Click:Connect(function()
+		RunningTypeStopClimbingEnabled = not RunningTypeStopClimbingEnabled
+		if RunningTypeStopClimbingEnabled == true then
+			RunningTypeStopClimbingOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			RunningTypeStopClimbingOptionButton.CheckImage.Image = ""
+		end
+	end)
+
+	local RunningTypeCharSpeedOptionButton = SettingsStuff.RunningTypeCharSpeedOption
+	AddHoverText(RunningTypeCharSpeedOptionButton, "Change animation speed depending on your character's speed")
+	RunningTypeCharSpeedOptionButton.MouseButton1Click:Connect(function()
+		RunningTypeCharSpeedEnabled = not RunningTypeCharSpeedEnabled
+		if RunningTypeCharSpeedEnabled == true then
+			RunningTypeCharSpeedOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			RunningTypeCharSpeedOptionButton.CheckImage.Image = ""
+		end
+	end)
+
+	local RunningTypeMinSpeedOption = SettingsStuff.RunningTypeMinSpeedOption
+	AddHoverText(RunningTypeMinSpeedOption, "Some animations uses Value for 'Running' type, like some <b>sprinting</b> animations. This Value is minimum WalkSpeed of your character needed for animation to play it. If your character's WalkSpeed is less than this minimum, animation won't play")
+	RunningTypeMinSpeedOption.MouseButton1Click:Connect(function()
+		RunningTypeMinSpeedEnabled = not RunningTypeMinSpeedEnabled
+		if RunningTypeMinSpeedEnabled == true then
+			RunningTypeMinSpeedOption.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			RunningTypeMinSpeedOption.CheckImage.Image = ""
 		end
 	end)
 
@@ -2065,18 +2845,23 @@ local function CreateGui()
 
 	PurpleThemeColor.MouseButton1Click:Connect(function()
 		theme = "LightPurple"
+		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Changed theme", Text = "Changed theme to LightPurple, please restart GUI", Duration = 3})
 	end)
 	OrangeThemeColor.MouseButton1Click:Connect(function()
 		theme = "LightOrange"
+		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Changed theme", Text = "Changed theme to LightOrange, please restart GUI", Duration = 3})
 	end)
 	YellowThemeColor.MouseButton1Click:Connect(function()
 		theme = "LightYellow"
+		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Changed theme", Text = "Changed theme to LightYellow, please restart GUI", Duration = 3})
 	end)
 	BlackThemeColor.MouseButton1Click:Connect(function()
 		theme = "Black"
+		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Changed theme", Text = "Changed theme to Black, please restart GUI", Duration = 3})
 	end)
 
 	local UICornerOptionButton = SettingsStuff.UICornerOption
+	AddHoverText(UICornerOptionButton, "Enables rounded corners in GUI")
 	UICornerOptionButton.MouseButton1Click:Connect(function()
 		UICornerEnabled = not UICornerEnabled
 		if UICornerEnabled == true then
@@ -2087,6 +2872,7 @@ local function CreateGui()
 	end)
 
 	local UIGradientOptionButton = SettingsStuff.UIGradientOption
+	AddHoverText(UIGradientOptionButton, "Enables gradient in GUI")
 	UIGradientOptionButton.MouseButton1Click:Connect(function()
 		UIGradientEnabled = not UIGradientEnabled
 		if UIGradientEnabled == true then
@@ -2095,8 +2881,101 @@ local function CreateGui()
 			UIGradientOptionButton.CheckImage.Image = ""
 		end
 	end)
-	
+
+	X05YSixe.MouseButton1Click:Connect(function()
+		YSize = 209
+		MainFrame.Size = UDim2.new(0, XSize, 0, YSize)
+		ScrollingFrame.Size = UDim2.new(1, 0, 1, -69)
+		ScrollingFrameR15.Size = UDim2.new(1, 0, 1, -69)
+		ScrollingFrameSpecific.Size = UDim2.new(1, 0, 1, -69)
+	end)
+
+	X1YSize.MouseButton1Click:Connect(function()
+		YSize = 285
+		MainFrame.Size = UDim2.new(0, XSize, 0, YSize)
+		ScrollingFrame.Size = UDim2.new(1, 0, 1, -69)
+		ScrollingFrameR15.Size = UDim2.new(1, 0, 1, -69)
+		ScrollingFrameSpecific.Size = UDim2.new(1, 0, 1, -69)
+	end)
+
+	X15YSize.MouseButton1Click:Connect(function()
+		YSize = 450
+		MainFrame.Size = UDim2.new(0, XSize, 0, YSize)
+		ScrollingFrame.Size = UDim2.new(1, 0, 1, -69)
+		ScrollingFrameR15.Size = UDim2.new(1, 0, 1, -69)
+		ScrollingFrameSpecific.Size = UDim2.new(1, 0, 1, -69)
+	end)
+
+	X2YSize.MouseButton1Click:Connect(function()
+		YSize = 660
+		MainFrame.Size = UDim2.new(0, XSize, 0, YSize)
+		ScrollingFrame.Size = UDim2.new(1, 0, 1, -69)
+		ScrollingFrameR15.Size = UDim2.new(1, 0, 1, -69)
+		ScrollingFrameSpecific.Size = UDim2.new(1, 0, 1, -69)
+	end)
+
+	X2Size.MouseButton1Click:Connect(function()
+		XSize = 240
+		MainFrame.Size = UDim2.new(0, XSize, 0, YSize)
+		ScrollingFrame.Size = UDim2.new(1, 0, 1, -69)
+		ScrollingFrameR15.Size = UDim2.new(1, 0, 1, -69)
+		ScrollingFrameSpecific.Size = UDim2.new(1, 0, 1, -69)
+
+		ValueText.Visible = false
+		if RigType == "R15" then
+			Title.Text = "Emoter R15"
+		else
+			Title.Text = "Emoter R6"
+		end
+	end)
+
+	X3Size.MouseButton1Click:Connect(function()
+		XSize = 350
+		MainFrame.Size = UDim2.new(0, XSize, 0, YSize)
+		ScrollingFrame.Size = UDim2.new(1, 0, 1, -69)
+		ScrollingFrameR15.Size = UDim2.new(1, 0, 1, -69)
+		ScrollingFrameSpecific.Size = UDim2.new(1, 0, 1, -69)
+
+		ValueText.Visible = false
+		if RigType == "R15" then
+			Title.Text = "Emoter GUI (R15)"
+		else
+			Title.Text = "Emoter GUI (R6)"
+		end
+	end)
+
+	X4Size.MouseButton1Click:Connect(function()
+		XSize = 460
+		MainFrame.Size = UDim2.new(0, XSize, 0, YSize)
+		ScrollingFrame.Size = UDim2.new(1, 0, 1, -69)
+		ScrollingFrameR15.Size = UDim2.new(1, 0, 1, -69)
+		ScrollingFrameSpecific.Size = UDim2.new(1, 0, 1, -69)
+
+		ValueText.Visible = true
+		if RigType == "R15" then
+			Title.Text = "Emoter GUI (R15)"
+		else
+			Title.Text = "Emoter GUI (R6)"
+		end
+	end)
+
+	X5Size.MouseButton1Click:Connect(function()
+		XSize = 571
+		MainFrame.Size = UDim2.new(0, XSize, 0, YSize)
+		ScrollingFrame.Size = UDim2.new(1, 0, 1, -69)
+		ScrollingFrameR15.Size = UDim2.new(1, 0, 1, -69)
+		ScrollingFrameSpecific.Size = UDim2.new(1, 0, 1, -69)
+
+		ValueText.Visible = true
+		if RigType == "R15" then
+			Title.Text = "Emoter GUI (R15)"
+		else
+			Title.Text = "Emoter GUI (R6)"
+		end
+	end)
+
 	local LoadGithubSGAOptionButton = SettingsStuff.LoadGithubSGAOption
+	AddHoverText(LoadGithubSGAOptionButton, "Enables loading SGA (SpecificGameAnims) from Github")
 	LoadGithubSGAOptionButton.MouseButton1Click:Connect(function()
 		LoadGithubSGAEnabled = not LoadGithubSGAEnabled
 		if LoadGithubSGAEnabled == true then
@@ -2106,27 +2985,84 @@ local function CreateGui()
 		end
 	end)
 
+	local LoadGithubCustomAnimOptionButton = SettingsStuff.LoadGithubCustomAnimOption
+	AddHoverText(LoadGithubCustomAnimOptionButton, "Enables loading additional animations from Github")
+	LoadGithubCustomAnimOptionButton.MouseButton1Click:Connect(function()
+		LoadGithubCustomAnimsEnabled = not LoadGithubCustomAnimsEnabled
+		if LoadGithubCustomAnimsEnabled == true then
+			LoadGithubCustomAnimOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			LoadGithubCustomAnimOptionButton.CheckImage.Image = ""
+		end
+	end)
+
+	local LoadLocalSGAOptionButton = SettingsStuff.LoadLocalSGAOption
+	AddHoverText(LoadLocalSGAOptionButton, "Enables loading SGA (SpecificGameAnims) from your local files. More information in my <b>Github</b>")
+	LoadLocalSGAOptionButton.MouseButton1Click:Connect(function()
+		LoadLocalSGAEnabled = not LoadLocalSGAEnabled
+		if LoadLocalSGAEnabled == true then
+			LoadLocalSGAOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			LoadLocalSGAOptionButton.CheckImage.Image = ""
+		end
+	end)
+
+	local LoadLocalCustomAnimOptionButton = SettingsStuff.LoadLocalCustomAnimOption
+	AddHoverText(LoadLocalCustomAnimOptionButton, "Enables loading additional animations from your local files. More information in my <b>Github</b>")
+	LoadLocalCustomAnimOptionButton.MouseButton1Click:Connect(function()
+		LoadLocalCustomAnimsEnabled = not LoadLocalCustomAnimsEnabled
+		if LoadLocalCustomAnimsEnabled == true then
+			LoadLocalCustomAnimOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			LoadLocalCustomAnimOptionButton.CheckImage.Image = ""
+		end
+	end)
+
 	SaveSettingsButton.MouseButton1Click:Connect(function()
-		local mySettings = {
-			ConfAnimPreviewEnable = AnimPreviewEnable,
-			ConfToolAnimHighPrior = ToolAnimHighPrior,
-			ConfToolIdleAnimHighPrior = ToolIdleAnimHighPrior,
-			ConfToolActionAnimHighPrior = ToolActionAnimHighPrior,
-			ConfAnimSwitchMode = AnimSwitchMode,
-			ConfAnimSmoothFade = AnimSmoothFade,
+		local SettingsToSave = {
+			ConfAnimPreviewEnabled = AnimPreviewEnabled,
+			ConfDebugInfoEnabled = DebugInfoEnabled,
+			ConfAnalyticsEnabled = AnalyticsEnabled,
+			ConfLoadAnimationsOnRestart = LoadAnimationsOnRestart,
+
+			ConfToolIdleAnimHighPriorEnabled = ToolIdleAnimHighPriorEnabled,
+			ConfToolActionAnimHighPriorEnabled = ToolActionAnimHighPriorEnabled,
+			ConfAnimSwitchModeEnabled = AnimSwitchModeEnabled,
+			ConfAnimSwitchModeRunIdleExceptionEnabled = AnimSwitchModeRunIdleExceptionEnabled,
+			ConfAnimSmoothFadeEnabled = AnimSmoothFadeEnabled,
+			ConfHigherPriorityEnabled = HigherPriorityEnabled,
+
+			ConfIdleTypeEnabled = IdleTypeEnabled,
+			ConfRunningTypeEnabled = RunningTypeEnabled,
+			ConfRunningTypeStopStandingEnabled = RunningTypeStopStandingEnabled,
+			ConfRunningTypeCharSpeedEnabled = RunningTypeCharSpeedEnabled,
+			ConfRunningTypeMinSpeedEnabled = RunningTypeMinSpeedEnabled,
+			ConfRunningTypeStopJumpingEnabled = RunningTypeStopJumpingEnabled,
+			ConfRunningTypeStopClimbingEnabled = RunningTypeStopClimbingEnabled,
+
 			ConfTheme = theme,
-			ConfHotkeysEnabled = HotkeysEnabled,
 			ConfUIGradientEnabled = UIGradientEnabled,
 			ConfUICornerEnabled = UICornerEnabled,
+			ConfXSize = XSize,
+			ConfYSize = YSize,
+
+			ConfLoadGithubSGAEnabled = LoadGithubSGAEnabled,
+			ConfLoadGithubCustomAnimsEnabled = LoadGithubCustomAnimsEnabled,
+			ConfLoadLocalSGAEnabled = LoadLocalSGAEnabled,
+			ConfLoadLocalCustomAnimsEnabled = LoadLocalCustomAnimsEnabled,
+
+			ConfHotkeysEnabled = HotkeysEnabled,
+			ConfDoubleHotkeyEnabled = DoubleHotkeyEnabled,
 			ConfSearchHotkey = SearchHotkey.Value,
 			ConfCloseHotkey = CloseHotkey.Value,
 			ConfSitHotkey = SitHotkey.Value,
 			ConfSwitchAnimHotkey = SwitchAnimHotkey.Value,
 			ConfAnimFadeHotkey = AnimFadeHotkey.Value,
 			ConfSettingsHotkey = SettingsHotkey.Value,
+			StopAnimsHotkey = StopAnimsHotkey.Value,
 			ConfEmoteWheelHotkey = EmoteWheelHotkey.Value
 		}
-		local encodedData = HttpService:JSONEncode(mySettings)
+		local encodedData = HttpService:JSONEncode(SettingsToSave)
 		writefile("EmoterData/"..ConfigFileName, encodedData)
 		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Saved", Text = "Succesfully saved settings!", Duration = 3})
 	end)
@@ -2137,8 +3073,10 @@ local function CreateGui()
 
 	ResetButton.MouseButton1Click:Connect(function()
 		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Restarting", Text = "Restarting Gui...", Duration = 3})
-		StopAnimsEvent:Fire()
+		table.clear(RestartAnimations)
+		StopAnimsEvent:Fire("Reset/Destroy")
 		SettingsFrame.Visible = false
+		GuiRestarted = true
 		OnRestart()
 	end)
 
@@ -2151,7 +3089,7 @@ local function CreateGui()
 	UserInputService.InputBegan:Connect(function(input, processed)
 
 		if processed then return end
-		if not GuiActive then return end
+		if GuiActive == false then return end
 
 		if input.KeyCode.Name == SearchHotkey.Value and HotkeysEnabled then
 			if MainFrame.Visible == true then
@@ -2184,8 +3122,8 @@ local function CreateGui()
 		end
 
 		if tostring(input.KeyCode.Name) == SwitchAnimHotkey.Value and HotkeysEnabled then
-			AnimSwitchMode = not AnimSwitchMode
-			if AnimSwitchMode == true then
+			AnimSwitchModeEnabled = not AnimSwitchModeEnabled
+			if AnimSwitchModeEnabled == true then
 				SwitchOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
 			else
 				SwitchOptionButton.CheckImage.Image = ""
@@ -2193,14 +3131,18 @@ local function CreateGui()
 		end
 
 		if tostring(input.KeyCode.Name) == AnimFadeHotkey.Value and HotkeysEnabled then
-			AnimSmoothFade = not AnimSmoothFade
-			if AnimSmoothFade == true then
+			AnimSmoothFadeEnabled = not AnimSmoothFadeEnabled
+			if AnimSmoothFadeEnabled == true then
 				AnimFadeOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
 			else
 				AnimFadeOptionButton.CheckImage.Image = ""
 			end
 		end
-
+		
+		if tostring(input.KeyCode.Name) == StopAnimsHotkey.Value and HotkeysEnabled then
+			StopAnimsEvent:Fire("Forced")
+		end
+		
 		if tostring(input.KeyCode.Name) == EmoteWheelHotkey.Value then
 			EmoteWheel.Visible = not EmoteWheel.Visible
 		end
@@ -2236,85 +3178,26 @@ local function CreateGui()
 				end
 			end
 		end
+
+		if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
+			AltPressed = true
+		end
 	end)
 
-
-	local function CreateDivideFrame(Title, LayoutOrder, Type)
-		local HasButton = false
-		if Type == "Spec" then
-			for _, v in pairs(ScrollingFrameSpecific:GetChildren()) do
-				if v:IsA("TextButton") then
-					if v.LayoutOrder == LayoutOrder + 1 then
-						HasButton = true
-						break
-					end
-				end		
-			end
-		else
-			HasButton = true
+	UserInputService.InputEnded:Connect(function(input)
+		if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
+			AltPressed = false
 		end
-		if HasButton == false then return end
-
-		local DivideFrame = Instance.new("Frame")
-		local Line = Instance.new("Frame")
-		local TextLabel = Instance.new("TextLabel")
-
-		DivideFrame.Name = "DivideFrame"
-		DivideFrame.Size = UDim2.new(0.98, 0, 0, 15)
-		DivideFrame.BackgroundTransparency = 1
-		DivideFrame.LayoutOrder = LayoutOrder
-
-		Line.Name = "Line"
-		Line.AnchorPoint = Vector2.new(0, 0.5)
-		Line.Size = UDim2.new(1, 0, 0, 3)
-		Line.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		Line.Position = UDim2.new(0, 0, 0.5, 0)
-		Line.BorderSizePixel = 0
-		Line.BackgroundColor3 = UiButColor
-		Line.Parent = DivideFrame
-
-		TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-		TextLabel.AutomaticSize = Enum.AutomaticSize.X
-		TextLabel.Size = UDim2.new(0, 50, 0, 25)
-		TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
-		TextLabel.BorderSizePixel = 0
-		TextLabel.BackgroundColor3 = ScrollBgColor
-		TextLabel.TextSize = 25
-		TextLabel.TextColor3 = UiButColor
-		TextLabel.Text = Title
-		TextLabel.TextWrapped = true
-		TextLabel.Font = Enum.Font.SourceSansBold
-		TextLabel.Parent = DivideFrame
-
-		local UIPadding = Instance.new("UIPadding")
-		UIPadding.PaddingLeft = UDim.new(0, 8)
-		UIPadding.PaddingRight = UDim.new(0, 10)
-		UIPadding.Parent = TextLabel
-
-		if Type == "R6" then
-			DivideFrame.Parent = ScrollingFrame
-		elseif Type == "R15" then
-			DivideFrame.Parent = ScrollingFrameR15
-		elseif Type == "Spec" then
-			DivideFrame.Parent = ScrollingFrameSpecific
-		end
-	end
-
+	end)
 
 	-- EMOTES
 
 	--[[Functions Template
-	local AnimName = Instance.new("TextButton")
-	CreateAnimButton(Obj, "Name", "Text", "R6", 0)
-	PlayAnim(Obj, "IdNumber", .1, 1, "PriorLow", true)
-	
-	- CreateAnimation has Object (Button), Name of object, Text, Type ow whiich type of scrolling frame will it be, 
-	and LayoutOrder to organize Anim button to its type
-	- PlayAnim has Object (Button), Id of anim, Anim FadeTime, speed of anim, Type of Anim and Looped state value (if anim is unlooped you can loop it by clicking RMB).
-	Type of anim is checked as Type:find("PriorLow"), so you can type in multiple states inside.
-	States available: PriorLow/PriorHigh (Priority of animation), Pause (Animation will stop after 1 second) 
+	local InstanceName = Instance.new("TextButton")
+	CreateAnimButton(InstanceName, "ButtonName", "ButtonText", "SFrameType (R6, R15 or Spec)", LayoutOrder)
+	PlayAnim(InstanceName, "AnimId", FadeTime, AnimSpeed, "PriorityPauseRunningIdle", Looped(true/false))
 	]]
-
+	print("Adding Emotes from script...")
 	--DivideFrames
 	CreateDivideFrame("Dances", 1, "R6")
 	CreateDivideFrame("Actions", 2, "R6")
@@ -2325,12 +3208,12 @@ local function CreateGui()
 	CreateDivideFrame("Dances", 1, "R15")
 	CreateDivideFrame("Actions", 2, "R15")
 	CreateDivideFrame("Walk & Run", 3, "R15")
-	CreateDivideFrame("Weird", 4, "R15")
-	CreateDivideFrame("Poses & Idles", 5, "R15")
+	CreateDivideFrame("Poses & Idles", 4, "R15")
+	CreateDivideFrame("Weird", 5, "R15")
 	CreateDivideFrame("Attack", 6, "R15")
 
-	-- R6 Emotes
 
+	-- R6 Emotes
 	local function R6Anims()
 		local Dance1 = Instance.new("TextButton")
 		CreateAnimButton(Dance1, "Dance1", "Dance 1", "R6", 1)
@@ -2394,7 +3277,7 @@ local function CreateGui()
 		PlayAnim(Levitate, "313762630", .1, 1, "PriorHigh", true)
 		local DinoWalk = Instance.new("TextButton")
 		CreateAnimButton(DinoWalk, "DinoWalk", "Dino Walk", "R6", 3)
-		PlayAnim(DinoWalk, "204328711", .1, 1, "PriorLow", true)
+		PlayAnim(DinoWalk, "204328711", .1, 1.5, "PriorLowRunning", true)
 		local Climb = Instance.new("TextButton")
 		CreateAnimButton(Climb, "Climb", "Climb Walk", "R6", 3)
 		PlayAnim(Climb, "125750800", .1, 1, "PriorLow", true)
@@ -2477,30 +3360,6 @@ local function CreateGui()
 		local Monkey = Instance.new("TextButton")
 		CreateAnimButton(Monkey, "Monkey", "Monkey", "R15", 1)
 		PlayAnim(Monkey, "10714388352", .1, 1, "PriorLow", true)
-		local SillyAnimals = Instance.new("TextButton")
-		CreateAnimButton(SillyAnimals, "SillyAnimals", "Silly Animals Dance", "R15", 1)
-		PlayAnim(SillyAnimals, "98943029911905", .1, 1, "PriorLow", true)
-		local ScubaSwim = Instance.new("TextButton")
-		CreateAnimButton(ScubaSwim, "ScubaSwim", "Scuba Swim", "R15", 1)
-		PlayAnim(ScubaSwim, "133144141297457", .1, 1, "PriorLow", true)
-		local SnakeDance = Instance.new("TextButton")
-		CreateAnimButton(SnakeDance, "SnakeDance", "Snake Dance", "R15", 1)
-		PlayAnim(SnakeDance, "102379382117775", .1, 1, "PriorLow", true)
-		local PitbullDance = Instance.new("TextButton")
-		CreateAnimButton(PitbullDance, "PitbullDance", "Pitbull Dance", "R15", 1)
-		PlayAnim(PitbullDance, "102593046003485", .1, 1, "PriorLow", true)
-		local LaDetoneDance = Instance.new("TextButton")
-		CreateAnimButton(LaDetoneDance, "LaDetoneDance", "La Detone Dance", "R15", 1)
-		PlayAnim(LaDetoneDance, "102779295838500", .1, 1, "PriorLow", true)
-		local DiaDeliciaDance = Instance.new("TextButton")
-		CreateAnimButton(DiaDeliciaDance, "DiaDeliciaDance", "Dia Delicia Dance", "R15", 1)
-		PlayAnim(DiaDeliciaDance, "108759656834820", .1, 1, "PriorLow", true)
-		local CrabDance = Instance.new("TextButton")
-		CreateAnimButton(CrabDance, "CrabDance", "Crab Dance", "R15", 1)
-		PlayAnim(CrabDance, "115209133522801", .1, 1, "PriorLow", true)
-		local RatDance = Instance.new("TextButton")
-		CreateAnimButton(RatDance, "RatDance", "Rat Dance", "R15", 1)
-		PlayAnim(RatDance, "78684440273676", .1, 1, "PriorLow", true)
 		local IWantMoneyDance = Instance.new("TextButton")
 		CreateAnimButton(IWantMoneyDance, "IWantMoneyDance", "IWantMoney Dance", "R15", 1)
 		PlayAnim(IWantMoneyDance, "115781688996859", .1, 1, "PriorLow", true)
@@ -2510,9 +3369,6 @@ local function CreateGui()
 		local GangnamStyle = Instance.new("TextButton")
 		CreateAnimButton(GangnamStyle, "GangnamStyle", "Gangnam Style", "R15", 1)
 		PlayAnim(GangnamStyle, "129764254213842", .1, 0.9, "PriorLow", true)
-		local CartoonDance = Instance.new("TextButton")
-		CreateAnimButton(CartoonDance, "CartoonDance", "Cartoon Dance", "R15", 1)
-		PlayAnim(CartoonDance, "123516934346404", .1, 0.8, "PriorLow", true)
 		local RussianKick = Instance.new("TextButton")
 		CreateAnimButton(RussianKick, "RussianKick", "Russian Kick", "R15", 1)
 		PlayAnim(RussianKick, "70653974473742", .1, 1, "PriorLow", true)
@@ -2589,15 +3445,6 @@ local function CreateGui()
 		local DolphinBang = Instance.new("TextButton")
 		CreateAnimButton(DolphinBang, "DolphinBang", "Dolphin Bang", "R15", 2)
 		PlayAnim(DolphinBang, "10714068222", .1, 1, "PriorLow", false)
-		local FlowingBreeze = Instance.new("TextButton")
-		CreateAnimButton(FlowingBreeze, "FlowingBreeze", "Flowing Breeze", "R15", 2)
-		PlayAnim(FlowingBreeze, "10714342957", .1, 1, "PriorLow", false)
-		local Fashionable = Instance.new("TextButton")
-		CreateAnimButton(Fashionable, "Fashionable", "Fashionable", "R15", 2)
-		PlayAnim(Fashionable, "10714091938", .1, 1, "PriorLow", false)
-		local Curtsy = Instance.new("TextButton")
-		CreateAnimButton(Curtsy, "Curtsy", "Curtsy", "R15", 2)
-		PlayAnim(Curtsy, "10714061912", .1, 1, "PriorLow", false)
 		local Twirl = Instance.new("TextButton")
 		CreateAnimButton(Twirl, "Twirl", "Twirl", "R15", 2)
 		PlayAnim(Twirl, "10714293450", .1, 1, "PriorLow", false)
@@ -2613,9 +3460,6 @@ local function CreateGui()
 		local Dizzy = Instance.new("TextButton")
 		CreateAnimButton(Dizzy, "Dizzy", "Dizzy", "R15", 2)
 		PlayAnim(Dizzy, "10714066964", .1, 1, "PriorLow", false)
-		local FingerGun = Instance.new("TextButton")
-		CreateAnimButton(FingerGun, "FingerGun", "Finger-Gun", "R15", 2)
-		PlayAnim(FingerGun, "73468073017890", .1, 1, "PriorLow", false)
 		local PushUp = Instance.new("TextButton")
 		CreateAnimButton(PushUp, "PushUp", "Push Ups", "R15", 2)
 		PlayAnim(PushUp, "80326183054599", .1, 1, "PriorLow", true)
@@ -2634,9 +3478,6 @@ local function CreateGui()
 		local Applaud = Instance.new("TextButton")
 		CreateAnimButton(Applaud, "Applaud", "Applaud", "R15", 2)
 		PlayAnim(Applaud, "10713966026", .1, 1, "PriorLow", true)
-		local FakeDeadRagdoll = Instance.new("TextButton")
-		CreateAnimButton(FakeDeadRagdoll, "FakeDeadRagdoll", "Fake DeadRagdoll", "R15", 2)
-		PlayAnim(FakeDeadRagdoll, "80098083655931", .1, 1, "PriorLow", true)
 		local FakeDeath = Instance.new("TextButton")
 		CreateAnimButton(FakeDeath, "FakeDeath", "FakeDeath", "R15", 2)
 		PlayAnim(FakeDeath, "88130117312312", .1, 1, "PriorLowPause", true)
@@ -2650,132 +3491,162 @@ local function CreateGui()
 		local Helicopter = Instance.new("TextButton")
 		CreateAnimButton(Helicopter, "Helicopter", "Helicopter", "R15", 3)
 		PlayAnim(Helicopter, "76510079095692", .5, 1, "PriorLow", true)
-		local Plane = Instance.new("TextButton")
-		CreateAnimButton(Plane, "Plane", "Plane", "R15", 3)
-		PlayAnim(Plane, "94462256787399", .5, 0.5, "PriorLow", true)
 		local CarDriving = Instance.new("TextButton")
 		CreateAnimButton(CarDriving, "CarDriving", "Car Driving", "R15", 3)
 		PlayAnim(CarDriving, "132471972345518", .5, 0.5, "PriorLow", true)
-		local ChibiWalk = Instance.new("TextButton")
-		CreateAnimButton(ChibiWalk, "ChibiWalk", "Chibi Walk", "R15", 3)
-		PlayAnim(ChibiWalk, "85887415033585", .1, 1.3, "PriorLow", true)
-		local MedusaWalk = Instance.new("TextButton")
-		CreateAnimButton(MedusaWalk, "MedusaWalk", "Medusa Walk", "R15", 3)
-		PlayAnim(MedusaWalk, "131663132818596", .1, 1.5, "PriorLow", true)
-		local TallCreatureWalk = Instance.new("TextButton")
-		CreateAnimButton(TallCreatureWalk, "TallCreatureWalk", "Tall Creature Walk", "R15", 3)
-		PlayAnim(TallCreatureWalk, "134010853417610", .1, 1.5, "PriorLow", true)
 		local Crawl = Instance.new("TextButton")
 		CreateAnimButton(Crawl, "Crawl", "Crawl", "R15", 3)
 		PlayAnim(Crawl, "106501741606953", .1, 1, "PriorLow", true)
+		local BigBadWolf = Instance.new("TextButton")
+		CreateAnimButton(BigBadWolf, "BigBadWolf", "Big Bad Wolf", "R15", 3)
+		PlayAnim(BigBadWolf, "84490859002106", .1, 1, "PriorLow", true)
+		local Wheel = Instance.new("TextButton")
+		CreateAnimButton(Wheel, "Wheel", "Wheel", "R15", 3)
+		PlayAnim(Wheel, "116700088132671", .1, 0.65, "PriorLowRunning", true)
+		local DefaultR6Run = Instance.new("TextButton")
+		CreateAnimButton(DefaultR6Run, "DefaultR6Run", "R6 Run", "R15", 3)
+		PlayAnim(DefaultR6Run, "88923549940250", .1, 1, "PriorLowRunning", true)
+		local MiniWalk = Instance.new("TextButton")
+		CreateAnimButton(MiniWalk, "MiniWalk", "Mini Walk", "R15", 3)
+		PlayAnim(MiniWalk, "85887415033585", .1, 1.3, "PriorLowRunning", true)
+		local MedusaWalk = Instance.new("TextButton")
+		CreateAnimButton(MedusaWalk, "MedusaWalk", "Medusa Walk", "R15", 3)
+		PlayAnim(MedusaWalk, "131663132818596", .1, 1.5, "PriorLowRunning", true)
+		local TallCreatureWalk = Instance.new("TextButton")
+		CreateAnimButton(TallCreatureWalk, "TallCreatureWalk", "Tall Creature Walk", "R15", 3)
+		PlayAnim(TallCreatureWalk, "134010853417610", .1, 1.5, "PriorLowRunning", true)
 		local ShadowRun = Instance.new("TextButton")
 		CreateAnimButton(ShadowRun, "ShadowRun", "Shadow Running", "R15", 3)
-		PlayAnim(ShadowRun, "82598234841035", .1, 0.8, "PriorLow", true)
+		PlayAnim(ShadowRun, "82598234841035", .1, 0.8, "PriorLowRunning", true)
 		local AdidasRun = Instance.new("TextButton")
 		CreateAnimButton(AdidasRun, "AdidasRun", "Adidas Running", "R15", 3)
-		PlayAnim(AdidasRun, "18537384940", .1, 1, "PriorLow", true)
-		local JumpingSpider = Instance.new("TextButton")
-		CreateAnimButton(JumpingSpider, "JumpingSpider", "Jumping Spider", "R15", 4)
-		PlayAnim(JumpingSpider, "139310328821985", .1, 1, "PriorLow", true)
-		local InsaneDog = Instance.new("TextButton")
-		CreateAnimButton(InsaneDog, "InsaneDog", "Insane Dog", "R15", 4)
-		PlayAnim(InsaneDog, "96435804447949", .1, 1, "PriorLow", true)
-		local WormAnim = Instance.new("TextButton")
-		CreateAnimButton(WormAnim, "WormAnim", "Worm Fly", "R15", 4)
-		PlayAnim(WormAnim, "135990691658209", .3, 1, "PriorLow", true)
-		local Orbit = Instance.new("TextButton")
-		CreateAnimButton(Orbit, "Orbit", "Orbit", "R15", 4)
-		PlayAnim(Orbit, "108359356964182", .5, 1, "PriorLow", true)
-		local Hanging = Instance.new("TextButton")
-		CreateAnimButton(Hanging, "Hanging", "Hanging", "R15", 4)
-		PlayAnim(Hanging, "125662782523118", .1, 1, "PriorLow", true)
-		local LaggyWalkTroll = Instance.new("TextButton")
-		CreateAnimButton(LaggyWalkTroll, "LaggyWalkTroll", "Laggy Walk Troll", "R15", 4)
-		PlayAnim(LaggyWalkTroll, "119199812452698", .1, 1, "PriorLow", true)
-		local InchWorm = Instance.new("TextButton")
-		CreateAnimButton(InchWorm, "InchWorm", "Inch Worm", "R15", 4)
-		PlayAnim(InchWorm, "119096405600200", .1, 1, "PriorLow", true)
-		local GoofyWiggle = Instance.new("TextButton")
-		CreateAnimButton(GoofyWiggle, "GoofyWiggle", "Goofy Wiggle", "R15", 4)
-		PlayAnim(GoofyWiggle, "74917195706355", .1, 1, "PriorLow", true)
-		local Tornado = Instance.new("TextButton")
-		CreateAnimButton(Tornado, "Tornado", "Tornado", "R15", 4)
-		PlayAnim(Tornado, "135373056067761", .1, 1, "PriorLow", true)
-		local AdminFly = Instance.new("TextButton")
-		CreateAnimButton(AdminFly, "AdminFly", "Admin Fly", "R15", 4)
-		PlayAnim(AdminFly, "85063861261432", .1, 1, "PriorLow", true)
-		local ObbyHead = Instance.new("TextButton")
-		CreateAnimButton(ObbyHead, "ObbyHead", "Little Obbyist", "R15", 4)
-		PlayAnim(ObbyHead, "115569573258316", .1, 1, "PriorLow", true)
-		local Insane = Instance.new("TextButton")
-		CreateAnimButton(Insane, "Insane", "Insane", "R15", 4)
-		PlayAnim(Insane, "93087898023268", .1, 1, "PriorLow", true)
-		local GoofyFLY = Instance.new("TextButton")
-		CreateAnimButton(GoofyFLY, "GoofyFLY", "Goofy FLY", "R15", 4)
-		PlayAnim(GoofyFLY, "118417760427139", .1, 1, "PriorLow", true)
-		local BodyPhone = Instance.new("TextButton")
-		CreateAnimButton(BodyPhone, "BodyPhone", "Body Phone", "R15", 4)
-		PlayAnim(BodyPhone, "73390669780316", .1, 0.8, "PriorLow", false)
-		local Spin = Instance.new("TextButton")
-		CreateAnimButton(Spin, "Spin", "Spin", "R15", 4)
-		PlayAnim(Spin, "110792133024438", .1, 1, "PriorHigh", true)
-		local SpinAround = Instance.new("TextButton")
-		CreateAnimButton(SpinAround, "SpinAround", "SpinAround", "R15", 4)
-		PlayAnim(SpinAround, "91004858616595", .1, 1, "PriorLow", true)
-		local FloatingSpace = Instance.new("TextButton")
-		CreateAnimButton(FloatingSpace, "FloatingSpace", "Floating Space", "R15", 4)
-		PlayAnim(FloatingSpace, "71209604118044", .1, 1, "PriorLow", true)
-		local FloatingSpace2 = Instance.new("TextButton")
-		CreateAnimButton(FloatingSpace2, "FloatingSpace2", "Floating Space 2", "R15", 4)
-		PlayAnim(FloatingSpace2, "70394064781064", .1, 0.5, "PriorLow", true)
-		local FloatingHeadSitting = Instance.new("TextButton")
-		CreateAnimButton(FloatingHeadSitting, "FloatingHeadSitting", "Floating Head Sit", "R15", 5)
-		PlayAnim(FloatingHeadSitting, "111681053387222", .3, 1, "PriorLow", true)
+		PlayAnim(AdidasRun, "18537384940", .1, 1, "PriorLowRunning", true)
+		local HappyRun = Instance.new("TextButton")
+		CreateAnimButton(HappyRun, "HappyRun", "Happy Run", "R15", 3)
+		PlayAnim(HappyRun, "136336776520965", .1, 1, "PriorLowRunning", true)
+		local FloatingRun = Instance.new("TextButton")
+		CreateAnimButton(FloatingRun, "FloatingRun", "Floating Run", "R15", 3)
+		PlayAnim(FloatingRun, "98995968630900", .1, 1, "PriorLowRunning", true)
+		local MotionRun = Instance.new("TextButton")
+		CreateAnimButton(MotionRun, "MotionRun", "Motion Run", "R15", 3)
+		PlayAnim(MotionRun, "101925097435036", .1, 1, "PriorLowRunning", true)
+		
+		local HappyIdle = Instance.new("TextButton")
+		CreateAnimButton(HappyIdle, "HappyIdle", "Happy Idle", "R15", 4)
+		PlayAnim(HappyIdle, "88212525150688", .1, 1, "PriorLowIdle", true)
+		local MiniIdle = Instance.new("TextButton")
+		CreateAnimButton(MiniIdle, "MiniIdle", "Mini Idle", "R15", 4)
+		PlayAnim(MiniIdle, "82127055873357", .1, 1, "PriorLowIdle", true)
 		local VibeIdle = Instance.new("TextButton")
-		CreateAnimButton(VibeIdle, "VibeIdle", "Vibe Idle", "R15", 5)
-		PlayAnim(VibeIdle, "99638411514722", .1, 1, "PriorLow", true)
+		CreateAnimButton(VibeIdle, "VibeIdle", "Vibe Idle", "R15", 4)
+		PlayAnim(VibeIdle, "99638411514722", .1, 1, "PriorLowIdle", true)
+		local TallIdle = Instance.new("TextButton")
+		CreateAnimButton(TallIdle, "TallIdle", "Tall Idle", "R15", 4)
+		PlayAnim(TallIdle, "73645108622491", .1, 1, "PriorLowIdle", true)
+		local FloatingHeadSitting = Instance.new("TextButton")
+		CreateAnimButton(FloatingHeadSitting, "FloatingHeadSitting", "Floating Head Sit", "R15", 4)
+		PlayAnim(FloatingHeadSitting, "111681053387222", .1, 1, "PriorLow", true)
 		local FloatChillSit = Instance.new("TextButton")
-		CreateAnimButton(FloatChillSit, "FloatChillSit", "Float Chill Sit", "R15", 5)
+		CreateAnimButton(FloatChillSit, "FloatChillSit", "Float Chill Sit", "R15", 4)
 		PlayAnim(FloatChillSit, "97361223864206", .1, 0.5, "PriorLow", true)
 		local FloatIdle = Instance.new("TextButton")
-		CreateAnimButton(FloatIdle, "FloatIdle", "Float Idle", "R15", 5)
-		PlayAnim(FloatIdle, "94942486115057", .1, 1, "PriorLow", true)
+		CreateAnimButton(FloatIdle, "FloatIdle", "Float Idle", "R15", 4)
+		PlayAnim(FloatIdle, "90055248227279", .1, 1, "PriorLowIdle", true)
+		local DefaultR6Idle = Instance.new("TextButton")
+		CreateAnimButton(DefaultR6Idle, "DefaultR6Idle", "R6 Idle", "R15", 4)
+		PlayAnim(DefaultR6Idle, "130392105157572", .1, 1, "PriorLowIdle", true)
 		local TPose = Instance.new("TextButton")
-		CreateAnimButton(TPose, "TPose", "T Pose", "R15", 5)
+		CreateAnimButton(TPose, "TPose", "T Pose", "R15", 4)
 		PlayAnim(TPose, "121655148084031", .1, 1, "PriorLow", true)
 		local CrouchR15 = Instance.new("TextButton")
-		CreateAnimButton(CrouchR15, "CrouchR15", "Crouch", "R15", 5)
+		CreateAnimButton(CrouchR15, "CrouchR15", "Crouch", "R15", 4)
 		PlayAnim(CrouchR15, "97517127273301", .3, 1, "PriorLow", true)
-		local Crawl = Instance.new("TextButton")
-		CreateAnimButton(Crawl, "Crawl", "Crawl", "R15", 5)
-		PlayAnim(Crawl, "106501741606953", .3, 1, "PriorLow", true)
 		local Sitting = Instance.new("TextButton")
-		CreateAnimButton(Sitting, "Sitting", "Sitting", "R15", 5)
+		CreateAnimButton(Sitting, "Sitting", "Sitting", "R15", 4)
 		PlayAnim(Sitting, "94763556845023", .1, 1, "PriorLow", true)
 		local MM2Sit = Instance.new("TextButton")
-		CreateAnimButton(MM2Sit, "MM2Sit", "MM2 Sit", "R15", 5)
+		CreateAnimButton(MM2Sit, "MM2Sit", "MM2 Sit", "R15", 4)
 		PlayAnim(MM2Sit, "130577643309726", .1, 1, "PriorLow", true)
 		local Box = Instance.new("TextButton")
-		CreateAnimButton(Box, "Box", "Box", "R15", 5)
+		CreateAnimButton(Box, "Box", "Box", "R15", 4)
 		PlayAnim(Box, "73753845465382", .1, 1, "PriorLow", true)
 		local Sleeping = Instance.new("TextButton")
-		CreateAnimButton(Sleeping, "Sleeping", "Sleeping", "R15", 5)
+		CreateAnimButton(Sleeping, "Sleeping", "Sleeping", "R15", 4)
 		PlayAnim(Sleeping, "121641415206650", .5, 1, "PriorLow", true)
 		local HeadJuggle = Instance.new("TextButton")
-		CreateAnimButton(HeadJuggle, "HeadJuggle", "Head Juggle", "R15", 5)
+		CreateAnimButton(HeadJuggle, "HeadJuggle", "Head Juggle", "R15", 4)
 		PlayAnim(HeadJuggle, "136767849845319", .1, 1, "PriorLow", true)
 		local FloatingOnClouds = Instance.new("TextButton")
-		CreateAnimButton(FloatingOnClouds, "FloatingOnClouds", "Floating On Clouds", "R15", 5)
+		CreateAnimButton(FloatingOnClouds, "FloatingOnClouds", "Floating On Clouds", "R15", 4)
 		PlayAnim(FloatingOnClouds, "77840765435893", .1, 1, "PriorLow", true)
 		local SitAnim = Instance.new("TextButton")
-		CreateAnimButton(SitAnim, "SitAnim", "Sit Anim", "R15", 5)
+		CreateAnimButton(SitAnim, "SitAnim", "Sit Anim", "R15", 4)
 		PlayAnim(SitAnim, "507768133", .1, 1, "PriorLow", true)
 		local ToolHandle = Instance.new("TextButton")
-		CreateAnimButton(ToolHandle, "ToolHandle", "Tool Handle", "R15", 5)
+		CreateAnimButton(ToolHandle, "ToolHandle", "Tool Handle", "R15", 4)
 		PlayAnim(ToolHandle, "507768375", .1, 1, "PriorHigh", true)
 		local FightingIdle = Instance.new("TextButton")
-		CreateAnimButton(FightingIdle, "FightingIdle", "Fighting Idle", "R15", 5)
-		PlayAnim(FightingIdle, "105947156749343", .1, 1, "PriorLow", true)
+		CreateAnimButton(FightingIdle, "FightingIdle", "Fighting Idle", "R15", 4)
+		PlayAnim(FightingIdle, "105947156749343", .1, 1, "PriorLowIdle", true)
+
+		local JumpingSpider = Instance.new("TextButton")
+		CreateAnimButton(JumpingSpider, "JumpingSpider", "Jumping Spider", "R15", 5)
+		PlayAnim(JumpingSpider, "139310328821985", .1, 1, "PriorLow", true)
+		local InsaneDog = Instance.new("TextButton")
+		CreateAnimButton(InsaneDog, "InsaneDog", "Insane Dog", "R15", 5)
+		PlayAnim(InsaneDog, "96435804447949", .1, 1, "PriorLow", true)
+		local WormAnim = Instance.new("TextButton")
+		CreateAnimButton(WormAnim, "WormAnim", "Worm Fly", "R15", 5)
+		PlayAnim(WormAnim, "135990691658209", .3, 1, "PriorLow", true)
+		local Orbit = Instance.new("TextButton")
+		CreateAnimButton(Orbit, "Orbit", "Orbit", "R15", 5)
+		PlayAnim(Orbit, "108359356964182", .5, 1, "PriorLow", true)
+		local Hanging = Instance.new("TextButton")
+		CreateAnimButton(Hanging, "Hanging", "Hanging", "R15", 5)
+		PlayAnim(Hanging, "125662782523118", .1, 1, "PriorLow", true)
+		local LaggyWalkTroll = Instance.new("TextButton")
+		CreateAnimButton(LaggyWalkTroll, "LaggyWalkTroll", "Laggy Walk Troll", "R15", 5)
+		PlayAnim(LaggyWalkTroll, "119199812452698", .1, 1, "PriorLow", true)
+		local InchWorm = Instance.new("TextButton")
+		CreateAnimButton(InchWorm, "InchWorm", "Inch Worm", "R15", 5)
+		PlayAnim(InchWorm, "119096405600200", .1, 1, "PriorLow", true)
+		local GoofyWiggle = Instance.new("TextButton")
+		CreateAnimButton(GoofyWiggle, "GoofyWiggle", "Goofy Wiggle", "R15", 5)
+		PlayAnim(GoofyWiggle, "74917195706355", .1, 1, "PriorLow", true)
+		local Tornado = Instance.new("TextButton")
+		CreateAnimButton(Tornado, "Tornado", "Tornado", "R15", 5)
+		PlayAnim(Tornado, "135373056067761", .1, 1, "PriorLow", true)
+		local AdminFly = Instance.new("TextButton")
+		CreateAnimButton(AdminFly, "AdminFly", "Admin Fly", "R15", 5)
+		PlayAnim(AdminFly, "85063861261432", .1, 1, "PriorLow", true)
+		local ObbyHead = Instance.new("TextButton")
+		CreateAnimButton(ObbyHead, "ObbyHead", "Little Obbyist", "R15", 5)
+		PlayAnim(ObbyHead, "115569573258316", .1, 1, "PriorLow", true)
+		local Insane = Instance.new("TextButton")
+		CreateAnimButton(Insane, "Insane", "Insane", "R15", 5)
+		PlayAnim(Insane, "93087898023268", .1, 1, "PriorLow", true)
+		local GoofyFLY = Instance.new("TextButton")
+		CreateAnimButton(GoofyFLY, "GoofyFLY", "Goofy FLY", "R15", 5)
+		PlayAnim(GoofyFLY, "118417760427139", .1, 1, "PriorLow", true)
+		local BodyPhone = Instance.new("TextButton")
+		CreateAnimButton(BodyPhone, "BodyPhone", "Body Phone", "R15", 5)
+		PlayAnim(BodyPhone, "73390669780316", .1, 0.8, "PriorLow", false)
+		local Spin = Instance.new("TextButton")
+		CreateAnimButton(Spin, "Spin", "Spin", "R15", 5)
+		PlayAnim(Spin, "110792133024438", .1, 1, "PriorHigh", true)
+		local HyperSpin = Instance.new("TextButton")
+		CreateAnimButton(HyperSpin, "HyperSpin", "Hyper Spin", "R15", 5)
+		PlayAnim(HyperSpin, "125165371323590", .1, 1, "PriorLow", true)
+		local SpinAround = Instance.new("TextButton")
+		CreateAnimButton(SpinAround, "SpinAround", "SpinAround", "R15", 5)
+		PlayAnim(SpinAround, "91004858616595", .1, 1, "PriorLow", true)
+		local FloatingSpace = Instance.new("TextButton")
+		CreateAnimButton(FloatingSpace, "FloatingSpace", "Floating Space", "R15", 5)
+		PlayAnim(FloatingSpace, "71209604118044", .1, 1, "PriorLow", true)
+		local FloatingSpace2 = Instance.new("TextButton")
+		CreateAnimButton(FloatingSpace2, "FloatingSpace2", "Floating Space 2", "R15", 5)
+		PlayAnim(FloatingSpace2, "70394064781064", .1, 0.5, "PriorLow", true)
+
 		local DaHoodStomp = Instance.new("TextButton")
 		CreateAnimButton(DaHoodStomp, "DaHoodStomp", "DaHood Stomp", "R15", 6)
 		PlayAnim(DaHoodStomp, "92249489340640", .1, 1, "PriorLow", false)
@@ -2795,6 +3666,45 @@ local function CreateGui()
 	else
 		R15Anims()
 	end
+	
+	local function AdditionalAnimsOperation()
+		print("[AdditionalAnims File]: Adding animations from AdditionalAnims file in Github")
+		
+		local finalUrl = "https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/SpecificGameAnimations/AdditionalAnimations"
+
+		local success, fileContent = pcall(function()
+			return game:HttpGet(finalUrl)
+		end)
+		if not success or not fileContent or fileContent == "404: Not Found" then
+			warn("[AdditionalAnims File]: AdditionalAnims file wasn't found")
+			return 
+		end
+		local success2, data = pcall(function()
+			return HttpService:JSONDecode(fileContent)
+		end)
+		if not success2 or not data then
+			warn("[AdditionalAnims File]: Error in JSON structure in AdditionalAnims file")
+			return
+		end
+		for categoryName, animationsList in pairs(data) do
+			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
+				print("[AdditionalAnims File]: Extracting Animations")
+				for _, info in ipairs(animationsList) do
+					local danceButton = Instance.new("TextButton")
+					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
+					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
+				end
+			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
+				print("[AdditionalAnims File]: Adding Default animations")
+				for _, id in ipairs(data["DefaultAnims"]) do
+					if not table.find(DefaultAnimsNameList, id) then
+						table.insert(DefaultAnimsNameList, tostring(id))
+					end
+				end
+			end
+		end
+		print("[AdditionalAnims File]: Loaded Data!")
+	end
 
 	local function CustomAnimsOperation()
 		print("[CustomAnims File]: Searching CustomAnims file")
@@ -2813,15 +3723,12 @@ local function CreateGui()
 			return
 		end
 		for categoryName, animationsList in pairs(data) do
-			--print("Loading category: " .. categoryName)
 			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
 				print("[CustomAnims File]: Extracting Animations")
 				for _, info in ipairs(animationsList) do
-					if not ((info[3] == "R6" and ScrollingFrame:FindFirstChild(info[1])) or (info[3] == "R15" and ScrollingFrameR15:FindFirstChild(info[1])) or (info[3] == "Spec" and ScrollingFrameSpecific:FindFirstChild(info[1]))) then
-						local danceButton = Instance.new("TextButton")
-						CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
-						PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
-					end
+					local danceButton = Instance.new("TextButton")
+					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
+					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
 				end
 			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
 				print("[CustomAnims File]: Adding Default animations")
@@ -2872,10 +3779,9 @@ local function CreateGui()
 	end
 
 	local function GithubSpecGameAnimsOperation()
-		local baseUrl = "https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/SpecificPlaceEmotes/"
+		local baseUrl = "https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/SpecificGameAnimations/"
 		local finalUrl = baseUrl .. tostring(game.GameId)
-		
-		if not LoadGithubSGAEnabled then return end
+
 		print("[SpecGameAnims Github]: Searching Anims file in Github for game ".. game.GameId)
 
 		local success, fileContent = pcall(function()
@@ -2894,15 +3800,12 @@ local function CreateGui()
 		end
 
 		for categoryName, animationsList in pairs(data) do
-			--print("[SpecGameAnims Github]: Loading category: " .. categoryName)
 			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
 				print("[SpecGameAnims Github]: Extracting Animations")
 				for _, info in ipairs(animationsList) do
-					if not ((info[3] == "R6" and ScrollingFrame:FindFirstChild(info[1])) or (info[3] == "R15" and ScrollingFrameR15:FindFirstChild(info[1])) or (info[3] == "Spec" and ScrollingFrameSpecific:FindFirstChild(info[1]))) then
-						local danceButton = Instance.new("TextButton")
-						CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
-						PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
-					end
+					local danceButton = Instance.new("TextButton")
+					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
+					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
 				end
 			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
 				print("[SpecGameAnims Github]: Adding Default animations")
@@ -2958,7 +3861,7 @@ local function CreateGui()
 			local extractedNumber = fileName:match("(%d+)")
 
 			if extractedNumber then
-				--print("[SpecGameAnims File]: Found file: " .. fileName .. " | Extracted number: " .. extractedNumber)
+				if DebugInfoEnabled then print("[SpecGameAnims File]: Found file: " .. fileName .. " | Extracted number: " .. extractedNumber) end
 				if extractedNumber == targetNumber then
 					print("[SpecGameAnims File]: Found file: " .. filePath)
 					fileFound = true
@@ -2988,15 +3891,12 @@ local function CreateGui()
 		end
 
 		for categoryName, animationsList in pairs(data) do
-			--print("Loading category: " .. categoryName)
 			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
 				print("[SpecGameAnims File]: Extracting Animations")
 				for _, info in ipairs(animationsList) do
-					if not ((info[3] == "R6" and ScrollingFrame:FindFirstChild(info[1])) or (info[3] == "R15" and ScrollingFrameR15:FindFirstChild(info[1])) or (info[3] == "Spec" and ScrollingFrameSpecific:FindFirstChild(info[1]))) then
-						local danceButton = Instance.new("TextButton")
-						CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
-						PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
-					end
+					local danceButton = Instance.new("TextButton")
+					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
+					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
 				end
 			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
 				print("[SpecGameAnims File]: Adding Default animations")
@@ -3030,71 +3930,47 @@ local function CreateGui()
 				EmoteWheelEmotes.Emote6 = info[6]
 				EmoteWheelEmotes.Emote7 = info[7]
 				EmoteWheelEmotes.Emote8 = info[8]
+			elseif categoryName == "AdditionalData" then
+				if data["AdditionalData"].DefaultWalkSpeed then
+					DefaultWalkSpeed = data["AdditionalData"].DefaultWalkSpeed
+					print("Chaged DefaultWalkSpeed to "..DefaultWalkSpeed)
+				elseif data["AdditionalData"].AnimationHandlerName then
+					AnimationHandler = data["AdditionalData"].AnimationHandlerName
+				end
 			end
 		end
 		print("[SpecGameAnims File]: Loaded data!")
 	end
 
 	if not IsInStudio then
-		CustomAnimsOperation()
-		GithubSpecGameAnimsOperation()
-		FileSpecGameAnimsOperation()
-	end
-	--[[for index, id in ipairs(DefaultAnimsNameList) do
-		print("Номер: " .. index .. " | ID анимации: " .. id)
-	end]]
-	
-	local ToolAnimTask = task.spawn(function()
-		while GuiActive == true do
-			if ToolAnimHighPrior == true then
-				local playingTracks = Humanoid:GetPlayingAnimationTracks()
-				local anyTrue = false
-				for _, ScrollFrame in ipairs(ScrollingFramesList) do
-					for _, item in ipairs(ScrollFrame:GetChildren()) do
-						if item:IsA("TextButton") and item.BackgroundColor3 == ButtonSelectCol then
-							anyTrue = true
-							break
-						end
-					end
-				end
-
-				if anyTrue then
-					for _, animtrack in ipairs(playingTracks) do
-						local animationObject = animtrack.Animation
-						local IdNumberString = string.match(animationObject.AnimationId, "%d+") 
-
-						if (table.find(ToolIdleAnimsList, animtrack.Name) or table.find(ToolIdleAnimsList, IdNumberString)) and ToolIdleAnimHighPrior then
-							animtrack.Priority = Enum.AnimationPriority.Action4
-						elseif (table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString)) and ToolActionAnimHighPrior then
-							animtrack.Priority = Enum.AnimationPriority.Action4
-							animtrack:AdjustWeight(100)
-						end
-					end
-				else
-					for _, animtrack in ipairs(playingTracks) do
-						local animationObject = animtrack.Animation
-						local IdNumberString = string.match(animationObject.AnimationId, "%d+") 
-
-						if (table.find(ToolIdleAnimsList, animtrack.Name) or table.find(ToolIdleAnimsList, IdNumberString)) then
-							animtrack.Priority = Enum.AnimationPriority.Idle
-						elseif (table.find(ToolActionAnimsList, animtrack.Name) or table.find(ToolActionAnimsList, IdNumberString)) then
-							animtrack.Priority = Enum.AnimationPriority.Action
-							animtrack:AdjustWeight(1)
-						end
-					end
-				end
-			end
-			task.wait()
+		print("Adding Emotes from files...")
+		if LoadGithubCustomAnimsEnabled then
+			AdditionalAnimsOperation()
 		end
-	end)
+		if LoadLocalCustomAnimsEnabled then
+			CustomAnimsOperation()
+		end
+		if LoadGithubSGAEnabled then
+			GithubSpecGameAnimsOperation()
+		end
+		if LoadLocalSGAEnabled then
+			FileSpecGameAnimsOperation()
+		end
+	end
+	if DebugInfoEnabled then
+		for index, id in ipairs(ToolActionAnimsList) do
+			print("Номер: " .. index .. " | ID анимации: " .. id)
+		end
+	end
 
 	CreateDivideFrame("Dances", 0, "Spec")
 	CreateDivideFrame("Actions", 1, "Spec")
 	CreateDivideFrame("Walk & Run", 2, "Spec")
-	CreateDivideFrame("Weird", 3, "Spec")
-	CreateDivideFrame("Poses & Idles", 4, "Spec")
+	CreateDivideFrame("Poses & Idles", 3, "Spec")
+	CreateDivideFrame("Weird", 4, "Spec")
 	CreateDivideFrame("Attack", 5, "Spec")
 
+	print("Loading Emote wheel and other functions...")
 	if not ScrollingFrameSpecific:FindFirstChildOfClass("TextButton") then
 		SpecGameSection.Visible = false
 		DefaultSection.Visible = false
@@ -3192,6 +4068,7 @@ local function CreateGui()
 
 
 	-- UI Decorations
+	print("Decorating GUI...")
 	local UiCornerParts = {"SpecGameSection", "DefaultSection", "Emote1", "Emote2", "Emote3", "Emote4", "Emote5", "Emote6", "Emote7", "Emote8", "ResetButton", "CustomAnimFrame", "PlayAnimButton", "CustomAnimButton", "HotkeysEditOption", "SaveSettingsButton", "LaunchIdDetectorButton", "GithubLinkButton", "HotkeysFrame", "SettingsFrame", "SettingsButton", "GuiTopFrame", "CloseGUI", "DestroyGUI", "GuiBottomFrame", "SpeedValue", "SideFrame", "OpenGUI", "ViewportFrame", "OptionsFrame", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "SitButton", "EmoteWheelButton", "ReversePlayButton", "SearchFrame", "SearchButton"}
 	local UiStrokeParts = {"SpecGameSection", "DefaultSection", "Emote1", "Emote2", "Emote3", "Emote4", "Emote5", "Emote6", "Emote7", "Emote8", "CustomAnimFrame", "HotkeysFrame", "SettingsFrame", "GuiTopFrame", "GuiBottomFrame", "SideFrame", "ScrollingFrame", "ScrollingFrameR15", "ScrollingFrameSpecific", "OptionsFrame", "SearchFrame"}
 	local UiStroke1Parts = {"ResetButton", "PlayAnimButton", "IdBox", "HotkeysEditOption", "SaveSettingsButton", "LaunchIdDetectorButton", "GithubLinkButton", "SpeedValue", "SearchBox", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "SitButton", "EmoteWheelButton", "ReversePlayButton"}
@@ -3232,10 +4109,6 @@ local function CreateGui()
 		end
 
 		if (UiPart.Parent.Name == "ScrollingFrame" or UiPart.Parent.Name == "ScrollingFrameR15" or UiPart.Parent.Name == "ScrollingFrameSpecific") and UiPart:IsA("TextButton") then
-			local UIStroke = Instance.new("UIStroke")
-			UIStroke.Parent = UiPart
-			UIStroke.Thickness = 1
-			UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			if UICornerEnabled then
 				local UICorner = Instance.new("UICorner")
 				UICorner.Parent = UiPart
@@ -3250,7 +4123,6 @@ local function CreateGui()
 
 		end
 	end
-
 	local function AddUiPadding(Part, left, right, top, bottom)
 		for _, UiPart in ipairs(Emoter:GetDescendants()) do
 			if UiPart.Name == Part then
@@ -3272,6 +4144,7 @@ local function CreateGui()
 	AddUiPadding("ScrollingFrameSpecific",5,16,7,10)
 	AddUiPadding("SearchBox",2,2)
 	AddUiPadding("SettingsStuff",5,8,3,5)
+	AddUiPadding("SwitchRunIdleExceptionOption", 20)
 	AddUiPadding("ThemeOptionText",0,0,0,2)
 	AddUiPadding("HotkeysEditOption",0,0,0,2)
 	AddUiPadding("HotkeysStuff",10,10,5,5)
@@ -3346,8 +4219,32 @@ local function CreateGui()
 	SearchBox.Text = PrevSearchText
 	IdBox.Text = PrevCustomAnimId
 	SpeedValue.Text = PrevAnimSpeedValue
+	if XSize < 460 then
+		ValueText.Visible = false
+		if XSize < 350 then
+			if RigType == "R15" then
+				Title.Text = "Emoter R15"
+			else
+				Title.Text = "Emoter R6"
+			end
+		end
+	end
 
 	GuiEmoter = Emoter
+	print("Script loaded!")
+	
+	local RestartPlayer
+	RestartPlayer = Player.CharacterAdded:Connect(function()
+		if not GuiActive or not GuiRestarted then
+			RestartPlayer:Disconnect()
+		end
+		if GuiActive and GuiRestarted == false and Player.Character:WaitForChild("Humanoid") then
+			table.clear(RestartAnimations)
+			StopAnimsEvent:Fire("Reset/Destroy")
+			OnRestart()
+			RestartPlayer:Disconnect()
+		end
+	end)
 end
 
 function OnRestart()
@@ -3394,18 +4291,15 @@ function OnRestart()
 	PrevAnimSpeedValue = GuiEmoter.MainFrame.GuiBottomFrame.SpeedFrame.SpeedValue.Text
 	PrevSearchText = GuiEmoter.MainFrame.SearchFrame.SearchBox.Text
 	PrevCustomAnimId = GuiEmoter.MainFrame.CustomAnimFrame.IdBox.Text
+
 	GuiEmoter:Destroy()
 	CreateGui()
+	if DebugInfoEnabled then
+		for index, id in ipairs(RestartAnimations) do
+			print("Restored: "..id)
+		end
+	end
 end
 
--- PLEASE DO NOT DELETE THIS
-game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Welcome to Emoter Gui!", Text = "Wait for script to load!", Duration = 5, Icon = "rbxassetid://85975257618857"})
--- PLEASE DO NOT DELETE THIS
-
+game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Welcome to Emoter Gui!", Text = "Wait for script to load!", Duration = 5, Icon = "rbxassetid://87633233506740"})
 CreateGui()
-
-Player.CharacterAdded:connect(function()
-	if GuiActive and Player.Character:WaitForChild("Humanoid") then
-		OnRestart()
-	end
-end)
