@@ -15,5 +15,7 @@
 	["FlowingBreeze", "Flowing Breeze", "R15", 2, 10714342957, .1, 1, "PriorLow", false],
 	["FingerGun", "Finger Gun", "R15", 2, 73468073017890, .1, 1, "PriorLow", false],
 	["Plane", "Plane", "R15", 3, 94462256787399, 0.3, 0.5, "PriorLow", true]
-	]
+	],
+	"DefaultAnims": 
+		[]
 }
