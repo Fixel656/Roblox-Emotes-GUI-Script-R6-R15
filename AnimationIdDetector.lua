@@ -767,7 +767,7 @@ LayoutBox.Font = Enum.Font.SourceSansBold
 LayoutBox.ClearTextOnFocus = false
 LayoutBox.TextScaled = true
 LayoutBox.Parent = NumberssFrame
-AddHoverText(LayoutBox, "Category number (1-Dances, 2-Actions, 3-Walk&Run, 4-Weird, 5-Poses&Idles, 6-Attack)")
+AddHoverText(LayoutBox, "Category number (1-Dances, 2-Actions, 3-Walk&Run, 4-Poses&Idles, 5-Weird, 6-Attack)")
 
 local FadeTimeBox = Instance.new("TextBox")
 FadeTimeBox.Name = "FadeTimeBox"
