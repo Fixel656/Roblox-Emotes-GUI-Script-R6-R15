@@ -123,4 +123,5 @@ I will add it manually and you could add files for yourself in your files folder
 - Moved some R15 useless (for me) animations to "AdditionalAnimations" Github file. you can disable it in settings
 - Swapped the "Poses & Idles" and "Weird" categories
 - Added "Stop all animations" hotkey
+- Made simple visitor counter
 - More fixes
