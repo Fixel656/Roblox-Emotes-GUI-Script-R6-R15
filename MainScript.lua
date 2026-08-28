@@ -3709,7 +3709,7 @@ local function CreateGui()
 	local function CustomAnimsOperation()
 		print("[CustomAnims File]: Searching CustomAnims file")
 		local success, fileContent = pcall(function()
-			return readfile("EmoterData/CustomAnims.lua")
+			return readfile("EmoterData/CustomAnims.json")
 		end)
 		if not success or not fileContent then 
 			warn("[CustomAnims File]: CustomAnims file wasn't found")
