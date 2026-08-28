@@ -2,7 +2,7 @@
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
 
-local ScriptVersion = "V5.0"
+local ScriptVersion = "V5.0.1"
 local GuiActive = true
 local GuiEmoter = nil
 local AnimationHandler = "Animate"
@@ -476,7 +476,7 @@ local function CreateGui()
 		Button.Text = "<b>" .. Text .. "</b>"
 		Button.TextScaled = true
 		Button.LayoutOrder = LayoutPos
-		
+
 		local UIStroke = Instance.new("UIStroke")
 		UIStroke.Parent = Button
 		UIStroke.Thickness = 1
@@ -494,7 +494,7 @@ local function CreateGui()
 		elseif Button.Parent.Name == "ScrollingFrameR15" then Frame = "R15"
 		elseif Button.Parent.Name == "ScrollingFrameSpecific" then Frame = "Spec"
 		end
-		
+
 		Button:SetAttribute("Looped", LoopedVal)
 		if LoopedVal == false then
 			AddHoverText(Button, "Click RMB to loop")
@@ -628,7 +628,7 @@ local function CreateGui()
 				track:Stop(FadeTime)
 			end
 			IsPlaying = false
-			
+
 			if (Reason == "Destroy") then return end
 
 			Button.BackgroundColor3 = ButtonCol
@@ -716,7 +716,7 @@ local function CreateGui()
 				StopAnim()
 			end
 		end)
-		
+
 		local MinWalkSpeedNumStr = string.match(Type, "Running([%d%.]+)")
 		local MinWalkSpeedNum = tonumber(MinWalkSpeedNumStr) or 0.5
 		if tonumber(MinWalkSpeedNumStr) ~= nil then AddHoverText(Button, "Minimal WalkSpeed to play:"..MinWalkSpeedNum) end
@@ -936,7 +936,7 @@ local function CreateGui()
 				VPFtrack:Stop()
 			end
 		end)
-		
+
 		for index, RestartedAnim in ipairs(RestartAnimations) do
 			local prefix, suffix
 			if string.match(RestartedAnim, "^R15") then
@@ -2600,7 +2600,7 @@ local function CreateGui()
 			AnalyticsButton.CheckImage.Image = ""
 		end
 	end)
-	
+
 	local LoadAnimationsOnRestartButton = SettingsStuff.LoadAnimationsOnRestartOption
 	AddHoverText(LoadAnimationsOnRestartButton, "Automatically plays 'Running' and 'Idle' animations when you restart GUI or when your character reappears")
 	LoadAnimationsOnRestartButton.MouseButton1Click:Connect(function()
@@ -3138,11 +3138,11 @@ local function CreateGui()
 				AnimFadeOptionButton.CheckImage.Image = ""
 			end
 		end
-		
+
 		if tostring(input.KeyCode.Name) == StopAnimsHotkey.Value and HotkeysEnabled then
 			StopAnimsEvent:Fire("Forced")
 		end
-		
+
 		if tostring(input.KeyCode.Name) == EmoteWheelHotkey.Value then
 			EmoteWheel.Visible = not EmoteWheel.Visible
 		end
@@ -3530,7 +3530,7 @@ local function CreateGui()
 		local MotionRun = Instance.new("TextButton")
 		CreateAnimButton(MotionRun, "MotionRun", "Motion Run", "R15", 3)
 		PlayAnim(MotionRun, "101925097435036", .1, 1, "PriorLowRunning", true)
-		
+
 		local HappyIdle = Instance.new("TextButton")
 		CreateAnimButton(HappyIdle, "HappyIdle", "Happy Idle", "R15", 4)
 		PlayAnim(HappyIdle, "88212525150688", .1, 1, "PriorLowIdle", true)
@@ -3666,10 +3666,10 @@ local function CreateGui()
 	else
 		R15Anims()
 	end
-	
+
 	local function AdditionalAnimsOperation()
 		print("[AdditionalAnims File]: Adding animations from AdditionalAnims file in Github")
-		
+
 		local finalUrl = "https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/SpecificGameAnimations/AdditionalAnimations"
 
 		local success, fileContent = pcall(function()
@@ -3972,9 +3972,16 @@ local function CreateGui()
 
 	print("Loading Emote wheel and other functions...")
 	if not ScrollingFrameSpecific:FindFirstChildOfClass("TextButton") then
-		SpecGameSection.Visible = false
 		DefaultSection.Visible = false
 		CurrentSection = "Default"
+		SpecGameSection.Size = UDim2.new(0, 33, 0, 32)
+		SpecGameSection.Position = UDim2.new(1, 31, 1, -67)
+		SpecGameSection.Text = "<b> ?</b>"
+		local Tip = SpecGameSection:Clone()
+		Tip.AutoButtonColor = false
+		Tip.Parent = MainFrame
+		SpecGameSection.Visible = false
+		AddHoverText(Tip, "Haven't found any animations for this specific game. \nWant to add it yourself? Check out <b>Emoter's Github</b> page!")
 	else
 		AddHoverText(SpecGameSection, "Specific game Animations")
 	end
@@ -4232,7 +4239,7 @@ local function CreateGui()
 
 	GuiEmoter = Emoter
 	print("Script loaded!")
-	
+
 	local RestartPlayer
 	RestartPlayer = Player.CharacterAdded:Connect(function()
 		if not GuiActive or not GuiRestarted then
