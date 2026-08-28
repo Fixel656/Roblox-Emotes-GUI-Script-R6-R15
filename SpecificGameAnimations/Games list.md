@@ -10,6 +10,7 @@
 Game name | Game Id | CustomAnims | DefaultAnims | ToolIdleAnims | ToolActionAnims | AdditionalData
 --- | --- | --- | --- | --- | --- | ---
 Forsaken | `6331902150` | Most emotes from shop + some other emotes | - | - | (Attack/Dash anims): Partially (C00lkid, Azure and Shedletsky with some skins) | -
+Nullscape | `7623259179` | All emotes from shop + some run and idle + unused animations | Added some animations, but unused in general | DoubleJump, Rail anims and other | All Slide, Dive, Grapple & Glider anims | Default WalkSpeed: 24
 
 </div>
 
