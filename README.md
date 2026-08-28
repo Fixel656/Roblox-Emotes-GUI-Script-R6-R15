@@ -35,16 +35,13 @@ Dance without any problems and restrictions!<br>
 - Added SGA - SpecificGameAnimations: file with Animations for specific games. It will be places with emotes available in these places specifically.<br/>
 I will add it manually and type available ones in README. Also you can add files for yourself in your files folder. More information [here](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/wiki/SpecificGameAnimations-and-how-to-make-your-own-SGA). <br/>
 (You can add your SGA in [Discussions](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/discussions/categories/your-sga-specific-game-animations) so i can add it to Github)<br/>
+- "Running" and "Idle" types for animations. "Running" type will change AnimationSpeed depending on the character's speed and stop when character isn't moving (staying). "Idle" type will play whed you're staying. It has a lot of configurations, so check more info on how to use it in my Wiki
 - Emote wheel (Activate by <kbd>,</kbd> button. You can't edit emotes for it in Gui itself (at least for now), You'll need to edit files in EmoterData folder.
 
 ### To do:
-- Update AutoPause function for animation
 - Double Hotkey
-- "HigherPriority" Setting for games that use Action4 animation priority
-- "Running" type for animations to have AnimationSpeed changing depending on the character's speed
 - Make size changing setting
-- Hints for settings
-- More R15 animations (there`s no other good FE R6 anims left)
+- More R15 animations
 - More Options (maybe)
 - More<br/>
 <br/>
