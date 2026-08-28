@@ -107,7 +107,7 @@ I will add it manually and you could add files for yourself in your files folder
 ### V4.3.6:
 - Added setting do disable loading SGA (Specific Game Anims) from Github
 
-## V5.0
+## V5.0:
 - Updated AutoPause function for animation. Now you can put a number right after "Pause" keyword. This number is time when animation should be paused. Also changed time logic
 - "HigherPriority" Setting for games that use Action4 animation priority. But sometimes animations looks kinda buggy with it (and i can't fix this), so better use it only when needed
 - **"Running" and "Idle" types for animations. "Running" type will change AnimationSpeed depending on the character's speed and stop when character isn't moving (staying). "Idle" type will play whed you're staying. It has a lot of configurations, so check more info on how to use it in my Wiki**
@@ -121,7 +121,6 @@ I will add it manually and you could add files for yourself in your files folder
 - "Running" and "Idle" types for animations can be activated automatically after restarting GUI/character reappearing (made only for these types as i don't think it needs to be for every animation)
 - Updated ToolAnimPriority function: now it uses `Humanoid.AnimationPlayed()` instead of `while true do`
 - Moved some R15 useless (for me) animations to "AdditionalAnimations" Github file. you can disable it in settings
-- Swapped the "Poses & Idles" and "Weird" categories
-- Added "Stop all animations" hotkey
-- Made simple visitor counter
-- More fixes
+
+### V5.0.1:
+- Added a tip for new players if there's no SGA
