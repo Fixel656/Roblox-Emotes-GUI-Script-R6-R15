@@ -1,4 +1,4 @@
---[[V3.1
+--[[V3.5
 AnimationIdDetector by Fixel
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
@@ -10,12 +10,14 @@ local MainFrame = Instance.new("Frame")
 local ResultsListFrame = Instance.new("ScrollingFrame")
 local AnimObjResultsListFrame = Instance.new("ScrollingFrame")
 
+local SideFrame = Instance.new("Frame")
+local SideFrameTitle = Instance.new("TextLabel")
+local SFDestroyGUI = Instance.new("TextButton")
+local OpenGUI = Instance.new("ImageButton")
+
 local GuiTopFrame = Instance.new("Frame")
 local DestroyGUI = Instance.new("TextButton")
 local Title = Instance.new("TextLabel")
-
-local ViewportFrame = Instance.new("ViewportFrame")
-local ClonedChar = nil
 
 local GuiBottomFrame = Instance.new("Frame")
 local CharStartButton = Instance.new("ImageButton")
@@ -26,6 +28,9 @@ local ObjectModelValue = Instance.new("TextBox")
 local ObjectNameBox = Instance.new("TextBox")
 local TextNameBox = Instance.new("TextBox")
 local AnimIdBox = Instance.new("TextBox")
+
+local ViewportFrame = Instance.new("ViewportFrame")
+local ClonedChar = nil
 
 local TargetAnimObjServices = {
 	game:GetService("Workspace"),
@@ -48,10 +53,24 @@ local DetectDefaultAnims = true
 local CharFunctionActive = true
 local ObjectFunctionActive = true
 
+local BgColor = Color3.fromRGB(137, 165, 255)
+local ScrollBgColor = Color3.fromRGB(240, 255, 255)
+local UiButColor = Color3.new(0, 0, 0) -- Color of GUI's buttons and Texts
+local ButtonCol = Color3.fromRGB(192, 191, 211) -- R6 Button Color
+local ButtonSelectCol = Color3.fromRGB(255, 255, 255) -- R6 Button darker color
+
 --SaveToEmoterData
-local ScrollFrameType = "Spec"
-local AnimType = "PriorLow"
 local Looped = true
+local ScrollFrameType = "Spec"
+local AnimType = ""
+local Priority = "PriorLow"
+local Paused = ""
+local Running = ""
+local Idle = ""
+
+local PausedValue = false
+local RunningValue = false
+local IdleValue = false
 
 game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Welcome to Anim Detector!", Text = "Wait for script to load", Duration = 5, Icon = "rbxassetid://88751076321975"})
 
@@ -370,6 +389,56 @@ else
 	AnimIdDetector.Parent = game.CoreGui
 end
 
+-- SideFrame
+SideFrame.Name = "SideFrame"
+SideFrame.Parent = AnimIdDetector
+SideFrame.Active = true
+SideFrame.BackgroundColor3 = BgColor
+SideFrame.Size = UDim2.new(0, 225, 0, 32)
+SideFrame.Visible = false
+SideFrame.Position = UDim2.new(0, 10, 0, 10)
+
+local UIDragDetectorSideFrame = Instance.new("UIDragDetector")
+UIDragDetectorSideFrame.Parent = SideFrame
+
+SideFrameTitle.Name = "SideFrameTitle"
+SideFrameTitle.Parent = SideFrame
+SideFrameTitle.AnchorPoint = Vector2.new(0.5, 0.5)
+SideFrameTitle.BackgroundTransparency = 1
+SideFrameTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
+SideFrameTitle.Size = UDim2.new(0, 119, 0, 31)
+SideFrameTitle.Font = Enum.Font.SourceSansBold
+SideFrameTitle.TextColor3 = Color3.new(1, 1, 1)
+SideFrameTitle.Text = "Anim ID Detector"
+SideFrameTitle.TextSize = 24
+SideFrameTitle.TextStrokeTransparency = 0
+
+SFDestroyGUI.Name = "DestroyGUI"
+SFDestroyGUI.Parent = SideFrame
+SFDestroyGUI.AnchorPoint = Vector2.new(1, 0.5)
+SFDestroyGUI.BackgroundTransparency = 0
+SFDestroyGUI.Position = UDim2.new(1, 0, 0.5, 0)
+SFDestroyGUI.Size = UDim2.new(0, 32, 0, 32)
+SFDestroyGUI.BackgroundColor3 = BgColor
+SFDestroyGUI.Font = Enum.Font.FredokaOne
+SFDestroyGUI.Text = "X"
+SFDestroyGUI.TextColor3 = UiButColor
+SFDestroyGUI.TextSize = 34
+SFDestroyGUI.TextWrapped = true
+AddHoverText(SFDestroyGUI, "Delete GUI")
+
+OpenGUI.Name = "OpenGUI"
+OpenGUI.Parent = SideFrame
+OpenGUI.AnchorPoint = Vector2.new(0, 0.5)
+OpenGUI.BackgroundTransparency = 0
+OpenGUI.BackgroundColor3 = BgColor
+OpenGUI.Position = UDim2.new(0, 0, 0.5, 0)
+OpenGUI.Size = UDim2.new(0, 32, 0, 32)
+OpenGUI.Image = "rbxassetid://101249930107274"
+OpenGUI.ImageColor3 = UiButColor
+AddHoverText(OpenGUI, "Open/Close GUI")
+
+
 MainFrame.Name = "MainFrame"
 MainFrame.Size = UDim2.new(0, 434, 0, 275)
 MainFrame.BackgroundTransparency = 1
@@ -391,13 +460,6 @@ ResultsListFrame.ScrollBarImageColor3 = Color3.fromRGB(0, 0, 0)
 ResultsListFrame.ScrollBarThickness = 10
 ResultsListFrame.Parent = MainFrame
 
-local UIPadding = Instance.new("UIPadding")
-UIPadding.PaddingTop = UDim.new(0, 5)
-UIPadding.PaddingBottom = UDim.new(0, 5)
-UIPadding.PaddingLeft = UDim.new(0, 5)
-UIPadding.PaddingRight = UDim.new(0, 16)
-UIPadding.Parent = ResultsListFrame
-
 local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UIListLayout.Padding = UDim.new(0, 5)
@@ -413,13 +475,6 @@ AnimObjResultsListFrame.CanvasSize = UDim2.new(0, 0, 0.5, 0)
 AnimObjResultsListFrame.ScrollBarImageColor3 = Color3.fromRGB(0, 0, 0)
 AnimObjResultsListFrame.ScrollBarThickness = 10
 AnimObjResultsListFrame.Parent = MainFrame
-
-local UIPadding = Instance.new("UIPadding")
-UIPadding.PaddingTop = UDim.new(0, 5)
-UIPadding.PaddingBottom = UDim.new(0, 5)
-UIPadding.PaddingLeft = UDim.new(0, 5)
-UIPadding.PaddingRight = UDim.new(0, 16)
-UIPadding.Parent = AnimObjResultsListFrame
 
 local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -468,6 +523,18 @@ DestroyGUI.Font = Enum.Font.FredokaOne
 DestroyGUI.Parent = GuiTopFrame
 AddHoverText(DestroyGUI, "Delete GUI")
 
+local CloseGUI = Instance.new("ImageButton")
+CloseGUI.Name = "CloseGUI"
+CloseGUI.Parent = GuiTopFrame
+CloseGUI.AnchorPoint = Vector2.new(0, 0.5)
+CloseGUI.BackgroundColor3 = BgColor
+CloseGUI.BackgroundTransparency = 0
+CloseGUI.Position = UDim2.new(0, 0, 0.5, 0)
+CloseGUI.Size = UDim2.new(0, 32, 0, 32)
+CloseGUI.Image = "rbxassetid://105612912027138"
+CloseGUI.ImageColor3 = UiButColor
+AddHoverText(CloseGUI, "Open/Close GUI")
+
 local AnimTypeButton = Instance.new("ImageButton")
 AnimTypeButton.Name = "AnimTypeButton"
 AnimTypeButton.Parent = GuiTopFrame
@@ -475,7 +542,7 @@ AnimTypeButton.AnchorPoint = Vector2.new(0, 0.5)
 AnimTypeButton.BackgroundColor3 = Color3.fromRGB(137, 165, 255)
 AnimTypeButton.ImageColor3 = Color3.fromRGB(0, 0, 0)
 AnimTypeButton.BackgroundTransparency = 0
-AnimTypeButton.Position = UDim2.new(0, 0, 0.5, 0)
+AnimTypeButton.Position = UDim2.new(0, 32, 0.5, 0)
 AnimTypeButton.Size = UDim2.new(0, 32, 0, 32)
 AnimTypeButton.Image = "rbxassetid://88751076321975"
 AddHoverText(AnimTypeButton, "Change Animation extraction type (Humanoid/Animation Object")
@@ -485,7 +552,7 @@ SaveToEmoterButton.Parent = GuiTopFrame
 SaveToEmoterButton.Name = "SaveToEmoterButton"
 SaveToEmoterButton.AnchorPoint = Vector2.new(0, 0.5)
 SaveToEmoterButton.Size = UDim2.new(0, 32, 0, 32)
-SaveToEmoterButton.Position = UDim2.new(0, 32, 0.5, 0)
+SaveToEmoterButton.Position = UDim2.new(0, 64, 0.5, 0)
 SaveToEmoterButton.BackgroundColor3 = Color3.fromRGB(137, 165, 255)
 SaveToEmoterButton.Image = "rbxassetid://84180020565122"
 AddHoverText(SaveToEmoterButton, "Open SaveToEmoter (For users of my Emotes GUI)")
@@ -569,11 +636,6 @@ ModelValue.TextScaled = true
 ModelValue.Parent = GuiBottomFrame
 AddHoverText(ModelValue, "Enter a name or a path to character")
 
-local UIPadding1 = Instance.new("UIPadding")
-UIPadding1.PaddingLeft = UDim.new(0, 2)
-UIPadding1.PaddingRight = UDim.new(0, 2)
-UIPadding1.Parent = ModelValue
-
 ObjectStartButton.Name = "ObjectStartButton"
 ObjectStartButton.AnchorPoint = Vector2.new(1, 0.5)
 ObjectStartButton.Size = UDim2.new(0, 51, 0, 35)
@@ -612,11 +674,6 @@ ObjectModelValue.Visible = false
 ObjectModelValue.Parent = GuiBottomFrame
 AddHoverText(ObjectModelValue, "Enter path to find anim objects in")
 
-local UIPadding1 = Instance.new("UIPadding")
-UIPadding1.PaddingLeft = UDim.new(0, 2)
-UIPadding1.PaddingRight = UDim.new(0, 2)
-UIPadding1.Parent = ObjectModelValue
-
 local UIListLayout1 = Instance.new("UIListLayout")
 UIListLayout1.FillDirection = Enum.FillDirection.Horizontal
 UIListLayout1.HorizontalAlignment = Enum.HorizontalAlignment.Center
@@ -625,10 +682,6 @@ UIListLayout1.SortOrder = Enum.SortOrder.LayoutOrder
 UIListLayout1.HorizontalFlex = Enum.UIFlexAlignment.Fill
 UIListLayout1.Padding = UDim.new(0, 5)
 UIListLayout1.Parent = GuiBottomFrame
-
-local UIPadding2 = Instance.new("UIPadding")
-UIPadding2.PaddingLeft = UDim.new(0, 3)
-UIPadding2.Parent = GuiBottomFrame
 
 local ExportButton = Instance.new("ImageButton")
 ExportButton.Parent = MainFrame
@@ -641,7 +694,7 @@ ExportButton.BackgroundColor3 = Color3.fromRGB(37, 255, 26)
 ExportButton.ScaleType = Enum.ScaleType.Fit
 ExportButton.ImageColor3 = Color3.fromRGB(0, 0, 0)
 ExportButton.Image = "rbxassetid://83856799245957"
-AddHoverText(ExportButton, "EXPORT")
+AddHoverText(ExportButton, "EXPORT to file")
 
 local UICorner = Instance.new("UICorner")
 UICorner.TopLeftRadius = UDim.new(0, 0)
@@ -685,6 +738,7 @@ ObjectNameBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 ObjectNameBox.TextSize = 14
 ObjectNameBox.TextColor3 = Color3.fromRGB(0, 0, 0)
 ObjectNameBox.Text = "Animation"
+ObjectNameBox.PlaceholderText = "Button name"
 ObjectNameBox.Font = Enum.Font.SourceSansBold
 ObjectNameBox.ClearTextOnFocus = false
 ObjectNameBox.TextScaled = true
@@ -700,6 +754,7 @@ TextNameBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 TextNameBox.TextSize = 14
 TextNameBox.TextColor3 = Color3.fromRGB(0, 0, 0)
 TextNameBox.Text = "Animation"
+TextNameBox.PlaceholderText = "Button text"
 TextNameBox.CursorPosition = -1
 TextNameBox.Font = Enum.Font.SourceSansBold
 TextNameBox.ClearTextOnFocus = false
@@ -715,6 +770,7 @@ AnimIdBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 AnimIdBox.TextSize = 14
 AnimIdBox.TextColor3 = Color3.fromRGB(0, 0, 0)
 AnimIdBox.Text = ""
+AnimIdBox.PlaceholderText = "Animation Id"
 AnimIdBox.CursorPosition = -1
 AnimIdBox.Font = Enum.Font.SourceSansBold
 AnimIdBox.ClearTextOnFocus = false
@@ -729,13 +785,6 @@ UIListLayout.Wraps = true
 UIListLayout.VerticalFlex = Enum.UIFlexAlignment.SpaceBetween
 UIListLayout.Parent = TextsFrame
 
-local UIPadding = Instance.new("UIPadding")
-UIPadding.PaddingTop = UDim.new(0, 3)
-UIPadding.PaddingBottom = UDim.new(0, 3)
-UIPadding.PaddingLeft = UDim.new(0, 3)
-UIPadding.PaddingRight = UDim.new(0, 3)
-UIPadding.Parent = TextsFrame
-
 local UIStroke1 = Instance.new("UIStroke")
 UIStroke1.Thickness = 2
 UIStroke1.Parent = TextsFrame
@@ -747,14 +796,14 @@ NumberssFrame.AnchorPoint = Vector2.new(1, 0)
 NumberssFrame.Size = UDim2.new(0.4047926, 0, 0.311, 0)
 NumberssFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 NumberssFrame.BackgroundTransparency = 1
-NumberssFrame.Position = UDim2.new(0.8847926, 0, 0, 0)
+NumberssFrame.Position = UDim2.new(0, 382, 0, 0)
 NumberssFrame.BorderSizePixel = 0
 NumberssFrame.BackgroundColor3 = Color3.fromRGB(240, 255, 255)
 NumberssFrame.Parent = SaveToEmoterFrame
 
 local LayoutBox = Instance.new("TextBox")
 LayoutBox.Name = "LayoutBox"
-LayoutBox.Size = UDim2.new(0, 29, 0, 30)
+LayoutBox.Size = UDim2.new(0, 29, 0, 32)
 LayoutBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
 LayoutBox.LayoutOrder = 3
 LayoutBox.Position = UDim2.new(0.5898618, 0, 0, 0)
@@ -771,7 +820,7 @@ AddHoverText(LayoutBox, "Category number (1-Dances, 2-Actions, 3-Walk&Run, 4-Pos
 
 local FadeTimeBox = Instance.new("TextBox")
 FadeTimeBox.Name = "FadeTimeBox"
-FadeTimeBox.Size = UDim2.new(0, 57, 0, 30)
+FadeTimeBox.Size = UDim2.new(0, 57, 0, 32)
 FadeTimeBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
 FadeTimeBox.LayoutOrder = 5
 FadeTimeBox.Position = UDim2.new(0.1302317, 0, 0, 0)
@@ -788,7 +837,7 @@ AddHoverText(FadeTimeBox, "Fade Time of animation")
 
 local AnimSpeedBox = Instance.new("TextBox")
 AnimSpeedBox.Name = "AnimSpeedBox"
-AnimSpeedBox.Size = UDim2.new(0, 82, 0, 30)
+AnimSpeedBox.Size = UDim2.new(0, 87, 0, 32)
 AnimSpeedBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
 AnimSpeedBox.LayoutOrder = 6
 AnimSpeedBox.Position = UDim2.new(0.3637507, 0, 0, 0)
@@ -810,35 +859,161 @@ UIListLayout9.Wraps = true
 UIListLayout9.VerticalFlex = Enum.UIFlexAlignment.SpaceBetween
 UIListLayout9.Parent = NumberssFrame
 
-local UIPadding9 = Instance.new("UIPadding")
-UIPadding9.PaddingTop = UDim.new(0, 3)
-UIPadding9.PaddingBottom = UDim.new(0, 3)
-UIPadding9.PaddingRight = UDim.new(0, 3)
-UIPadding9.Parent = NumberssFrame
-
 local ChoosableFrame = Instance.new("Frame")
+ChoosableFrame.Parent = SaveToEmoterFrame
 ChoosableFrame.Name = "ChoosableFrame"
 ChoosableFrame.ZIndex = -1
 ChoosableFrame.AnchorPoint = Vector2.new(0, 1)
-ChoosableFrame.Size = UDim2.new(0.398, 0, 0.0283019, 65)
-ChoosableFrame.BackgroundTransparency = 1
-ChoosableFrame.Position = UDim2.new(0.48, 0, 1, 0)
-ChoosableFrame.Parent = SaveToEmoterFrame
+ChoosableFrame.Size = UDim2.new(0, 179, 0, 93)
+ChoosableFrame.Position = UDim2.new(0, 203, 0, 133)
+ChoosableFrame.BackgroundColor3 = Color3.fromRGB(240, 255, 255)
+
+local ScrollingFrameBox = Instance.new("Frame")
+ScrollingFrameBox.Name = "ScrollingFrameBox"
+ScrollingFrameBox.Size = UDim2.new(0, 53, 0, 63)
+ScrollingFrameBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ScrollingFrameBox.Position = UDim2.new(0, 3, 0, 3)
+ScrollingFrameBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ScrollingFrameBox.Parent = ChoosableFrame
+AddHoverText(ScrollingFrameBox, "Scrolling frame animation will be shown in (SPECific is recomended)")
+
+local R6Button = Instance.new("TextButton")
+R6Button.Name = "R6Button"
+R6Button.Size = UDim2.new(1, 0, 0, 20)
+R6Button.BackgroundTransparency = 1
+R6Button.TextTransparency = 1
+R6Button.Parent = ScrollingFrameBox
+
+local CheckImage = Instance.new("ImageLabel")
+CheckImage.Name = "CheckImage"
+CheckImage.AnchorPoint = Vector2.new(0, 0.5)
+CheckImage.Size = UDim2.new(0, 15, 0, 15)
+CheckImage.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CheckImage.Position = UDim2.new(0, 0, 0.5, 0)
+CheckImage.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CheckImage.ImageColor3 = Color3.fromRGB(0, 0, 0)
+CheckImage.Parent = R6Button
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 5)
+UIListLayout.Parent = R6Button
+
+local TextLabel = Instance.new("TextLabel")
+TextLabel.Size = UDim2.new(0.9500334, -10, 0, 25)
+TextLabel.BackgroundTransparency = 1
+TextLabel.Position = UDim2.new(0.115608, 0, 0, 0)
+TextLabel.TextSize = 14
+TextLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.Text = "R6"
+TextLabel.Font = Enum.Font.SourceSans
+TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+TextLabel.Parent = R6Button
+
+local UIPadding = Instance.new("UIPadding")
+UIPadding.PaddingBottom = UDim.new(0, 2)
+UIPadding.Parent = TextLabel
+
+local R15Button = Instance.new("TextButton")
+R15Button.Name = "R15Button"
+R15Button.Size = UDim2.new(1, 0, 0, 20)
+R15Button.BackgroundTransparency = 1
+R15Button.TextTransparency = 1
+R15Button.Parent = ScrollingFrameBox
+
+local CheckImage1 = Instance.new("ImageLabel")
+CheckImage1.Name = "CheckImage"
+CheckImage1.AnchorPoint = Vector2.new(0, 0.5)
+CheckImage1.Size = UDim2.new(0, 15, 0, 15)
+CheckImage1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CheckImage1.Position = UDim2.new(0, 0, 0.5, 0)
+CheckImage1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CheckImage1.ImageColor3 = Color3.fromRGB(0, 0, 0)
+CheckImage1.Parent = R15Button
+
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Parent = CheckImage1
 
 local UIListLayout1 = Instance.new("UIListLayout")
 UIListLayout1.FillDirection = Enum.FillDirection.Horizontal
 UIListLayout1.VerticalAlignment = Enum.VerticalAlignment.Center
 UIListLayout1.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout1.Wraps = true
-UIListLayout1.VerticalFlex = Enum.UIFlexAlignment.SpaceBetween
 UIListLayout1.Padding = UDim.new(0, 5)
-UIListLayout1.Parent = ChoosableFrame
+UIListLayout1.Parent = R15Button
+
+local TextLabel1 = Instance.new("TextLabel")
+TextLabel1.Size = UDim2.new(0.9500334, -10, 0, 25)
+TextLabel1.BackgroundTransparency = 1
+TextLabel1.Position = UDim2.new(0.115608, 0, 0, 0)
+TextLabel1.TextSize = 14
+TextLabel1.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel1.Text = "R15"
+TextLabel1.Font = Enum.Font.SourceSans
+TextLabel1.TextXAlignment = Enum.TextXAlignment.Left
+TextLabel1.Parent = R15Button
+
+local UIPadding1 = Instance.new("UIPadding")
+UIPadding1.PaddingBottom = UDim.new(0, 2)
+UIPadding1.Parent = TextLabel1
+
+local SpecificButton = Instance.new("TextButton")
+SpecificButton.Name = "SpecificButton"
+SpecificButton.Size = UDim2.new(1, 0, 0, 20)
+SpecificButton.LayoutOrder = 2
+SpecificButton.BackgroundTransparency = 1
+SpecificButton.TextTransparency = 1
+SpecificButton.Parent = ScrollingFrameBox
+
+local CheckImage2 = Instance.new("ImageLabel")
+CheckImage2.Name = "CheckImage"
+CheckImage2.AnchorPoint = Vector2.new(0, 0.5)
+CheckImage2.Size = UDim2.new(0, 15, 0, 15)
+CheckImage2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CheckImage2.Position = UDim2.new(0, 0, 0.5, 0)
+CheckImage2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CheckImage2.Image = "rbxassetid://130396712201457"
+CheckImage2.ImageColor3 = Color3.fromRGB(0, 0, 0)
+CheckImage2.Parent = SpecificButton
+
+local UIListLayout2 = Instance.new("UIListLayout")
+UIListLayout2.FillDirection = Enum.FillDirection.Horizontal
+UIListLayout2.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout2.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout2.Padding = UDim.new(0, 5)
+UIListLayout2.Parent = SpecificButton
+
+local TextLabel2 = Instance.new("TextLabel")
+TextLabel2.Size = UDim2.new(0.9500334, -10, 0, 25)
+TextLabel2.BackgroundTransparency = 1
+TextLabel2.Position = UDim2.new(0.115608, 0, 0, 0)
+TextLabel2.TextSize = 14
+TextLabel2.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel2.Text = "Spec"
+TextLabel2.Font = Enum.Font.SourceSans
+TextLabel2.TextXAlignment = Enum.TextXAlignment.Left
+TextLabel2.Parent = SpecificButton
+
+local UIPadding2 = Instance.new("UIPadding")
+UIPadding2.PaddingBottom = UDim.new(0, 2)
+UIPadding2.Parent = TextLabel2
+
+local UIListLayout3 = Instance.new("UIListLayout")
+UIListLayout3.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout3.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout3.Parent = ScrollingFrameBox
+
+local UIStroke1 = Instance.new("UIStroke")
+UIStroke1.Thickness = 2
+UIStroke1.Parent = ChoosableFrame
 
 local PriorityBox = Instance.new("Frame")
 PriorityBox.Name = "PriorityBox"
-PriorityBox.Size = UDim2.new(0, 62, 0, 45)
+PriorityBox.Size = UDim2.new(0, 116, 0, 21)
 PriorityBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
 PriorityBox.LayoutOrder = 1
+PriorityBox.Position = UDim2.new(0, 60, 0, 3)
 PriorityBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 PriorityBox.Parent = ChoosableFrame
 AddHoverText(PriorityBox, "Priority of animation")
@@ -850,39 +1025,38 @@ LowButton.BackgroundTransparency = 1
 LowButton.TextTransparency = 1
 LowButton.Parent = PriorityBox
 
-local CheckImage = Instance.new("ImageLabel")
-CheckImage.Name = "CheckImage"
-CheckImage.AnchorPoint = Vector2.new(0, 0.5)
-CheckImage.Size = UDim2.new(0, 15, 0, 15)
-CheckImage.BorderColor3 = Color3.fromRGB(0, 0, 0)
-CheckImage.BorderSizePixel = 1
-CheckImage.Position = UDim2.new(0, 0, 0.5, 0)
-CheckImage.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-CheckImage.Image = "rbxassetid://130396712201457"
-CheckImage.ImageColor3 = Color3.fromRGB(0, 0, 0)
-CheckImage.Parent = LowButton
+local CheckImage4 = Instance.new("ImageLabel")
+CheckImage4.Name = "CheckImage"
+CheckImage4.AnchorPoint = Vector2.new(0, 0.5)
+CheckImage4.Size = UDim2.new(0, 15, 0, 15)
+CheckImage4.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CheckImage4.Position = UDim2.new(0, 0, 0.5, 0)
+CheckImage4.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CheckImage4.Image = "rbxassetid://130396712201457"
+CheckImage4.ImageColor3 = Color3.fromRGB(0, 0, 0)
+CheckImage4.Parent = LowButton
 
-local UIListLayout2 = Instance.new("UIListLayout")
-UIListLayout2.FillDirection = Enum.FillDirection.Horizontal
-UIListLayout2.VerticalAlignment = Enum.VerticalAlignment.Center
-UIListLayout2.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout2.Padding = UDim.new(0, 5)
-UIListLayout2.Parent = LowButton
+local UIListLayout6 = Instance.new("UIListLayout")
+UIListLayout6.FillDirection = Enum.FillDirection.Horizontal
+UIListLayout6.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout6.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout6.Padding = UDim.new(0, 5)
+UIListLayout6.Parent = LowButton
 
-local TextLabel = Instance.new("TextLabel")
-TextLabel.Size = UDim2.new(0.9500334, -10, 0, 25)
-TextLabel.BackgroundTransparency = 1
-TextLabel.Position = UDim2.new(0.115608, 0, 0, 0)
-TextLabel.TextSize = 14
-TextLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
-TextLabel.Text = "Low"
-TextLabel.Font = Enum.Font.SourceSans
-TextLabel.TextXAlignment = Enum.TextXAlignment.Left
-TextLabel.Parent = LowButton
+local TextLabel4 = Instance.new("TextLabel")
+TextLabel4.Size = UDim2.new(0.9500334, -10, 0, 25)
+TextLabel4.BackgroundTransparency = 1
+TextLabel4.Position = UDim2.new(0.115608, 0, 0, 0)
+TextLabel4.TextSize = 14
+TextLabel4.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel4.Text = "Low"
+TextLabel4.Font = Enum.Font.SourceSans
+TextLabel4.TextXAlignment = Enum.TextXAlignment.Left
+TextLabel4.Parent = LowButton
 
-local UIPadding1 = Instance.new("UIPadding")
-UIPadding1.PaddingBottom = UDim.new(0, 2)
-UIPadding1.Parent = TextLabel
+local UIPadding7 = Instance.new("UIPadding")
+UIPadding7.PaddingBottom = UDim.new(0, 2)
+UIPadding7.Parent = TextLabel4
 
 local HighButton = Instance.new("TextButton")
 HighButton.Name = "HighButton"
@@ -891,204 +1065,257 @@ HighButton.BackgroundTransparency = 1
 HighButton.TextTransparency = 1
 HighButton.Parent = PriorityBox
 
-local CheckImage1 = Instance.new("ImageLabel")
-CheckImage1.Name = "CheckImage"
-CheckImage1.AnchorPoint = Vector2.new(0, 0.5)
-CheckImage1.Size = UDim2.new(0, 15, 0, 15)
-CheckImage1.BorderColor3 = Color3.fromRGB(0, 0, 0)
-CheckImage1.BorderSizePixel = 1
-CheckImage1.Position = UDim2.new(0, 0, 0.5, 0)
-CheckImage1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-CheckImage1.ImageColor3 = Color3.fromRGB(0, 0, 0)
-CheckImage1.Parent = HighButton
-
-local UIListLayout3 = Instance.new("UIListLayout")
-UIListLayout3.FillDirection = Enum.FillDirection.Horizontal
-UIListLayout3.VerticalAlignment = Enum.VerticalAlignment.Center
-UIListLayout3.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout3.Padding = UDim.new(0, 5)
-UIListLayout3.Parent = HighButton
-
-local TextLabel1 = Instance.new("TextLabel")
-TextLabel1.Size = UDim2.new(0.9500334, -10, 0, 25)
-TextLabel1.BackgroundTransparency = 1
-TextLabel1.Position = UDim2.new(0.115608, 0, 0, 0)
-TextLabel1.TextSize = 14
-TextLabel1.TextColor3 = Color3.fromRGB(0, 0, 0)
-TextLabel1.Text = "High"
-TextLabel1.Font = Enum.Font.SourceSans
-TextLabel1.TextXAlignment = Enum.TextXAlignment.Left
-TextLabel1.Parent = HighButton
-
-local UIPadding2 = Instance.new("UIPadding")
-UIPadding2.PaddingBottom = UDim.new(0, 2)
-UIPadding2.Parent = TextLabel1
-
-local UIPadding3 = Instance.new("UIPadding")
-UIPadding3.PaddingLeft = UDim.new(0, 5)
-UIPadding3.Parent = PriorityBox
-
-local UIListLayout4 = Instance.new("UIListLayout")
-UIListLayout4.VerticalAlignment = Enum.VerticalAlignment.Center
-UIListLayout4.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout4.Parent = PriorityBox
-
-local ScrollingFrameBox = Instance.new("Frame")
-ScrollingFrameBox.Name = "ScrollingFrameBox"
-ScrollingFrameBox.Size = UDim2.new(0, 56, 1, 0)
-ScrollingFrameBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
-ScrollingFrameBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-ScrollingFrameBox.Parent = ChoosableFrame
-AddHoverText(ScrollingFrameBox, "Scrolling frame animation will be shown in (SPECific one is recomended)")
-
-local R6Button = Instance.new("TextButton")
-R6Button.Name = "R6Button"
-R6Button.Size = UDim2.new(1, 0, 0, 20)
-R6Button.BackgroundTransparency = 1
-R6Button.TextTransparency = 1
-R6Button.Parent = ScrollingFrameBox
-
-local CheckImage2 = Instance.new("ImageLabel")
-CheckImage2.Name = "CheckImage"
-CheckImage2.AnchorPoint = Vector2.new(0, 0.5)
-CheckImage2.Size = UDim2.new(0, 15, 0, 15)
-CheckImage2.BorderColor3 = Color3.fromRGB(0, 0, 0)
-CheckImage2.BorderSizePixel = 1
-CheckImage2.Position = UDim2.new(0, 0, 0.5, 0)
-CheckImage2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-CheckImage2.ImageColor3 = Color3.fromRGB(0, 0, 0)
-CheckImage2.Parent = R6Button
-
-local UIListLayout5 = Instance.new("UIListLayout")
-UIListLayout5.FillDirection = Enum.FillDirection.Horizontal
-UIListLayout5.VerticalAlignment = Enum.VerticalAlignment.Center
-UIListLayout5.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout5.Padding = UDim.new(0, 5)
-UIListLayout5.Parent = R6Button
-
-local TextLabel2 = Instance.new("TextLabel")
-TextLabel2.Size = UDim2.new(0.9500334, -10, 0, 25)
-TextLabel2.BackgroundTransparency = 1
-TextLabel2.Position = UDim2.new(0.115608, 0, 0, 0)
-TextLabel2.TextSize = 14
-TextLabel2.TextColor3 = Color3.fromRGB(0, 0, 0)
-TextLabel2.Text = "R6"
-TextLabel2.Font = Enum.Font.SourceSans
-TextLabel2.TextXAlignment = Enum.TextXAlignment.Left
-TextLabel2.Parent = R6Button
-
-local UIPadding4 = Instance.new("UIPadding")
-UIPadding4.PaddingBottom = UDim.new(0, 2)
-UIPadding4.Parent = TextLabel2
-
-local R15Button = Instance.new("TextButton")
-R15Button.Name = "R15Button"
-R15Button.Size = UDim2.new(1, 0, 0, 20)
-R15Button.BackgroundTransparency = 1
-R15Button.TextTransparency = 1
-R15Button.Parent = ScrollingFrameBox
-
-local CheckImage3 = Instance.new("ImageLabel")
-CheckImage3.Name = "CheckImage"
-CheckImage3.AnchorPoint = Vector2.new(0, 0.5)
-CheckImage3.Size = UDim2.new(0, 15, 0, 15)
-CheckImage3.BorderColor3 = Color3.fromRGB(0, 0, 0)
-CheckImage3.BorderSizePixel = 1
-CheckImage3.Position = UDim2.new(0, 0, 0.5, 0)
-CheckImage3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-CheckImage3.ImageColor3 = Color3.fromRGB(0, 0, 0)
-CheckImage3.Parent = R15Button
-
-local UIStroke5 = Instance.new("UIStroke")
-UIStroke5.Parent = CheckImage3
-
-local UIListLayout6 = Instance.new("UIListLayout")
-UIListLayout6.FillDirection = Enum.FillDirection.Horizontal
-UIListLayout6.VerticalAlignment = Enum.VerticalAlignment.Center
-UIListLayout6.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout6.Padding = UDim.new(0, 5)
-UIListLayout6.Parent = R15Button
-
-local TextLabel3 = Instance.new("TextLabel")
-TextLabel3.Size = UDim2.new(0.9500334, -10, 0, 25)
-TextLabel3.BackgroundTransparency = 1
-TextLabel3.Position = UDim2.new(0.115608, 0, 0, 0)
-TextLabel3.TextSize = 14
-TextLabel3.TextColor3 = Color3.fromRGB(0, 0, 0)
-TextLabel3.Text = "R15"
-TextLabel3.Font = Enum.Font.SourceSans
-TextLabel3.TextXAlignment = Enum.TextXAlignment.Left
-TextLabel3.Parent = R15Button
-
-local UIPadding5 = Instance.new("UIPadding")
-UIPadding5.PaddingBottom = UDim.new(0, 2)
-UIPadding5.Parent = TextLabel3
-
-local SpecificButton = Instance.new("TextButton")
-SpecificButton.Name = "SpecificButton"
-SpecificButton.Size = UDim2.new(1, 0, 0, 20)
-SpecificButton.LayoutOrder = 2
-SpecificButton.BackgroundTransparency = 1
-SpecificButton.TextTransparency = 1
-SpecificButton.Parent = ScrollingFrameBox
-
-local CheckImage4 = Instance.new("ImageLabel")
-CheckImage4.Name = "CheckImage"
-CheckImage4.AnchorPoint = Vector2.new(0, 0.5)
-CheckImage4.Size = UDim2.new(0, 15, 0, 15)
-CheckImage4.BorderColor3 = Color3.fromRGB(0, 0, 0)
-CheckImage4.BorderSizePixel = 1
-CheckImage4.Position = UDim2.new(0, 0, 0.5, 0)
-CheckImage4.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-CheckImage4.Image = "rbxassetid://130396712201457"
-CheckImage4.ImageColor3 = Color3.fromRGB(0, 0, 0)
-CheckImage4.Parent = SpecificButton
+local CheckImage5 = Instance.new("ImageLabel")
+CheckImage5.Name = "CheckImage"
+CheckImage5.AnchorPoint = Vector2.new(0, 0.5)
+CheckImage5.Size = UDim2.new(0, 15, 0, 15)
+CheckImage5.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CheckImage5.Position = UDim2.new(0, 0, 0.5, 0)
+CheckImage5.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CheckImage5.ImageColor3 = Color3.fromRGB(0, 0, 0)
+CheckImage5.Parent = HighButton
 
 local UIListLayout7 = Instance.new("UIListLayout")
 UIListLayout7.FillDirection = Enum.FillDirection.Horizontal
 UIListLayout7.VerticalAlignment = Enum.VerticalAlignment.Center
 UIListLayout7.SortOrder = Enum.SortOrder.LayoutOrder
 UIListLayout7.Padding = UDim.new(0, 5)
-UIListLayout7.Parent = SpecificButton
+UIListLayout7.Parent = HighButton
 
-local TextLabel4 = Instance.new("TextLabel")
-TextLabel4.Size = UDim2.new(0.9500334, -10, 0, 25)
-TextLabel4.BackgroundTransparency = 1
-TextLabel4.Position = UDim2.new(0.115608, 0, 0, 0)
-TextLabel4.TextSize = 14
-TextLabel4.TextColor3 = Color3.fromRGB(0, 0, 0)
-TextLabel4.Text = "Spec"
-TextLabel4.Font = Enum.Font.SourceSans
-TextLabel4.TextXAlignment = Enum.TextXAlignment.Left
-TextLabel4.Parent = SpecificButton
-
-local UIPadding6 = Instance.new("UIPadding")
-UIPadding6.PaddingBottom = UDim.new(0, 2)
-UIPadding6.Parent = TextLabel4
-
-local UIListLayout8 = Instance.new("UIListLayout")
-UIListLayout8.VerticalAlignment = Enum.VerticalAlignment.Center
-UIListLayout8.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout8.Parent = ScrollingFrameBox
-
-local UIPadding7 = Instance.new("UIPadding")
-UIPadding7.PaddingLeft = UDim.new(0, 5)
-UIPadding7.Parent = ScrollingFrameBox
+local TextLabel5 = Instance.new("TextLabel")
+TextLabel5.Size = UDim2.new(0.9500334, -10, 0, 25)
+TextLabel5.BackgroundTransparency = 1
+TextLabel5.Position = UDim2.new(0.115608, 0, 0, 0)
+TextLabel5.TextSize = 14
+TextLabel5.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel5.Text = "High"
+TextLabel5.Font = Enum.Font.SourceSans
+TextLabel5.TextXAlignment = Enum.TextXAlignment.Left
+TextLabel5.Parent = HighButton
 
 local UIPadding8 = Instance.new("UIPadding")
-UIPadding8.PaddingBottom = UDim.new(0, 3)
-UIPadding8.Parent = ChoosableFrame
+UIPadding8.PaddingBottom = UDim.new(0, 2)
+UIPadding8.Parent = TextLabel5
+
+local UIListLayout8 = Instance.new("UIListLayout")
+UIListLayout8.FillDirection = Enum.FillDirection.Horizontal
+UIListLayout8.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout8.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout8.HorizontalFlex = Enum.UIFlexAlignment.Fill
+UIListLayout8.Parent = PriorityBox
 
 local LoopBox = Instance.new("ImageButton")
 LoopBox.Name = "LoopBox"
-LoopBox.Size = UDim2.new(0, 40, 0, 40)
+LoopBox.Size = UDim2.new(0, 53, 0, 20)
 LoopBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
 LoopBox.LayoutOrder = 2
-LoopBox.BackgroundColor3 = Color3.new(0, 1, 0)
+LoopBox.Position = UDim2.new(0, 3, 0, 70)
+LoopBox.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+LoopBox.ScaleType = Enum.ScaleType.Fit
 LoopBox.ImageColor3 = Color3.fromRGB(0, 0, 0)
 LoopBox.Image = "rbxassetid://127077202039990"
 LoopBox.Parent = ChoosableFrame
-AddHoverText(LoopBox, "Loopable animation")
+AddHoverText(LoopBox, "Make animation looped")
+
+local PausedBox = Instance.new("Frame")
+PausedBox.Name = "PausedBox"
+PausedBox.Size = UDim2.new(0, 116, 0, 21)
+PausedBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+PausedBox.LayoutOrder = 1
+PausedBox.Position = UDim2.new(0, 60, 0, 25)
+PausedBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+PausedBox.Parent = ChoosableFrame
+AddHoverText(PausedBox, "Animation will automatically stop on selected TimePosition. (Default is 1)")
+
+local PauseButton = Instance.new("TextButton")
+PauseButton.Name = "PauseButton"
+PauseButton.Size = UDim2.new(1, 0, 1, 0)
+PauseButton.BackgroundTransparency = 1
+PauseButton.TextTransparency = 1
+PauseButton.Parent = PausedBox
+
+local CheckImage3 = Instance.new("ImageLabel")
+CheckImage3.Name = "CheckImage"
+CheckImage3.AnchorPoint = Vector2.new(0, 0.5)
+CheckImage3.Size = UDim2.new(0, 15, 0, 15)
+CheckImage3.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CheckImage3.Position = UDim2.new(0, 0, 0.5, 0)
+CheckImage3.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CheckImage3.ImageColor3 = Color3.fromRGB(0, 0, 0)
+CheckImage3.Parent = PauseButton
+
+local UIListLayout4 = Instance.new("UIListLayout")
+UIListLayout4.FillDirection = Enum.FillDirection.Horizontal
+UIListLayout4.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout4.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout4.Padding = UDim.new(0, 5)
+UIListLayout4.Parent = PauseButton
+
+local TextLabel3 = Instance.new("TextLabel")
+TextLabel3.Size = UDim2.new(0.5176986, -10, 0, 25)
+TextLabel3.BackgroundTransparency = 1
+TextLabel3.Position = UDim2.new(0.1769901, 0, -0.0952381, 0)
+TextLabel3.TextSize = 14
+TextLabel3.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel3.Text = "Pause"
+TextLabel3.Font = Enum.Font.SourceSans
+TextLabel3.TextXAlignment = Enum.TextXAlignment.Left
+TextLabel3.Parent = PauseButton
+
+local UIPadding5 = Instance.new("UIPadding")
+UIPadding5.PaddingBottom = UDim.new(0, 2)
+UIPadding5.Parent = TextLabel3
+
+local PausedTextBox = Instance.new("TextBox")
+PausedTextBox.Name = "PausedTextBox"
+PausedTextBox.Size = UDim2.new(0, 40, 1, 0)
+PausedTextBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+PausedTextBox.Position = UDim2.new(0.6220715, 0, -0.125, 0)
+PausedTextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+PausedTextBox.TextSize = 14
+PausedTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+PausedTextBox.PlaceholderText = "1"
+PausedTextBox.Text = ""
+PausedTextBox.CursorPosition = -1
+PausedTextBox.Font = Enum.Font.SourceSans
+PausedTextBox.ClearTextOnFocus = false
+PausedTextBox.TextScaled = true
+PausedTextBox.Parent = PauseButton
+
+local UIListLayout5 = Instance.new("UIListLayout")
+UIListLayout5.FillDirection = Enum.FillDirection.Horizontal
+UIListLayout5.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout5.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout5.HorizontalFlex = Enum.UIFlexAlignment.Fill
+UIListLayout5.Parent = PausedBox
+
+local RunningBox = Instance.new("Frame")
+RunningBox.Name = "RunningBox"
+RunningBox.Size = UDim2.new(0, 116, 0, 21)
+RunningBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+RunningBox.LayoutOrder = 1
+RunningBox.Position = UDim2.new(0, 60, 0, 47)
+RunningBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+RunningBox.Parent = ChoosableFrame
+AddHoverText(RunningBox, "'Running' animation type. Number is a minimum WalkSpeed needed for animation to play (Default is 0)")
+
+local RunningButton = Instance.new("TextButton")
+RunningButton.Name = "RunningButton"
+RunningButton.Size = UDim2.new(1, 0, 1, 0)
+RunningButton.BackgroundTransparency = 1
+RunningButton.TextTransparency = 1
+RunningButton.Parent = RunningBox
+
+local CheckImage6 = Instance.new("ImageLabel")
+CheckImage6.Name = "CheckImage"
+CheckImage6.AnchorPoint = Vector2.new(0, 0.5)
+CheckImage6.Size = UDim2.new(0, 15, 0, 15)
+CheckImage6.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CheckImage6.Position = UDim2.new(0, 0, 0.5, 0)
+CheckImage6.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CheckImage6.ImageColor3 = Color3.fromRGB(0, 0, 0)
+CheckImage6.Parent = RunningButton
+
+local UIListLayout9 = Instance.new("UIListLayout")
+UIListLayout9.FillDirection = Enum.FillDirection.Horizontal
+UIListLayout9.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout9.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout9.Padding = UDim.new(0, 5)
+UIListLayout9.Parent = RunningButton
+
+local TextLabel6 = Instance.new("TextLabel")
+TextLabel6.Size = UDim2.new(0.5176986, -10, 0, 25)
+TextLabel6.BackgroundTransparency = 1
+TextLabel6.Position = UDim2.new(0.1769901, 0, -0.0952381, 0)
+TextLabel6.TextSize = 14
+TextLabel6.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel6.Text = "Running"
+TextLabel6.Font = Enum.Font.SourceSans
+TextLabel6.TextXAlignment = Enum.TextXAlignment.Left
+TextLabel6.Parent = RunningButton
+
+local UIPadding10 = Instance.new("UIPadding")
+UIPadding10.PaddingBottom = UDim.new(0, 2)
+UIPadding10.Parent = TextLabel6
+
+local RunningTextBox = Instance.new("TextBox")
+RunningTextBox.Name = "RunningTextBox"
+RunningTextBox.Size = UDim2.new(0, 40, 1, 0)
+RunningTextBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+RunningTextBox.Position = UDim2.new(0.6220715, 0, -0.125, 0)
+RunningTextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+RunningTextBox.TextSize = 14
+RunningTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+RunningTextBox.PlaceholderText = "0"
+RunningTextBox.Text = ""
+RunningTextBox.CursorPosition = -1
+RunningTextBox.Font = Enum.Font.SourceSans
+RunningTextBox.ClearTextOnFocus = false
+RunningTextBox.TextScaled = true
+RunningTextBox.Parent = RunningButton
+
+local UIListLayout10 = Instance.new("UIListLayout")
+UIListLayout10.FillDirection = Enum.FillDirection.Horizontal
+UIListLayout10.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout10.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout10.HorizontalFlex = Enum.UIFlexAlignment.Fill
+UIListLayout10.Parent = RunningBox
+
+local IdleBox = Instance.new("Frame")
+IdleBox.Name = "IdleBox"
+IdleBox.Size = UDim2.new(0, 116, 0, 21)
+IdleBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+IdleBox.LayoutOrder = 1
+IdleBox.Position = UDim2.new(0, 60, 0, 69)
+IdleBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+IdleBox.Parent = ChoosableFrame
+AddHoverText(IdleBox, "'Idle' animation type")
+
+local IdleButton = Instance.new("TextButton")
+IdleButton.Name = "IdleButton"
+IdleButton.Size = UDim2.new(1, 0, 1, 0)
+IdleButton.BackgroundTransparency = 1
+IdleButton.TextTransparency = 1
+IdleButton.Parent = IdleBox
+
+local CheckImage7 = Instance.new("ImageLabel")
+CheckImage7.Name = "CheckImage"
+CheckImage7.AnchorPoint = Vector2.new(0, 0.5)
+CheckImage7.Size = UDim2.new(0, 15, 0, 15)
+CheckImage7.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CheckImage7.Position = UDim2.new(0, 0, 0.5, 0)
+CheckImage7.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CheckImage7.ImageColor3 = Color3.fromRGB(0, 0, 0)
+CheckImage7.Parent = IdleButton
+
+local UIListLayout11 = Instance.new("UIListLayout")
+UIListLayout11.FillDirection = Enum.FillDirection.Horizontal
+UIListLayout11.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout11.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout11.Padding = UDim.new(0, 5)
+UIListLayout11.Parent = IdleButton
+
+local TextLabel7 = Instance.new("TextLabel")
+TextLabel7.Size = UDim2.new(0.5176986, -10, 0, 25)
+TextLabel7.BackgroundTransparency = 1
+TextLabel7.Position = UDim2.new(0.1769901, 0, -0.0952381, 0)
+TextLabel7.TextSize = 14
+TextLabel7.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel7.Text = "Idle"
+TextLabel7.Font = Enum.Font.SourceSans
+TextLabel7.TextXAlignment = Enum.TextXAlignment.Left
+TextLabel7.Parent = IdleButton
+
+local UIPadding12 = Instance.new("UIPadding")
+UIPadding12.PaddingBottom = UDim.new(0, 2)
+UIPadding12.Parent = TextLabel7
+
+local UIListLayout12 = Instance.new("UIListLayout")
+UIListLayout12.FillDirection = Enum.FillDirection.Horizontal
+UIListLayout12.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout12.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout12.HorizontalFlex = Enum.UIFlexAlignment.Fill
+UIListLayout12.Parent = IdleBox
 
 local PlayableAnimSaveButton = Instance.new("ImageButton")
 PlayableAnimSaveButton.Name = "PlayableAnimSaveButton"
@@ -1140,10 +1367,10 @@ AddHoverText(ToolActionSaveButton, "Save anim to ToolActionAnims Whitelist")
 
 
 -- UI Decorations
-local UiCornerParts = {"LaunchEmoterButton", "SaveToEmoterButton", "GuiTopFrame", "DestroyGUI", "GuiBottomFrame", "CharStartButton", "ObjectStartButton", "ModelValue", "ObjectModelValue", "ViewportFrame", "AnimTypeButton", "DetectDefaultAnimsButton"}
-local UiStrokeParts = {"PlayableAnimSaveButton", "DefaultAnimSaveButton", "ToolIdleSaveButton", "ToolActionSaveButton", "GuiTopFrame", "GuiBottomFrame", "CharStartButton", "ObjectStartButton", "ModelValue", "ObjectModelValue", "ResultsListFrame", "AnimObjResultsListFrame", "ExportButton"}
-local UiStroke1Parts = {"ModelValue", "ModelValue", "ObjectModelValue"}
-local UiGradientParts = {"LaunchEmoterButton", "PlayableAnimSaveButton", "DefaultAnimSaveButton", "ToolIdleSaveButton", "ToolActionSaveButton", "SaveToEmoterButton", "GuiTopFrame", "GuiBottomFrame", "DestroyGUI", "CharStartButton", "ObjectStartButton", "AnimTypeButton", "DetectDefaultAnimsButton", "ExportButton"}
+local UiCornerParts = {"SideFrame", "OpenGUI", "CloseGUI", "LaunchEmoterButton", "SaveToEmoterButton", "GuiTopFrame", "DestroyGUI", "GuiBottomFrame", "CharStartButton", "ObjectStartButton", "ModelValue", "ObjectModelValue", "ViewportFrame", "AnimTypeButton", "DetectDefaultAnimsButton"}
+local UiStrokeParts = {"SideFrame", "PlayableAnimSaveButton", "DefaultAnimSaveButton", "ToolIdleSaveButton", "ToolActionSaveButton", "GuiTopFrame", "GuiBottomFrame", "CharStartButton", "ObjectStartButton", "ResultsListFrame", "AnimObjResultsListFrame", "ExportButton"}
+local UiStroke1Parts = {"ModelValue", "ObjectModelValue"}
+local UiGradientParts = {"SideFrame", "OpenGUI", "CloseGUI", "LaunchEmoterButton", "PlayableAnimSaveButton", "DefaultAnimSaveButton", "ToolIdleSaveButton", "ToolActionSaveButton", "SaveToEmoterButton", "GuiTopFrame", "GuiBottomFrame", "DestroyGUI", "CharStartButton", "ObjectStartButton", "AnimTypeButton", "DetectDefaultAnimsButton", "ExportButton"}
 for _, UiPart in ipairs(AnimIdDetector:GetDescendants()) do
 	if table.find(UiCornerParts, UiPart.Name) then
 		local UICorner = Instance.new("UICorner")
@@ -1159,7 +1386,7 @@ for _, UiPart in ipairs(AnimIdDetector:GetDescendants()) do
 
 	end
 
-	if table.find(UiStrokeParts, UiPart.Name) then
+	if table.find(UiStrokeParts, UiPart.Name) or table.find(UiStroke1Parts, UiPart.Name) then
 		local UIStroke = Instance.new("UIStroke")
 		UIStroke.Parent = UiPart
 		UIStroke.Thickness = 2
@@ -1191,10 +1418,48 @@ for _, UiPart in ipairs(AnimIdDetector:GetDescendants()) do
 
 	end
 end
+local function AddUiPadding(Part, left, right, top, bottom)
+	for _, UiPart in ipairs(AnimIdDetector:GetDescendants()) do
+		if UiPart.Name == Part then
+			local UIPadding = Instance.new("UIPadding")
+			UIPadding.PaddingLeft = UDim.new(0, left)
+			UIPadding.PaddingRight = UDim.new(0, right)
+			UIPadding.PaddingTop = UDim.new(0, top)
+			UIPadding.PaddingBottom = UDim.new(0, bottom)
+			UIPadding.Parent = UiPart
+		end
+	end
+end
+
+AddUiPadding("ResultsListFrame",5,16,5,5)
+AddUiPadding("AnimObjResultsListFrame",5,16,5,5)
+AddUiPadding("ModelValue",2,2)
+AddUiPadding("GuiBottomFrame",3)
+AddUiPadding("TextsFrame",3,3,3,3)
+AddUiPadding("NumberssFrame",0,2,3,3)
+AddUiPadding("ScrollingFrameBox",4)
+AddUiPadding("ChoosableFrame",0,0,0,3)
+AddUiPadding("PausedBox",3)
+AddUiPadding("PriorityBox",3)
+AddUiPadding("RunningBox",3)
+AddUiPadding("IdleBox",3)
 
 
 -- Functions
+OpenGUI.MouseButton1Click:connect(function()
+	MainFrame.Visible = true
+	SideFrame.Visible = false
+	MainFrame.Position = SideFrame.Position
+end)
+CloseGUI.MouseButton1Click:connect(function()
+	MainFrame.Visible = false
+	SideFrame.Visible = true
+	SideFrame.Position = MainFrame.Position
+end)
 DestroyGUI.MouseButton1Click:connect(function()
+	AnimIdDetector:Destroy()
+end)
+SFDestroyGUI.MouseButton1Click:connect(function()
 	AnimIdDetector:Destroy()
 end)
 
@@ -1249,19 +1514,55 @@ SpecificButton.MouseButton1Click:Connect(function()
 end)
 
 LowButton.MouseButton1Click:Connect(function()
-	AnimType = "PriorLow"
+	Priority = "PriorLow"
 	LowButton.CheckImage.Image = "rbxassetid://130396712201457"
 	HighButton.CheckImage.Image = ""
 end)
 HighButton.MouseButton1Click:Connect(function()
-	AnimType = "PriorHigh"
+	Priority = "PriorHigh"
 	LowButton.CheckImage.Image = ""
 	HighButton.CheckImage.Image = "rbxassetid://130396712201457"
 end)
 
+PauseButton.MouseButton1Click:Connect(function()
+	PausedValue = not PausedValue
+	if PausedValue == true then
+		PauseButton.CheckImage.Image = "rbxassetid://130396712201457"
+	else 
+		PauseButton.CheckImage.Image = ""
+	end
+	RunningValue = false
+	IdleValue = false
+	RunningButton.CheckImage.Image = ""
+	IdleButton.CheckImage.Image = ""
+end)
+RunningButton.MouseButton1Click:Connect(function()
+	RunningValue = not RunningValue
+	if RunningValue == true then
+		RunningButton.CheckImage.Image = "rbxassetid://130396712201457"
+	else 
+		RunningButton.CheckImage.Image = ""
+	end
+	PausedValue = false
+	IdleValue = false
+	PauseButton.CheckImage.Image = ""
+	IdleButton.CheckImage.Image = ""
+end)
+IdleButton.MouseButton1Click:Connect(function()
+	IdleValue = not IdleValue
+	if IdleValue == true then
+		IdleButton.CheckImage.Image = "rbxassetid://130396712201457"
+	else 
+		IdleButton.CheckImage.Image = ""
+	end
+	PausedValue = false
+	RunningValue = false
+	PauseButton.CheckImage.Image = ""
+	RunningButton.CheckImage.Image = ""
+end)
+
 LoopBox.MouseButton1Click:Connect(function()
 	Looped = not Looped
-	print(Looped)
 	if Looped then
 		LoopBox.BackgroundColor3 = Color3.new(0, 1, 0)
 	else
@@ -1329,7 +1630,7 @@ local function FormatJSON(data)
 	-- 6. Processing AdditionalData (В одну строку)
 	local additional = data["AdditionalData"] or {}
 	result = result .. '\t"AdditionalData": {\n\t\t'
-	
+
 	-- Сначала собираем все пары ключ-значение во временный массив
 	local pairsList = {}
 	for key, val in pairs(additional) do
@@ -1343,7 +1644,7 @@ local function FormatJSON(data)
 		end
 		table.insert(pairsList, '"' .. tostring(key) .. '": ' .. valueStr)
 	end
-	
+
 	-- Соединяем их через запятую с пробелом
 	result = result .. table.concat(pairsList, ", ")
 	result = result .. "\n\t}\n"
@@ -1357,7 +1658,7 @@ local function AddNewEmote(Category, ButtonName, ButtonText, ScrollFrameType, La
 	local folderPath = "EmoterData/SpecificAnims"
 	local targetFilePath = nil
 	local fileFound = false
-
+	
 	if AnimId == "" or AnimId == nil then
 		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error!", Text = "You need to have AnimId to add new animation!", Duration = 3})
 		return
@@ -1530,7 +1831,22 @@ local function AddNewEmote(Category, ButtonName, ButtonText, ScrollFrameType, La
 end
 
 PlayableAnimSaveButton.MouseButton1Click:Connect(function()
-	AddNewEmote("Emote", ObjectNameBox.Text, TextNameBox.Text, ScrollFrameType, tonumber(LayoutBox.Text), tonumber(AnimIdBox.Text), tonumber(FadeTimeBox.Text), tonumber(AnimSpeedBox.Text), AnimType, Looped)
+	if PausedValue == true then
+		Paused = "Pause"..PausedTextBox.Text
+	else
+		Paused = ""
+	end
+	if RunningValue == true then
+		Running = "Running"..RunningTextBox.Text
+	else
+		Running = ""
+	end
+	if IdleValue == true then
+		Idle = "Idle"
+	else
+		Idle = ""
+	end
+	AddNewEmote("Emote", ObjectNameBox.Text, TextNameBox.Text, ScrollFrameType, tonumber(LayoutBox.Text), tonumber(AnimIdBox.Text), tonumber(FadeTimeBox.Text), tonumber(AnimSpeedBox.Text), Priority..Paused..Running..Idle, Looped)
 end)
 DefaultAnimSaveButton.MouseButton1Click:Connect(function()
 	AddNewEmote("DefaultAnim", ObjectNameBox.Text, TextNameBox.Text, ScrollFrameType, LayoutBox.Text, AnimIdBox.Text, FadeTimeBox.Text, AnimSpeedBox.Text, AnimType, Looped)
@@ -1772,7 +2088,7 @@ ExportButton.MouseButton1Click:connect(function()
 		SafeMode = false, -- Kicks you before Saving, which prevents you from being detected in any game. Default: false
 		AntiIdle = true,
 		mode = "invalid",
-		FilePath = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.."_Animations_"..os.date("%d-%m-%Y_%H-%M-%S"),
+		FilePath = "AIDD Extracted"..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name.."_Animations_"..os.date("%d-%m-%Y_%H-%M-%S"),
 		Object = game.CoreGui.AnimsFolder,
 	}
 	synsaveinstance(Options)
