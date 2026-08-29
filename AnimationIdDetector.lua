@@ -1,4 +1,4 @@
---[[V3.5
+--[[V3.5.1
 AnimationIdDetector by Fixel
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
@@ -209,6 +209,8 @@ local function createUniqueObject(Object, Name, parent)
 end
 
 local function AddResult(Name, Id, Priority, ObjectPath)
+	if Id == nil or Id == "" then return end
+
 	local ResultFrame = Instance.new("Frame")
 	local PriorityText = Instance.new("TextLabel")
 	local AnimNameText = Instance.new("TextBox")
@@ -334,7 +336,9 @@ local function AddResult(Name, Id, Priority, ObjectPath)
 	UIListLayout.Parent = ResultFrame
 
 	AnimNameText.Text = Name
-	AnimIdText.Text = Id
+	if Id ~= nil or not Id == "" then
+		AnimIdText.Text = Id
+	end
 	if Priority ~= 0 then
 		PriorityText.Text = Priority
 	elseif ObjectPath ~= nil then
@@ -1859,7 +1863,6 @@ ToolActionSaveButton.MouseButton1Click:Connect(function()
 end)
 
 local function DetectPlayingAnimations()
-
 	local Humanoid = nil
 	local Animator = nil
 
