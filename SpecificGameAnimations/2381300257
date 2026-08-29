@@ -1,0 +1,41 @@
+{
+	"CustomEmotes": [
+		["FlowingBreeze", "Flowing Breeze", "Spec", 2, "13426046169", 0.1, 1, "PriorLow", false],
+		["Boppin", "Boppin", "Spec", 1, "13786623122", 0.1, 1, "PriorLow", true],
+		["Bee", "Bee", "Spec", 1, "14439211592", 0.1, 1, "PriorLow", true],
+		["Smug", "Smug", "Spec", 1, "13571433563", 0.1, 1, "PriorLow", true],
+		["Zombie", "Zombie Dance", "Spec", 1, "13571459275", 0.1, 1, "PriorLow", true],
+		["Robot", "Robot", "Spec", 1, "13426057073", 0.1, 1, "PriorLow", true],
+		["QuietWaves", "QuietWaves", "Spec", 2, "13425933399", 0.1, 1, "PriorLow", false],
+		["TPose", "T Pose", "Spec", 5, "138961294964131", 0.1, 1, "PriorLow", true],
+		["Breakdance", "Breakdance", "Spec", 1, "13426054656", 0.1, 1, "PriorLow", true],
+		["Godlike", "Godlike", "Spec", 2, "13426053788", 0.1, 1, "PriorLow", false],
+		["AroundTown", "Around Town", "Spec", 1, "13426052817", 0.1, 1, "PriorLow", true],
+		["Fashionable", "Fashionable", "Spec", 2, "13426052079", 0.1, 1, "PriorLow", true],
+		["Happy", "Happy", "Spec", 2, "13426050855", 0.1, 1, "PriorLow", true],
+		["Confused", "Confused", "Spec", 2, "13426050207", 0.1, 1, "PriorLow", false],
+		["AirDance", "AirDance", "Spec", 1, "13426049361", 0.1, 1, "PriorLow", true],
+		["HighWave", "HighWave", "Spec", 2, "13426048564", 0.1, 1, "PriorLow", true],
+		["BabyDance", "Baby Dance", "Spec", 1, "13426047769", 0.1, 1, "PriorLow", true],
+		["PowerBlast", "Power Blast", "Spec", 2, "13426047089", 0.1, 1, "PriorLow", true],
+		["Dizzy", "Dizzy", "Spec", 2, "13426045450", 0.1, 1, "PriorLow", false],
+		["FlossDance", "Floss Dance", "Spec", 1, "13426044652", 0.1, 1, "PriorLow", true],
+		["DolphinDance", "Dolphin Dance", "Spec", 1, "13426043561", 0.1, 1, "PriorLow", true],
+		["MonkeyDance", "Monkey Dance", "Spec", 1, "13426042469", 0.1, 1, "PriorLow", true],
+		["FancyFeet", "Fancy Feet", "Spec", 1, "13426041296", 0.1, 1, "PriorLow", true],
+		["HeroLand", "Hero Land", "Spec", 2, "13426040284", 0.1, 1, "PriorLow", false],
+		["ArmCircles", "Arm Circles", "Spec", 1, "13571471344", 0.1, 1, "PriorLow", true],
+		["Unlock", "Unlock", "Spec", 1, "13571500021", 0.1, 1, "PriorLow", true],
+		["Fly", "Fly", "Spec", 1, "13571481852", 0.1, 1, "PriorLow", true],
+		["Whip", "Whip", "Spec", 1, "13571447601", 0.1, 1, "PriorLow", true],
+		["Parrot", "Parrot", "Spec", 1, "13786750119", 0.1, 1, "PriorLow", true]
+	],
+	"DefaultAnims": 
+		[],
+	"ToolActionAnims": 
+		[],
+	"ToolIdleAnims": 
+		[],
+	"EmoteWheelEmotes": 
+		["R6Wave", "SpecHappy", "SpecPowerBlast", "SpecBoppin", "SpecTPose", "SpecFlossDance", "SpecUnlock", "SpecParrot"]
+}
