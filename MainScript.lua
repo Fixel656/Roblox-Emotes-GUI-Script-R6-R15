@@ -2,7 +2,7 @@
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
 
-local ScriptVersion = "V5.0.1"
+local ScriptVersion = "V5.0.2"
 local GuiActive = true
 local GuiEmoter = nil
 local AnimationHandler = "Animate"
