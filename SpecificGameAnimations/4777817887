@@ -1,0 +1,62 @@
+{
+	"CustomEmotes": [
+		["SideStepper", "Side Stepper", "Spec", 1, 16587561047, 0.1, 1, "PriorLow", true],
+		["HeadSpin", "Head Spin", "Spec", 1, 16219248889, 0.1, 1, "PriorLow", true],
+		["AbsoluteCinema", "Absolute Cinema", "Spec", 2, 128387644981822, 0.1, 1, "PriorLow", true],
+		["SnowAngel", "Snow Angel", "Spec", 2, 15516811683, 0.1, 1, "PriorLow", true],
+		["SkippingRope", "Skipping Rope (no rope)", "Spec", 2, 16691017967, 0.1, 1, "PriorLow", true],
+		["Meditate", "Meditate", "Spec", 2, 16738351181, 0.1, 1, "PriorLow", true],
+		["MakeItSnow", "Make It Snow", "Spec", 2, 15434222741, 0.1, 1, "PriorLow", true],
+		["VictoryLap", "Victory Lap", "Spec", 1, 84507368877315, 0.1, 1, "PriorLow", true],
+		["GriddleSlide", "Griddle Slide", "Spec", 1, 14351086764, 0.1, 1, "PriorLow", true],
+		["JumpShuffle", "Jump Shuffle", "Spec", 1, 14351104972, 0.1, 1, "PriorLow", true],
+		["GoCrazy", "Go Crazy", "Spec", 1, 17299144510, 0.1, 1, "PriorLow", true],
+		["VictoryVibe", "VictoryVibe", "Spec", 1, 14351118998, 0.1, 1, "PriorLow", true],
+		["DanceMoves", "DanceMoves", "Spec", 1, 15317365570, 0.1, 1, "PriorLow", true],
+		["Clapping", "Clapping", "Spec", 2, 16738357900, 0.1, 1, "PriorLow", true],
+		["Kickflip", "Kickflip", "Spec", 1, 18977514481, 0.1, 1, "PriorLow", true],
+		["Heatwave", "Heatwave", "Spec", 2, 18251759715, 0.1, 1, "PriorLow", true],
+		["ColdBreeze", "ColdBreeze", "Spec", 2, 18251754835, 0.1, 1, "PriorLow", true],
+		["GameFace", "Game Face", "Spec", 2, 108830395885649, 0.1, 1, "PriorLow", true],
+		["Running", "Running", "Spec", 3, 13772468608, 0.1, 1, "PriorLow", true],
+		["PolarRoar", "Polar Roar", "Spec", 2, 138631791714845, 0.1, 1, "PriorLow", true],
+		["Dance", "Dance", "Spec", 1, 70900520545852, 0.1, 1, "PriorLow", true],
+		["Reach", "Reach", "Spec", 1, 86275126932330, 0.1, 1, "PriorLow", true],
+		["TakeTheL", "Take The L", "Spec", 1, 14351095988, 0.1, 1, "PriorLow", true],
+		["RussianKick", "Russian Kick", "Spec", 1, 14351112547, 0.1, 1, "PriorLow", true],
+		["FlyWalk", "Fly Walk", "Spec", 3, "103908700853897", 0.1, 1, "PriorLowRunRunning", true],
+		["FlyIdle", "Fly Idle", "Spec", 4, "128190471484341", 0.1, 1, "PriorLowIdle", true],
+		["SwordSpin", "Sword Spin", "Spec", 2, "15440936174", 0.1, 1, "PriorLow", true],
+		["StrangeParry", "Strange Parry", "Spec", 5, "129518143408210", 0.1, 1, "PriorLow", true],
+		["FallenAngelFly", "FallenAngel Fly", "Spec", 3, "91724814213780", 0.1, 1, "PriorLowRunning", true],
+		["ZombieRun", "Zombie Run", "Spec", 3, "16008637550", 0.1, 1, "PriorLowRunning", true],
+		["TigerKatanaRun", "Tiger's Katana Run", "Spec", 3, "116286753905035", 0.1, 1, "PriorLowRunning", true],
+		["RegretBladesWalk", "Regret Blades Walk", "Spec", 3, "106950286517232", 0.1, 1.5, "PriorLowRunning", true],
+		["StormbaneIdle", "Stormbane Idle", "Spec", 4, "81532806022907", 0.1, 1, "PriorLowIdle", true],
+		["SnowmanFly", "Snowman Fly", "Spec", 3, "136045331002208", 0.1, 1, "PriorLowRunning", true],
+		["GreatSwordIdle", "GreatSword Idle", "Spec", 4, "17120761047", 0.1, 1, "PriorHigh", true],
+		["GravelightIdle", "Gravelight Idle", "Spec", 4, "110269014079813", 0.1, 1, "PriorLowIdle", true],
+		["GravelightRun", "Gravelight Run", "Spec", 3, "101047190761266", 0.1, 1.2, "PriorLowRunning", true],
+		["StormbaneFly", "Stormbane Fly", "Spec", 3, "111444522137590", 0.1, 1, "PriorLowRunning", true],
+		["RegretBladesIdle", "RegretBladesIdle", "Spec", 4, "115628454391509", 0.1, 1, "PriorLowIdle", true],
+		["WolfSwordRun", "Wolf Sword Run", "Spec", 3, "136551510424060", 0.1, 1, "PriorLowRunning", true],
+		["GyaruKatanaRun", "Gyaru Katana Run", "Spec", 3, "81022834948578", 0.1, 1.3, "PriorLowRunning", true],
+		["FootballIdle", "Football Idle", "Spec", 4, "138349857076910", 0.1, 1, "PriorLowIdle", true],
+		["HaloWingsIdle", "Halo Wings Idle", "Spec", 4, "129582892729195", 0.1, 1, "PriorLowIdle", true],
+		["HaloWingsFly", "HaloWings Fly", "Spec", 3, "80642553325539", 0.1, 1, "PriorLowRunning", true],
+		["Emote1228", "Emote 1228", "Spec", 1, "122578332554538", 0.1, 1, "PriorLow", true],
+		["SwordFly", "Sword Fly", "Spec", 1, "15848664404", 0.1, 1, "PriorLow", true],
+		["Breakdance", "Breakdance", "Spec", 1, "16219250574", 0.1, 1, "PriorLow", true]
+	],
+	"DefaultAnims": 
+		[],
+	"ToolActionAnims": 
+		["GrabParry", "SuccessParry", "Parry", "14379567905", "14054793477", "14054770624", "14058075715", "14783613932", "13852264110", "14730113980", "14723187666", "15439298952", "15439338073", "15439426840", "16043832607"],
+	"ToolIdleAnims": 
+		[],
+	"EmoteWheelEmotes": 
+		["SpecTakeTheL", "SpecSwordFly", "SpecVictoryLap", "SpecSideStepper", "SpecGreatSwordIdle", "SpecStormbaneIdle", "SpecStormbaneFly", "SpecHaloWingsFly"],
+	"AdditionalData": {
+		"DefaultWalkSpeed": 36
+	}
+}
