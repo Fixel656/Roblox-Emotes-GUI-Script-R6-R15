@@ -736,7 +736,7 @@ local function CreateGui()
 					if RunningTypeMinSpeedEnabled == false then
 						MinWalkSpeedNum = 0.5
 					end
-					if currentSpeed > 0.5 and Player.Character:WaitForChild("Humanoid")WalkSpeed >= MinWalkSpeedNum then
+					if currentSpeed > 0.5 and Humanoid.WalkSpeed >= MinWalkSpeedNum then
 
 						local AnimWeight = 1
 						if HigherPriorityEnabled then
@@ -4251,7 +4251,7 @@ local function CreateGui()
 			OnRestart()
 			RestartPlayer:Disconnect()
 		end
-		GuiRestarted == false
+		GuiRestarted = false
 	end)
 end
 
