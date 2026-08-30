@@ -4251,7 +4251,7 @@ local function CreateGui()
 			OnRestart()
 			RestartPlayer:Disconnect()
 		end
-		GuiRestarted = false
+		GuiRestarted = true
 	end)
 end
 
