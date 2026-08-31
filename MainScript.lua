@@ -2,7 +2,7 @@
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
 
-local ScriptVersion = "V5.0.2"
+local ScriptVersion = "V5.1"
 local GuiActive = true
 local GuiEmoter = nil
 local AnimationHandler = "Animate"
@@ -477,11 +477,6 @@ local function CreateGui()
 		Button.TextScaled = true
 		Button.LayoutOrder = LayoutPos
 
-		local UIStroke = Instance.new("UIStroke")
-		UIStroke.Parent = Button
-		UIStroke.Thickness = 1
-		UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
 		local ButtonPadding = Instance.new("UIPadding")
 		ButtonPadding.Parent = Button
 		ButtonPadding.PaddingLeft = UDim.new(0, 2)
@@ -519,9 +514,12 @@ local function CreateGui()
 		local AnimACTIVE = false
 
 		Button.Destroying:Connect(function()
-			track:Destroy()
-			Anim:Destroy()
-			Humanoid = nil
+			if GuiLoaded == false then
+				track:Destroy()
+				Anim:Destroy()
+				Humanoid = nil
+				track = nil
+			end
 		end)
 
 		local function StartAnim()
@@ -948,10 +946,13 @@ local function CreateGui()
 			end
 
 			if prefix == Frame and suffix == Button.Name then
+				print("working")
 				task.spawn(function()
 					Button:WaitForChild("UIStroke")
-					AnimACTIVE = true
-					StartAnim()
+					if Button ~= nil and LoadAnimationsOnRestart == true then
+						AnimACTIVE = true
+						StartAnim()
+					end
 				end)
 			end
 		end
@@ -3754,25 +3755,25 @@ local function CreateGui()
 			elseif categoryName == "R6EmoteWheelEmotes" and #data["EmoteWheelEmotes"] ~= 0 and RigType == "R6" then
 				print("[SpecGameAnims File]: Adding EmoteWhell Data")
 				local info = data["EmoteWheelEmotes"]
-				EmoteWheelEmotes.Emote1 = info[1]
-				EmoteWheelEmotes.Emote2 = info[2]
-				EmoteWheelEmotes.Emote3 = info[3]
-				EmoteWheelEmotes.Emote4 = info[4]
-				EmoteWheelEmotes.Emote5 = info[5]
-				EmoteWheelEmotes.Emote6 = info[6]
-				EmoteWheelEmotes.Emote7 = info[7]
-				EmoteWheelEmotes.Emote8 = info[8]
+				EmoteWheelEmotes.Emote1 = info.Emote1
+				EmoteWheelEmotes.Emote2 = info.Emote2
+				EmoteWheelEmotes.Emote3 = info.Emote3
+				EmoteWheelEmotes.Emote4 = info.Emote4
+				EmoteWheelEmotes.Emote5 = info.Emote5
+				EmoteWheelEmotes.Emote6 = info.Emote6
+				EmoteWheelEmotes.Emote7 = info.Emote7
+				EmoteWheelEmotes.Emote8 = info.Emote8
 			elseif categoryName == "R15EmoteWheelEmotes" and #data["EmoteWheelEmotes"] ~= 0 and RigType == "R15" then
 				print("[SpecGameAnims File]: Adding EmoteWhell Data")
 				local info = data["EmoteWheelEmotes"]
-				EmoteWheelEmotes.Emote1 = info[1]
-				EmoteWheelEmotes.Emote2 = info[2]
-				EmoteWheelEmotes.Emote3 = info[3]
-				EmoteWheelEmotes.Emote4 = info[4]
-				EmoteWheelEmotes.Emote5 = info[5]
-				EmoteWheelEmotes.Emote6 = info[6]
-				EmoteWheelEmotes.Emote7 = info[7]
-				EmoteWheelEmotes.Emote8 = info[8]
+				EmoteWheelEmotes.Emote1 = info.Emote1
+				EmoteWheelEmotes.Emote2 = info.Emote2
+				EmoteWheelEmotes.Emote3 = info.Emote3
+				EmoteWheelEmotes.Emote4 = info.Emote4
+				EmoteWheelEmotes.Emote5 = info.Emote5
+				EmoteWheelEmotes.Emote6 = info.Emote6
+				EmoteWheelEmotes.Emote7 = info.Emote7
+				EmoteWheelEmotes.Emote8 = info.Emote8
 			end
 		end
 		print("[CustomAnims File]: Loaded Data!")
@@ -3831,14 +3832,21 @@ local function CreateGui()
 			elseif categoryName == "EmoteWheelEmotes" and #data["EmoteWheelEmotes"] ~= 0 then
 				print("[SpecGameAnims File]: Adding EmoteWhell Data")
 				local info = data["EmoteWheelEmotes"]
-				EmoteWheelEmotes.Emote1 = info[1]
-				EmoteWheelEmotes.Emote2 = info[2]
-				EmoteWheelEmotes.Emote3 = info[3]
-				EmoteWheelEmotes.Emote4 = info[4]
-				EmoteWheelEmotes.Emote5 = info[5]
-				EmoteWheelEmotes.Emote6 = info[6]
-				EmoteWheelEmotes.Emote7 = info[7]
-				EmoteWheelEmotes.Emote8 = info[8]
+				EmoteWheelEmotes.Emote1 = info.Emote1
+				EmoteWheelEmotes.Emote2 = info.Emote2
+				EmoteWheelEmotes.Emote3 = info.Emote3
+				EmoteWheelEmotes.Emote4 = info.Emote4
+				EmoteWheelEmotes.Emote5 = info.Emote5
+				EmoteWheelEmotes.Emote6 = info.Emote6
+				EmoteWheelEmotes.Emote7 = info.Emote7
+				EmoteWheelEmotes.Emote8 = info.Emote8
+			elseif categoryName == "AdditionalData" then
+				if data["AdditionalData"].DefaultWalkSpeed then
+					DefaultWalkSpeed = data["AdditionalData"].DefaultWalkSpeed
+					print("Chaged DefaultWalkSpeed to "..DefaultWalkSpeed)
+				elseif data["AdditionalData"].AnimationHandlerName then
+					AnimationHandler = data["AdditionalData"].AnimationHandlerName
+				end
 			end
 		end
 		print("[SpecGameAnims Github]: Loaded Data!")
@@ -3919,17 +3927,17 @@ local function CreateGui()
 						table.insert(ToolIdleAnimsList, tostring(id))
 					end
 				end
-			elseif categoryName == "EmoteWheelEmotes" and #data["EmoteWheelEmotes"] ~= 0 then
+			elseif categoryName == "EmoteWheelEmotes" then
 				print("[SpecGameAnims File]: Adding EmoteWhell Data")
 				local info = data["EmoteWheelEmotes"]
-				EmoteWheelEmotes.Emote1 = info[1]
-				EmoteWheelEmotes.Emote2 = info[2]
-				EmoteWheelEmotes.Emote3 = info[3]
-				EmoteWheelEmotes.Emote4 = info[4]
-				EmoteWheelEmotes.Emote5 = info[5]
-				EmoteWheelEmotes.Emote6 = info[6]
-				EmoteWheelEmotes.Emote7 = info[7]
-				EmoteWheelEmotes.Emote8 = info[8]
+				EmoteWheelEmotes.Emote1 = info.Emote1
+				EmoteWheelEmotes.Emote2 = info.Emote2
+				EmoteWheelEmotes.Emote3 = info.Emote3
+				EmoteWheelEmotes.Emote4 = info.Emote4
+				EmoteWheelEmotes.Emote5 = info.Emote5
+				EmoteWheelEmotes.Emote6 = info.Emote6
+				EmoteWheelEmotes.Emote7 = info.Emote7
+				EmoteWheelEmotes.Emote8 = info.Emote8
 			elseif categoryName == "AdditionalData" then
 				if data["AdditionalData"].DefaultWalkSpeed then
 					DefaultWalkSpeed = data["AdditionalData"].DefaultWalkSpeed
@@ -4116,6 +4124,10 @@ local function CreateGui()
 		end
 
 		if (UiPart.Parent.Name == "ScrollingFrame" or UiPart.Parent.Name == "ScrollingFrameR15" or UiPart.Parent.Name == "ScrollingFrameSpecific") and UiPart:IsA("TextButton") then
+			local UIStroke = Instance.new("UIStroke")
+			UIStroke.Parent = UiPart
+			UIStroke.Thickness = 1
+			UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 			if UICornerEnabled then
 				local UICorner = Instance.new("UICorner")
 				UICorner.Parent = UiPart
@@ -4238,6 +4250,7 @@ local function CreateGui()
 	end
 
 	GuiEmoter = Emoter
+	GuiLoaded = true
 	print("Script loaded!")
 
 	local RestartPlayer
