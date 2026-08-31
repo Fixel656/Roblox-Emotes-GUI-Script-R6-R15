@@ -1,0 +1,30 @@
+{
+	"CustomEmotes": [
+	["Hi", "Hi", "Spec", 2, "4308390587", 0.1, 1, "PriorLow", false],
+	["Woah", "Woah", "Spec", 2, "4308399012", 0.1, 1, "PriorLow", false],
+	["Sad", "Sad", "Spec", 2, "4308410706", 0.1, 1, "PriorLow", false],
+	["Giggle", "Giggle", "Spec", 2, "4308402710", 0.1, 1, "PriorLow", false],
+	["Think", "Think", "Spec", 2, "4308415882", 0.1, 1, "PriorLow", false],
+	["Scared", "Scared", "Spec", 2, "4308413393", 0.1, 1, "PriorLow", false],
+	["Angry", "Angry", "Spec", 2, "4308387518", 0.1, 1, "PriorLow", false],
+	["Confused", "Confused", "Spec", 2, "4308393154", 0.1, 1, "PriorLow", false],
+	["Sleep", "Sleep", "Spec", 3, "4308418502", 0.1, 1, "PriorLow", true],
+	["Clap", "Clap", "Spec", 2, "4308424082", 0.1, 1, "PriorLow", false],
+	["Sit", "Sit", "Spec", 3, "4308421826", 0.1, 1, "PriorLow", true],
+	["Shuffle", "Shuffle", "Spec", 1, "4308343244", 0.1, 1, "PriorLow", true],
+	["Swing", "Swing", "Spec", 1, "4308330448", 0.1, 1, "PriorLow", true],
+	["Easy", "Easy", "Spec", 1, "4308337079", 0.1, 1, "PriorLow", true],
+	["HipHop", "HipHop", "Spec", 1, "4308346808", 0.1, 1, "PriorLow", true],
+	["HipHop2", "HipHop 2", "Spec", 1, "4308356261", 0.1, 1, "PriorLow", true],
+	["Flair", "Flair", "Spec", 1, "4308358633", 0.1, 1, "PriorLow", true],
+	["Marashin", "Marashin", "Spec", 1, "4308362239", 0.1, 1, "PriorLow", true]
+	],
+	"DefaultAnims": 
+		[],
+	"ToolActionAnims": 
+		["15828066365", "3941484484"],
+	"ToolIdleAnims": 
+		["4308323620", "3943232303", "3941487278", "3941879405", "14171121785", "866020346"],
+	"EmoteWheelEmotes": 
+		[]
+}
