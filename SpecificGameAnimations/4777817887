@@ -46,7 +46,11 @@
 		["HaloWingsFly", "HaloWings Fly", "Spec", 3, "80642553325539", 0.1, 1, "PriorLowRunning", true],
 		["Emote1228", "Emote 1228", "Spec", 1, "122578332554538", 0.1, 1, "PriorLow", true],
 		["SwordFly", "Sword Fly", "Spec", 1, "15848664404", 0.1, 1, "PriorLow", true],
-		["Breakdance", "Breakdance", "Spec", 1, "16219250574", 0.1, 1, "PriorLow", true]
+		["Breakdance", "Breakdance", "Spec", 1, "16219250574", 0.1, 1, "PriorLow", true],
+		["Sitting", "Sitting", "Spec", 2, "15385231848", 0.1, 1, "PriorLow", true],
+		["RoyalRelicPose", "Royal Relic Pose", "Spec", 2, "111026434828095", 0.1, 1, "PriorLow", true],
+		["CrimsonKagunePose", "Crimson Kagune Pose", "Spec", 2, "118692493325416", 0.1, 1, "PriorLow", true],
+		["PhantomOpsPose", "Phantom Ops Pose", "Spec", 2, "70516097064675", 0.1, 1, "PriorLow", true]
 	],
 	"DefaultAnims": 
 		[],
@@ -55,7 +59,7 @@
 	"ToolIdleAnims": 
 		[],
 	"EmoteWheelEmotes": 
-		["SpecTakeTheL", "SpecSwordFly", "SpecVictoryLap", "SpecSideStepper", "SpecGreatSwordIdle", "SpecStormbaneIdle", "SpecStormbaneFly", "SpecHaloWingsFly"],
+		{"Emote1": "SpecTakeTheL", "Emote2": "SpecSwordFly", "Emote3": "SpecVictoryLap", "Emote4": "SpecSideStepper", "Emote5": "SpecSitting", "Emote6": "SpecRussianKick", "Emote7": "SpecGreatSwordIdle", "Emote8": "SpecHaloWingsFly"},
 	"AdditionalData": {
 		"DefaultWalkSpeed": 36
 	}
