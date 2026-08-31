@@ -12,7 +12,7 @@ Game name | Game Id | CustomAnims | DefaultAnims | ToolIdleAnims | ToolActionAni
 Forsaken | `6331902150` | Most emotes from shop + some other emotes | - | - | (Attack/Dash anims): Partially (C00lkid, Azure and Shedletsky with some skins) | -
 Nullscape | `7623259179` | All emotes from shop + some run and idle + unused animations | Added some animations, but unused in general | DoubleJump, Rail anims and other | All Slide, Dive, Grapple & Glider anims | Default WalkSpeed: 24
 Blade ball | `4777817887` | Some emotes + some running and idle animations | - | - | Parry and ability anims | Default WalkSpeed: 36
-Average plate gaem | `2381300257` | 29/45 emotes | - | - | - | - 
+Average plate gaem | `2381300257` | 29/45 emotes | - | - | All tool Actions | - 
 
 </div>
 
