@@ -81,7 +81,7 @@
 	"ToolIdleAnims": 
 		["QuickTurn", "DoubleJump", "RailJump", "RailLoop"],
 	"EmoteWheelEmotes": 
-		["SpecWave", "SpecPBJ", "SpecTenna", "SpecBoingBoing", "SpecGangnamStyle", "SpecGracefulRun", "SpecFrontSpin", "SpecShadowRun"],
+		{"Emote1": "SpecWave", "Emote2": "SpecPBJ", "Emote3": "SpecTenna", "Emote4": "SpecBoingBoing", "Emote5": "SpecGangnamStyle", "Emote6": "SpecGracefulRun", "Emote7": "SpecFrontSpin", "Emote8": "SpecShadowRun"},
 	"AdditionalData": {
 		"DefaultWalkSpeed": 24
 	}
