@@ -13,6 +13,7 @@ Forsaken | `6331902150` | Most emotes from shop + some other emotes | - | - | (A
 Nullscape | `7623259179` | All emotes from shop + some run and idle + unused animations | Added some animations, but unused in general | DoubleJump, Rail anims and other | All Slide, Dive, Grapple & Glider anims | Default WalkSpeed: 24
 Blade ball | `4777817887` | Some emotes + some running and idle animations | - | - | Parry and ability anims | Default WalkSpeed: 36
 Average plate gaem | `2381300257` | 29/45 emotes | - | - | All tool Actions | - 
+Work at a Pizza Place | `47545` | Emotes from emote list (Except for VIP ones) | - | Some tool animations | Some tool animations | -
 
 </div>
 
