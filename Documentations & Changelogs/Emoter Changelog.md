@@ -127,3 +127,7 @@ I will add it manually and you could add files for yourself in your files folder
 
 ### V5.0.2:
 - Fixed GUI not changing old GUI's state to Restarted which was making a lot of errors
+
+### V5.1:
+- Fixed some critical bugs
+- Changed how EmoteWheelEmotes reads information from file
