@@ -28,14 +28,28 @@
 		["Unlock", "Unlock", "Spec", 1, "13571500021", 0.1, 1, "PriorLow", true],
 		["Fly", "Fly", "Spec", 1, "13571481852", 0.1, 1, "PriorLow", true],
 		["Whip", "Whip", "Spec", 1, "13571447601", 0.1, 1, "PriorLow", true],
-		["Parrot", "Parrot", "Spec", 1, "13786750119", 0.1, 1, "PriorLow", true]
+		["Parrot", "Parrot", "Spec", 1, "13786750119", 0.1, 1, "PriorLow", true],
+		["FloorSpin", "Floor Spin", "Spec", 5, "18730363581", 0.1, 1, "PriorLow", true],
+		["Propeller", "Propeller", "Spec", 2, "17225971442", 0.1, 1, "PriorLow", true],
+		["Surf", "Surf", "Spec", 3, "17704786645", 0.1, 1, "PriorLow", true],
+		["Stunned", "Stunned", "Spec", 5, "10571765838", 0.1, 1, "PriorLow", true],
+		["InFire", "In Fire", "Spec", 2, "13141783826", 0.1, 1, "PriorLow", true],
+		["Dansen", "Dansen", "Spec", 1, "13795213258", 0.1, 1, "PriorLow", true],
+		["RussianKick", "Russian Kick", "Spec", 1, "13951627129", 0.1, 1, "PriorLow", true],
+		["California", "California", "Spec", 1, "14037753578", 0.1, 1, "PriorLow", true],
+		["Muffin", "Muffin", "Spec", 1, "14439210139", 0.1, 1, "PriorLow", true],
+		["Penguin", "Penguin", "Spec", 1, "17717785541", 0.1, 1, "PriorLow", true],
+		["Victory", "Victory", "Spec", 1, "73144716797042", 0.1, 1, "PriorLow", true]
 	],
 	"DefaultAnims": 
 		[],
 	"ToolActionAnims": 
-		[],
+		["7353055228", "7352604811", "7352930078", "7354876159", "7355016322", "12861490343", "18366895333", "18553329204", "13940784761", "14418439249", "15001889649", "15875841686", "18681235352", "105020716730838"],
 	"ToolIdleAnims": 
-		[],
+		["13142005580"],
 	"EmoteWheelEmotes": 
-		["R6Wave", "SpecHappy", "SpecPowerBlast", "SpecBoppin", "SpecTPose", "SpecFlossDance", "SpecUnlock", "SpecParrot"]
+		{"Emote1": "R6Wave", "Emote2": "SpecHappy", "Emote3": "SpecPowerBlast", "Emote4": "SpecBoppin", "Emote5": "SpecTPose", "Emote6": "SpecFlossDance", "Emote7": "SpecUnlock", "Emote8": "SpecParrot"},
+	"AdditionalData": {
+		
+	}
 }
