@@ -118,7 +118,7 @@ I will add it manually and you could add files for yourself in your files folder
 - Fixed a situation where a lot of errors appears in console when deleting/restarting GUI
 - Now you can Change priority of animation easily by **Alt+Click**
 - Added new category for SGA - "AdditionalData". It handles default walk speed for games (needed for "Running" type) and name of In-game Animation handler (like "Animate" script)
-- "Running" and "Idle" types for animations can be activated automatically after restarting GUI/character reappearing (made only for these types as i don't think it needs to be for every animation)
+- "Running" and "Idle" types for animations can be played automatically after restarting GUI/character reappearing (made only for these types as i don't think it needs to be for every animation)
 - Updated ToolAnimPriority function: now it uses `Humanoid.AnimationPlayed()` instead of `while true do`
 - Moved some R15 useless (for me) animations to "AdditionalAnimations" Github file. you can disable it in settings
 
@@ -131,3 +131,9 @@ I will add it manually and you could add files for yourself in your files folder
 ### V5.1:
 - Fixed some critical bugs
 - Changed how EmoteWheelEmotes reads information from file
+
+### V5.2:
+- Now you can settings separately for each game by clicking RMB on save button
+- Deleted some useless console outputs and made others to show only when Show debug info setting is enabled
+- Updated animations pausing function: now it immediately pauses ANY animation if it starting to play
+- Added setting so ANY animation can be played automatically after restarting GUI/character reappearing (found a reason for adding it)
