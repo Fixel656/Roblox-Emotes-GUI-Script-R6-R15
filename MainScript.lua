@@ -2,7 +2,7 @@
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
 
-local ScriptVersion = "V5.1"
+local ScriptVersion = "V5.2"
 local GuiActive = true
 local GuiEmoter = nil
 local AnimationHandler = "Animate"
@@ -11,6 +11,9 @@ local IsInStudio = game:GetService("RunService"):IsStudio()
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
 local ContextActionService = game:GetService("ContextActionService")
+print("Script by Fixel656, based on Energize GUI by illremember. Do not copy and do not claim as your own!")
+print("Script version: "..ScriptVersion)
+print("Game Id: "..game.GameId)
 
 --Settings
 local ToolAnimHighPriorEnabled = false
@@ -18,6 +21,8 @@ local AnimPreviewEnabled = true
 local DebugInfoEnabled = false
 local AnalyticsEnabled = true
 local LoadAnimationsOnRestart = true
+local LoadAllAnimationsOnRestart = true
+local TopMost = false
 
 local ToolIdleAnimHighPriorEnabled = false
 local ToolActionAnimHighPriorEnabled = true
@@ -66,16 +71,42 @@ AnimFadeHotkey.Value = "B"
 
 EmoteWheelHotkey.Value = "Comma" --Not affected by "Hotkeys Enabled" setting
 
-local ConfigFileName = "EmoterConfig.json"
-if not IsInStudio then
-	if isfile("EmoterData/"..ConfigFileName) then
-		local rawData = readfile("EmoterData/"..ConfigFileName)
+--Loading & Saving
+local ConfigFile = "EmoterData/EmoterConfig.json"
+if not IsInStudio then	
+	local targetNumber = tostring(game.GameId)
+	local folderPath = "EmoterData/SpecificSettings"
+	local fileFound = false
+
+	local success, files = pcall(listfiles, folderPath)
+	if not success then
+		return
+	end
+	for _, filePath in ipairs(files) do
+		local fileName = filePath:match("[^/\\]+$") or filePath
+		local extractedNumber = fileName:match("(%d+)")
+
+		if extractedNumber then
+			if extractedNumber == targetNumber then
+				fileFound = true
+				ConfigFile = filePath
+				print("Found settings specifically for this game, loading...")
+				break
+			end
+		end
+	end
+	
+	if isfile(ConfigFile) then
+		local rawData = readfile(ConfigFile)
+		
 		local DecodedSettings = HttpService:JSONDecode(rawData)
 		-- Accessing the loaded data
 		AnimPreviewEnabled = DecodedSettings.ConfAnimPreviewEnabled
 		DebugInfoEnabled = DecodedSettings.ConfDebugInfoEnabled
 		AnalyticsEnabled = DecodedSettings.ConfAnalyticsEnabled
 		LoadAnimationsOnRestart = DecodedSettings.ConfLoadAnimationsOnRestart
+		LoadAllAnimationsOnRestart = DecodedSettings.ConfLoadAllAnimationsOnRestart
+		TopMost = DecodedSettings.ConfTopMost
 
 		ToolIdleAnimHighPriorEnabled = DecodedSettings.ConfToolIdleAnimHighPriorEnabled
 		ToolActionAnimHighPriorEnabled = DecodedSettings.ConfToolActionAnimHighPriorEnabled
@@ -113,6 +144,87 @@ if not IsInStudio then
 		SettingsHotkey.Value = tostring(DecodedSettings.ConfSettingsHotkey)
 		StopAnimsHotkey.Value = tostring(DecodedSettings.StopAnimsHotkey)
 		EmoteWheelHotkey.Value = tostring(DecodedSettings.ConfEmoteWheelHotkey)
+	end
+end
+local function SaveData(Type)
+	local SettingsToSave = {
+		ConfAnimPreviewEnabled = AnimPreviewEnabled,
+		ConfDebugInfoEnabled = DebugInfoEnabled,
+		ConfAnalyticsEnabled = AnalyticsEnabled,
+		ConfLoadAnimationsOnRestart = LoadAnimationsOnRestart,
+		ConfLoadAllAnimationsOnRestart = LoadAllAnimationsOnRestart,
+		ConfTopMost = TopMost,
+
+		ConfToolIdleAnimHighPriorEnabled = ToolIdleAnimHighPriorEnabled,
+		ConfToolActionAnimHighPriorEnabled = ToolActionAnimHighPriorEnabled,
+		ConfAnimSwitchModeEnabled = AnimSwitchModeEnabled,
+		ConfAnimSwitchModeRunIdleExceptionEnabled = AnimSwitchModeRunIdleExceptionEnabled,
+		ConfAnimSmoothFadeEnabled = AnimSmoothFadeEnabled,
+		ConfHigherPriorityEnabled = HigherPriorityEnabled,
+
+		ConfIdleTypeEnabled = IdleTypeEnabled,
+		ConfRunningTypeEnabled = RunningTypeEnabled,
+		ConfRunningTypeStopStandingEnabled = RunningTypeStopStandingEnabled,
+		ConfRunningTypeCharSpeedEnabled = RunningTypeCharSpeedEnabled,
+		ConfRunningTypeMinSpeedEnabled = RunningTypeMinSpeedEnabled,
+		ConfRunningTypeStopJumpingEnabled = RunningTypeStopJumpingEnabled,
+		ConfRunningTypeStopClimbingEnabled = RunningTypeStopClimbingEnabled,
+
+		ConfTheme = theme,
+		ConfUIGradientEnabled = UIGradientEnabled,
+		ConfUICornerEnabled = UICornerEnabled,
+		ConfXSize = XSize,
+		ConfYSize = YSize,
+
+		ConfLoadGithubSGAEnabled = LoadGithubSGAEnabled,
+		ConfLoadGithubCustomAnimsEnabled = LoadGithubCustomAnimsEnabled,
+		ConfLoadLocalSGAEnabled = LoadLocalSGAEnabled,
+		ConfLoadLocalCustomAnimsEnabled = LoadLocalCustomAnimsEnabled,
+
+		ConfHotkeysEnabled = HotkeysEnabled,
+		ConfDoubleHotkeyEnabled = DoubleHotkeyEnabled,
+		ConfSearchHotkey = SearchHotkey.Value,
+		ConfCloseHotkey = CloseHotkey.Value,
+		ConfSitHotkey = SitHotkey.Value,
+		ConfSwitchAnimHotkey = SwitchAnimHotkey.Value,
+		ConfAnimFadeHotkey = AnimFadeHotkey.Value,
+		ConfSettingsHotkey = SettingsHotkey.Value,
+		StopAnimsHotkey = StopAnimsHotkey.Value,
+		ConfEmoteWheelHotkey = EmoteWheelHotkey.Value
+	}
+	local encodedData = HttpService:JSONEncode(SettingsToSave)
+
+	if Type == "Default" then
+		writefile("EmoterData/EmoterConfig.json", encodedData)
+		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Saved", Text = "Succesfully saved settings!", Duration = 3})
+	elseif Type == "Specific" then
+		local targetNumber = tostring(game.GameId)
+		local folderPath = "EmoterData/SpecificSettings"
+		local fileFound = false
+
+		local success, files = pcall(listfiles, folderPath)
+		if not success then
+			return
+		end
+		for _, filePath in ipairs(files) do
+			local fileName = filePath:match("[^/\\]+$") or filePath
+			local extractedNumber = fileName:match("(%d+)")
+
+			if extractedNumber then
+				if extractedNumber == targetNumber then
+					fileFound = true
+					ConfigFile = filePath
+					print("Found settings specifically for this game, saving...")
+					break
+				end
+			end
+		end
+		if not fileFound then
+			ConfigFile = "EmoterData/SpecificSettings/"..targetNumber.." (".. game:GetService("MarketplaceService"):GetProductInfoAsync(game.PlaceId).Name ..").json"
+		end
+
+		writefile(ConfigFile, encodedData)
+		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Saved", Text = "Succesfully saved settings for specific game!", Duration = 3})
 	end
 end
 
@@ -222,6 +334,7 @@ local function CreateGui()
 	local OptionsFrame = Instance.new("Frame") --Frame of additional options
 	local StopAnimsEvent = Instance.new("BindableEvent") --Event to stop animations when disabling StopDefaultAnims option
 	local PauseAnimsButton = Instance.new("ImageButton")
+	local PauseAnimsOption = false
 	local StopDefAnimsButton = Instance.new("ImageButton")
 	local PauseAnimateButton = Instance.new("ImageButton")
 	local SitButton = Instance.new("ImageButton")
@@ -300,7 +413,6 @@ local function CreateGui()
 		ButtonSelectCol = Color3.fromRGB(129, 129, 129)
 	end
 
-	print("Checking functions...")
 	local function AddVPF()
 		ViewportFrame.Parent = MainFrame
 		ViewportFrame.Visible = false
@@ -693,11 +805,18 @@ local function CreateGui()
 			if not (Reason == "Reset/Destroy" or Reason == "Forced") and AnimSwitchModeRunIdleExceptionEnabled and ((Type:find("Running") and RunningTypeEnabled) or (Type:find("Idle") and IdleTypeEnabled)) then return end
 			if AnimACTIVE == false then return end
 
-			if (Reason == "Reset/Destroy") and ((Type:find("Running") and RunningTypeEnabled) or (Type:find("Idle") and IdleTypeEnabled)) then
+			if (Reason == "Reset/Destroy") and (LoadAnimationsOnRestart or LoadAllAnimationsOnRestart) then
 				local Name = Button.Name
-				if AnimACTIVE then
-					table.insert(RestartAnimations, Frame..Name)
+				if ((Type:find("Running") and RunningTypeEnabled) or (Type:find("Idle") and IdleTypeEnabled)) and LoadAnimationsOnRestart then
+					if AnimACTIVE then
+						table.insert(RestartAnimations, Frame..Name)
+					end
+				elseif LoadAllAnimationsOnRestart then
+					if AnimACTIVE then
+						table.insert(RestartAnimations, Frame..Name)
+					end
 				end
+				
 			end
 
 			if SwitchModeFactor == true then 
@@ -718,18 +837,24 @@ local function CreateGui()
 		local MinWalkSpeedNumStr = string.match(Type, "Running([%d%.]+)")
 		local MinWalkSpeedNum = tonumber(MinWalkSpeedNumStr) or 0.5
 		if tonumber(MinWalkSpeedNumStr) ~= nil then AddHoverText(Button, "Minimal WalkSpeed to play:"..MinWalkSpeedNum) end
+		local RunningConnection
+		local IdleConnection
+		
 		if Type:find("Running") then
 			if RunningTypeMinSpeedEnabled == false then
 				MinWalkSpeedNum = 0.5
 			end
-			Humanoid.Running:Connect(function(currentSpeed)
+			RunningConnection = Humanoid.Running:Connect(function(currentSpeed)
 				if GuiActive and GuiRestarted == false then
 					if currentSpeed > 0.5 then
 						IsMoving = true
 					else
 						IsMoving = false
 					end
+				else
+					RunningConnection:Disconnect()
 				end
+				
 				if AnimACTIVE and RunningTypeEnabled and GuiActive and GuiRestarted == false then
 					if RunningTypeMinSpeedEnabled == false then
 						MinWalkSpeedNum = 0.5
@@ -815,14 +940,17 @@ local function CreateGui()
 		end
 
 		if Type:find("Idle") then
-			Humanoid.Running:Connect(function(currentSpeed)
-				if GuiActive then
+			IdleConnection = Humanoid.Running:Connect(function(currentSpeed)
+				if GuiActive and GuiRestarted == false then
 					if currentSpeed > 0.5 then
 						IsMoving = true
 					else
 						IsMoving = false
 					end
+				else
+					IdleConnection:Disconnect()
 				end
+				
 				if AnimACTIVE and IdleTypeEnabled and GuiActive and GuiRestarted == false then
 					if currentSpeed > 0.5 then
 						if IsPlaying then
@@ -949,7 +1077,7 @@ local function CreateGui()
 				print("working")
 				task.spawn(function()
 					Button:WaitForChild("UIStroke")
-					if Button ~= nil and LoadAnimationsOnRestart == true then
+					if Button ~= nil then
 						AnimACTIVE = true
 						StartAnim()
 					end
@@ -1148,7 +1276,6 @@ local function CreateGui()
 
 
 	-- Creating Objects
-	print("Creating Objects...")
 	Emoter.Name = "Emoter"
 	Emoter.ResetOnSpawn = false
 	Emoter.IgnoreGuiInset = true
@@ -1157,7 +1284,11 @@ local function CreateGui()
 		Emoter.DisplayOrder = 100
 	else
 		Emoter.Parent = game.CoreGui
-		Emoter.DisplayOrder = -1
+		if TopMost == true then
+			Emoter.DisplayOrder = 100
+		else
+			Emoter.DisplayOrder = -1
+		end
 	end
 	if not IsInStudio then
 		Emoter.Enabled = false
@@ -2113,6 +2244,8 @@ local function CreateGui()
 	AddSettings(DebugInfoEnabled, "DebugInfoOption", "Show Debug information", 0)
 	AddSettings(AnalyticsEnabled, "AnalyticsOption", "Enable analytics (hover for info)", 0)
 	AddSettings(LoadAnimationsOnRestart, "LoadAnimationsOnRestartOption", "Play 'Running' & 'Idle' anims on reset", 0)
+	AddSettings(LoadAllAnimationsOnRestart, "LoadAllAnimationsOnRestartOption", "Play ALL animations on reset", 0)
+	AddSettings(TopMost, "TopMostOption", "Top most", 0)
 
 	AddSettings(ToolIdleAnimHighPriorEnabled, "ToolIdlePriorityOption", "High priority on ToolIdle anims", 1)
 	AddSettings(ToolActionAnimHighPriorEnabled, "ToolActionPriorityOption", "High priority on ToolAction anims", 1)
@@ -2231,7 +2364,7 @@ local function CreateGui()
 	SaveSettingsButton.Image = "rbxassetid://11768914234"
 	SaveSettingsButton.ImageColor3 = UiButColor
 	SaveSettingsButton.Parent = MoreButtonsFrame
-	AddHoverText(SaveSettingsButton, "Save settings")
+	AddHoverText(SaveSettingsButton, "Save settings. RMB will save settings for <b>only</b> this game")
 
 	LaunchIdDetectorButton.Name = "LaunchIdDetectorButton"
 	LaunchIdDetectorButton.Size = UDim2.new(0, 35, 0, 35)
@@ -2262,7 +2395,6 @@ local function CreateGui()
 
 
 	-- Buttons and other functions
-	print("Loading buttons and other functions...")
 	DestroyGUI.MouseButton1Click:connect(function()
 		GuiActive = false
 		StopAnimsEvent:Fire("Reset/Destroy")
@@ -2479,10 +2611,9 @@ local function CreateGui()
 
 
 	--Option Buttons
-	local PauseDefAnimsOption = false
 	PauseAnimsButton.MouseButton1Click:Connect(function()
-		PauseDefAnimsOption = not PauseDefAnimsOption
-		if PauseDefAnimsOption then
+		PauseAnimsOption = not PauseAnimsOption
+		if PauseAnimsOption then
 			local playingTracks = Player.Character.Humanoid:GetPlayingAnimationTracks()
 			for _, animtrack in ipairs(playingTracks) do
 				if animtrack.Name ~= "AAnimation" then
@@ -2490,11 +2621,10 @@ local function CreateGui()
 				end
 			end
 		else
-
 			local playingTracks = Player.Character.Humanoid:GetPlayingAnimationTracks()
 			for _, animtrack in ipairs(playingTracks) do
 				if animtrack.Name ~= "AAnimation" then
-					animtrack:AdjustSpeed(1) -- always playing at speed 1. Gonna fix it (maybe)
+					animtrack:AdjustSpeed(1) -- always playing at speed 1
 				end
 			end
 		end
@@ -2509,7 +2639,7 @@ local function CreateGui()
 			StopAnimsEvent:Fire("Forced")
 			AnimateScript.Disabled = false
 			PauseAnimateButton.BackgroundColor3 = ButtonCol
-			PauseDefAnimsOption = false
+			PauseAnimsOption = false
 			PauseAnimsButton.BackgroundColor3 = ButtonCol
 		end
 	end)
@@ -2537,7 +2667,7 @@ local function CreateGui()
 			Player.Character.Animate.Disabled = false
 			StopDefAnimsButton.BackgroundColor3 = ButtonCol
 
-			PauseDefAnimsOption = false
+			PauseAnimsOption = false
 			PauseAnimsButton.BackgroundColor3 = ButtonCol
 			PauseAnimateButton.BackgroundColor3 = ButtonCol
 			PauseAnimateButton.ImageTransparency = 0
@@ -2579,7 +2709,6 @@ local function CreateGui()
 			PreviewOptionButton.CheckImage.Image = ""
 		end
 	end)
-
 	local DebugInfoButton = SettingsStuff.DebugInfoOption
 	AddHoverText(DebugInfoButton, "Show debug information in Developer console (Animation data and other things)")
 	DebugInfoButton.MouseButton1Click:Connect(function()
@@ -2590,7 +2719,6 @@ local function CreateGui()
 			DebugInfoButton.CheckImage.Image = ""
 		end
 	end)
-
 	local AnalyticsButton = SettingsStuff.AnalyticsOption
 	AddHoverText(AnalyticsButton, "<b>DISCLAIMER</b>: these analytics are made only to see NUMBER of people using my script. I don't save or even share any personal data, UserId, Username and any other data")
 	AnalyticsButton.MouseButton1Click:Connect(function()
@@ -2601,9 +2729,8 @@ local function CreateGui()
 			AnalyticsButton.CheckImage.Image = ""
 		end
 	end)
-
 	local LoadAnimationsOnRestartButton = SettingsStuff.LoadAnimationsOnRestartOption
-	AddHoverText(LoadAnimationsOnRestartButton, "Automatically plays 'Running' and 'Idle' animations when you restart GUI or when your character reappears")
+	AddHoverText(LoadAnimationsOnRestartButton, "Automatically plays 'Running' and 'Idle' animations you played before restarting GUI or your character reappearing")
 	LoadAnimationsOnRestartButton.MouseButton1Click:Connect(function()
 		LoadAnimationsOnRestart = not LoadAnimationsOnRestart
 		if LoadAnimationsOnRestart == true then
@@ -2612,6 +2739,29 @@ local function CreateGui()
 			LoadAnimationsOnRestartButton.CheckImage.Image = ""
 		end
 	end)
+	local LoadAllAnimationsOnRestartButton = SettingsStuff.LoadAllAnimationsOnRestartOption
+	AddHoverText(LoadAllAnimationsOnRestartButton, "Automatically plays ALL animations you played before restarting GUI or your character reappearing")
+	LoadAllAnimationsOnRestartButton.MouseButton1Click:Connect(function()
+		LoadAllAnimationsOnRestart = not LoadAllAnimationsOnRestart
+		if LoadAllAnimationsOnRestart == true then
+			LoadAllAnimationsOnRestartButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			LoadAllAnimationsOnRestartButton.CheckImage.Image = ""
+		end
+	end)
+	local TopMostButton = SettingsStuff.TopMostOption
+	AddHoverText(TopMostButton, "When enabled, GUI will stay on top of <b>ALL</b> other windows and GUIs")
+	TopMostButton.MouseButton1Click:Connect(function()
+		TopMost = not TopMost
+		if TopMost == true then
+			Emoter.DisplayOrder = 100
+			TopMostButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			Emoter.DisplayOrder = -1
+			TopMostButton.CheckImage.Image = ""
+		end
+	end)
+	
 
 	if ToolIdleAnimHighPriorEnabled or ToolActionAnimHighPriorEnabled then
 		ToolAnimHighPriorEnabled = true
@@ -2668,10 +2818,22 @@ local function CreateGui()
 			end
 		end
 	end
+	
+	local function PauseAnimation()
+		if PauseAnimsOption then
+			local playingTracks = Player.Character.Humanoid:GetPlayingAnimationTracks()
+			for _, animtrack in ipairs(playingTracks) do
+				if animtrack.Name ~= "AAnimation" then
+					animtrack:AdjustSpeed(0)
+				end
+			end
+		end
+	end
 
 	Player.Character:WaitForChild("Humanoid").AnimationPlayed:Connect(function()
 		if GuiActive and GuiRestarted == false then
 			ToolAnimPriorityCheck()
+			PauseAnimation()
 		end
 	end)
 
@@ -3018,54 +3180,12 @@ local function CreateGui()
 			LoadLocalCustomAnimOptionButton.CheckImage.Image = ""
 		end
 	end)
-
+	
 	SaveSettingsButton.MouseButton1Click:Connect(function()
-		local SettingsToSave = {
-			ConfAnimPreviewEnabled = AnimPreviewEnabled,
-			ConfDebugInfoEnabled = DebugInfoEnabled,
-			ConfAnalyticsEnabled = AnalyticsEnabled,
-			ConfLoadAnimationsOnRestart = LoadAnimationsOnRestart,
-
-			ConfToolIdleAnimHighPriorEnabled = ToolIdleAnimHighPriorEnabled,
-			ConfToolActionAnimHighPriorEnabled = ToolActionAnimHighPriorEnabled,
-			ConfAnimSwitchModeEnabled = AnimSwitchModeEnabled,
-			ConfAnimSwitchModeRunIdleExceptionEnabled = AnimSwitchModeRunIdleExceptionEnabled,
-			ConfAnimSmoothFadeEnabled = AnimSmoothFadeEnabled,
-			ConfHigherPriorityEnabled = HigherPriorityEnabled,
-
-			ConfIdleTypeEnabled = IdleTypeEnabled,
-			ConfRunningTypeEnabled = RunningTypeEnabled,
-			ConfRunningTypeStopStandingEnabled = RunningTypeStopStandingEnabled,
-			ConfRunningTypeCharSpeedEnabled = RunningTypeCharSpeedEnabled,
-			ConfRunningTypeMinSpeedEnabled = RunningTypeMinSpeedEnabled,
-			ConfRunningTypeStopJumpingEnabled = RunningTypeStopJumpingEnabled,
-			ConfRunningTypeStopClimbingEnabled = RunningTypeStopClimbingEnabled,
-
-			ConfTheme = theme,
-			ConfUIGradientEnabled = UIGradientEnabled,
-			ConfUICornerEnabled = UICornerEnabled,
-			ConfXSize = XSize,
-			ConfYSize = YSize,
-
-			ConfLoadGithubSGAEnabled = LoadGithubSGAEnabled,
-			ConfLoadGithubCustomAnimsEnabled = LoadGithubCustomAnimsEnabled,
-			ConfLoadLocalSGAEnabled = LoadLocalSGAEnabled,
-			ConfLoadLocalCustomAnimsEnabled = LoadLocalCustomAnimsEnabled,
-
-			ConfHotkeysEnabled = HotkeysEnabled,
-			ConfDoubleHotkeyEnabled = DoubleHotkeyEnabled,
-			ConfSearchHotkey = SearchHotkey.Value,
-			ConfCloseHotkey = CloseHotkey.Value,
-			ConfSitHotkey = SitHotkey.Value,
-			ConfSwitchAnimHotkey = SwitchAnimHotkey.Value,
-			ConfAnimFadeHotkey = AnimFadeHotkey.Value,
-			ConfSettingsHotkey = SettingsHotkey.Value,
-			StopAnimsHotkey = StopAnimsHotkey.Value,
-			ConfEmoteWheelHotkey = EmoteWheelHotkey.Value
-		}
-		local encodedData = HttpService:JSONEncode(SettingsToSave)
-		writefile("EmoterData/"..ConfigFileName, encodedData)
-		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Saved", Text = "Succesfully saved settings!", Duration = 3})
+		SaveData("Default")
+	end)
+	SaveSettingsButton.MouseButton2Click:Connect(function()
+		SaveData("Specific")
 	end)
 
 	LaunchIdDetectorButton.MouseButton1Click:Connect(function()
@@ -3090,7 +3210,7 @@ local function CreateGui()
 	UserInputService.InputBegan:Connect(function(input, processed)
 
 		if processed then return end
-		if GuiActive == false then return end
+		if GuiActive == false or GuiRestarted == true then return end
 
 		if input.KeyCode.Name == SearchHotkey.Value and HotkeysEnabled then
 			if MainFrame.Visible == true then
@@ -3669,7 +3789,7 @@ local function CreateGui()
 	end
 
 	local function AdditionalAnimsOperation()
-		print("[AdditionalAnims File]: Adding animations from AdditionalAnims file in Github")
+		if DebugInfoEnabled then print("[AdditionalAnims File]: Adding animations from AdditionalAnims file in Github") end
 
 		local finalUrl = "https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/SpecificGameAnimations/AdditionalAnimations"
 
@@ -3677,7 +3797,7 @@ local function CreateGui()
 			return game:HttpGet(finalUrl)
 		end)
 		if not success or not fileContent or fileContent == "404: Not Found" then
-			warn("[AdditionalAnims File]: AdditionalAnims file wasn't found")
+			if DebugInfoEnabled then warn("[AdditionalAnims File]: AdditionalAnims file wasn't found") end
 			return 
 		end
 		local success2, data = pcall(function()
@@ -3689,14 +3809,14 @@ local function CreateGui()
 		end
 		for categoryName, animationsList in pairs(data) do
 			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
-				print("[AdditionalAnims File]: Extracting Animations")
+				if DebugInfoEnabled then print("[AdditionalAnims File]: Extracting Animations") end
 				for _, info in ipairs(animationsList) do
 					local danceButton = Instance.new("TextButton")
 					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
 					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
 				end
 			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
-				print("[AdditionalAnims File]: Adding Default animations")
+				if DebugInfoEnabled then print("[AdditionalAnims File]: Adding Default animations")end
 				for _, id in ipairs(data["DefaultAnims"]) do
 					if not table.find(DefaultAnimsNameList, id) then
 						table.insert(DefaultAnimsNameList, tostring(id))
@@ -3708,12 +3828,12 @@ local function CreateGui()
 	end
 
 	local function CustomAnimsOperation()
-		print("[CustomAnims File]: Searching CustomAnims file")
+		if DebugInfoEnabled then print("[CustomAnims File]: Searching CustomAnims file") end
 		local success, fileContent = pcall(function()
 			return readfile("EmoterData/CustomAnims.json")
 		end)
 		if not success or not fileContent then 
-			warn("[CustomAnims File]: CustomAnims file wasn't found")
+			if DebugInfoEnabled then warn("[CustomAnims File]: CustomAnims file wasn't found") end
 			return 
 		end
 		local success2, data = pcall(function()
@@ -3725,35 +3845,35 @@ local function CreateGui()
 		end
 		for categoryName, animationsList in pairs(data) do
 			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
-				print("[CustomAnims File]: Extracting Animations")
+				if DebugInfoEnabled then print("[CustomAnims File]: Extracting Animations") end
 				for _, info in ipairs(animationsList) do
 					local danceButton = Instance.new("TextButton")
 					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
 					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
 				end
 			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
-				print("[CustomAnims File]: Adding Default animations")
+				if DebugInfoEnabled then print("[CustomAnims File]: Adding Default animations") end
 				for _, id in ipairs(data["DefaultAnims"]) do
 					if not table.find(DefaultAnimsNameList, id) then
 						table.insert(DefaultAnimsNameList, tostring(id))
 					end
 				end
 			elseif categoryName == "ToolActionAnims" and #data["ToolActionAnims"] ~= 0 then
-				print("[CustomAnims File]: Adding ToolAction Animations")
+				if DebugInfoEnabled then print("[CustomAnims File]: Adding ToolAction Animations") end
 				for _, id in ipairs(data["ToolActionAnims"]) do
 					if not table.find(ToolActionAnimsList, id) then
 						table.insert(ToolActionAnimsList, tostring(id))
 					end
 				end
 			elseif categoryName == "ToolIdleAnims" and #data["ToolIdleAnims"] ~= 0 then
-				print("[CustomAnims File]: Adding ToolIdle Animations")
+				if DebugInfoEnabled then print("[CustomAnims File]: Adding ToolIdle Animations") end
 				for _, id in ipairs(data["ToolIdleAnims"]) do
 					if not table.find(ToolIdleAnimsList, id) then
 						table.insert(ToolIdleAnimsList, tostring(id))
 					end
 				end
 			elseif categoryName == "R6EmoteWheelEmotes" and RigType == "R6" then
-				print("[SpecGameAnims File]: Adding EmoteWhell Data")
+				if DebugInfoEnabled then print("[SpecGameAnims File]: Adding EmoteWhell Data") end
 				local info = data["R6EmoteWheelEmotes"]
 				if info.Emote1 then EmoteWheelEmotes.Emote1 = info.Emote1 end
 				if info.Emote2 then EmoteWheelEmotes.Emote2 = info.Emote2 end
@@ -3764,7 +3884,7 @@ local function CreateGui()
 				if info.Emote7 then EmoteWheelEmotes.Emote7 = info.Emote7 end
 				if info.Emote8 then EmoteWheelEmotes.Emote8 = info.Emote8 end
 			elseif categoryName == "R15EmoteWheelEmotes" and RigType == "R15" then
-				print("[SpecGameAnims File]: Adding EmoteWhell Data")
+				if DebugInfoEnabled then print("[SpecGameAnims File]: Adding EmoteWhell Data") end
 				local info = data["R15EmoteWheelEmotes"]
 				if info.Emote1 then EmoteWheelEmotes.Emote1 = info.Emote1 end
 				if info.Emote2 then EmoteWheelEmotes.Emote2 = info.Emote2 end
@@ -3783,13 +3903,13 @@ local function CreateGui()
 		local baseUrl = "https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/SpecificGameAnimations/"
 		local finalUrl = baseUrl .. tostring(game.GameId)
 
-		print("[SpecGameAnims Github]: Searching Anims file in Github for game ".. game.GameId)
+		if DebugInfoEnabled then print("[SpecGameAnims Github]: Searching Anims file in Github for game ".. game.GameId) end
 
 		local success, fileContent = pcall(function()
 			return game:HttpGet(finalUrl)
 		end)
 		if not success or not fileContent or fileContent == "404: Not Found" then
-			warn("[SpecGameAnims Github]: No file in Github for this game")
+			if DebugInfoEnabled then warn("[SpecGameAnims Github]: No file in Github for this game") end
 			return
 		end
 		local success2, data = pcall(function()
@@ -3802,35 +3922,35 @@ local function CreateGui()
 
 		for categoryName, animationsList in pairs(data) do
 			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
-				print("[SpecGameAnims Github]: Extracting Animations")
+				if DebugInfoEnabled then print("[SpecGameAnims Github]: Extracting Animations") end
 				for _, info in ipairs(animationsList) do
 					local danceButton = Instance.new("TextButton")
 					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
 					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
 				end
 			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
-				print("[SpecGameAnims Github]: Adding Default animations")
+				if DebugInfoEnabled then print("[SpecGameAnims Github]: Adding Default animations") end
 				for _, id in ipairs(data["DefaultAnims"]) do
 					if not table.find(DefaultAnimsNameList, id) then
 						table.insert(DefaultAnimsNameList, tostring(id))
 					end
 				end
 			elseif categoryName == "ToolActionAnims" and #data["ToolActionAnims"] ~= 0 then
-				print("[SpecGameAnims Github]: Adding ToolAction Animations")
+				if DebugInfoEnabled then print("[SpecGameAnims Github]: Adding ToolAction Animations") end
 				for _, id in ipairs(data["ToolActionAnims"]) do
 					if not table.find(ToolActionAnimsList, id) then
 						table.insert(ToolActionAnimsList, tostring(id))
 					end
 				end
 			elseif categoryName == "ToolIdleAnims" and #data["ToolIdleAnims"] ~= 0 then
-				print("[SpecGameAnims Github]: Adding ToolIdle Animations")
+				if DebugInfoEnabled then print("[SpecGameAnims Github]: Adding ToolIdle Animations") end
 				for _, id in ipairs(data["ToolIdleAnims"]) do
 					if not table.find(ToolIdleAnimsList, id) then
 						table.insert(ToolIdleAnimsList, tostring(id))
 					end
 				end
 			elseif categoryName == "EmoteWheelEmotes" then
-				print("[SpecGameAnims File]: Adding EmoteWhell Data")
+				if DebugInfoEnabled then print("[SpecGameAnims File]: Adding EmoteWhell Data") end
 				local info = data["EmoteWheelEmotes"]
 				if info.Emote1 then EmoteWheelEmotes.Emote1 = info.Emote1 end
 				if info.Emote2 then EmoteWheelEmotes.Emote2 = info.Emote2 end
@@ -3843,7 +3963,7 @@ local function CreateGui()
 			elseif categoryName == "AdditionalData" then
 				if data["AdditionalData"].DefaultWalkSpeed then
 					DefaultWalkSpeed = data["AdditionalData"].DefaultWalkSpeed
-					print("Chaged DefaultWalkSpeed to "..DefaultWalkSpeed)
+					if DebugInfoEnabled then print("Chaged DefaultWalkSpeed to "..DefaultWalkSpeed) end
 				elseif data["AdditionalData"].AnimationHandlerName then
 					AnimationHandler = data["AdditionalData"].AnimationHandlerName
 				end
@@ -3853,7 +3973,7 @@ local function CreateGui()
 	end
 
 	local function FileSpecGameAnimsOperation()
-		print("[SpecGameAnims File]: Searching Specific GameAnims file")
+		if DebugInfoEnabled then print("[SpecGameAnims File]: Searching Specific GameAnims file") end
 		local targetNumber = tostring(game.GameId)
 		local folderPath = "EmoterData/SpecificAnims"
 		local targetFilePath = nil
@@ -3861,7 +3981,7 @@ local function CreateGui()
 
 		local success, files = pcall(listfiles, folderPath)
 		if not success then
-			warn("[SpecGameAnims File]: Your exploit doesn't support function listfiles() or folder id empty")
+			if DebugInfoEnabled then warn("[SpecGameAnims File]: Your exploit doesn't support function listfiles() or folder id empty") end
 			return
 		end
 		for _, filePath in ipairs(files) do
@@ -3871,23 +3991,22 @@ local function CreateGui()
 			if extractedNumber then
 				if DebugInfoEnabled then print("[SpecGameAnims File]: Found file: " .. fileName .. " | Extracted number: " .. extractedNumber) end
 				if extractedNumber == targetNumber then
-					print("[SpecGameAnims File]: Found file: " .. filePath)
+					if DebugInfoEnabled then print("[SpecGameAnims File]: Found file: " .. filePath) end
 					fileFound = true
 					targetFilePath = filePath
-
 					break
 				end
 			end
 		end
 		if not fileFound then
-			warn("[SpecGameAnims File]: File with number " .. targetNumber .. "hasn't found in files")
+			if DebugInfoEnabled then warn("[SpecGameAnims File]: File with number " .. targetNumber .. "hasn't found in files") end
 			return
 		end
 		local success2, fileContent = pcall(function()
 			return readfile(targetFilePath)
 		end)
 		if not success2 or not fileContent then
-			warn("[SpecGameAnims File]: Didn't read file")
+			if DebugInfoEnabled then warn("[SpecGameAnims File]: Didn't read file") end
 			return
 		end
 		local success3, data = pcall(function()
@@ -3900,35 +4019,35 @@ local function CreateGui()
 
 		for categoryName, animationsList in pairs(data) do
 			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
-				print("[SpecGameAnims File]: Extracting Animations")
+				if DebugInfoEnabled then print("[SpecGameAnims File]: Extracting Animations") end
 				for _, info in ipairs(animationsList) do
 					local danceButton = Instance.new("TextButton")
 					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
 					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
 				end
 			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
-				print("[SpecGameAnims File]: Adding Default animations")
+				if DebugInfoEnabled then print("[SpecGameAnims File]: Adding Default animations") end
 				for _, id in ipairs(data["DefaultAnims"]) do
 					if not table.find(DefaultAnimsNameList, id) then
 						table.insert(DefaultAnimsNameList, tostring(id))
 					end
 				end
 			elseif categoryName == "ToolActionAnims" and #data["ToolActionAnims"] ~= 0 then
-				print("[SpecGameAnims File]: Adding ToolAction Animations")
+				if DebugInfoEnabled then print("[SpecGameAnims File]: Adding ToolAction Animations") end
 				for _, id in ipairs(data["ToolActionAnims"]) do
 					if not table.find(ToolActionAnimsList, id) then
 						table.insert(ToolActionAnimsList, tostring(id))
 					end
 				end
 			elseif categoryName == "ToolIdleAnims" and #data["ToolIdleAnims"] ~= 0 then
-				print("[SpecGameAnims File]: Adding ToolIdle Animations")
+				if DebugInfoEnabled then print("[SpecGameAnims File]: Adding ToolIdle Animations") end
 				for _, id in ipairs(data["ToolIdleAnims"]) do
 					if not table.find(ToolIdleAnimsList, id) then
 						table.insert(ToolIdleAnimsList, tostring(id))
 					end
 				end
 			elseif categoryName == "EmoteWheelEmotes" then
-				print("[SpecGameAnims File]: Adding EmoteWhell Data")
+				if DebugInfoEnabled then print("[SpecGameAnims File]: Adding EmoteWhell Data") end
 				local info = data["EmoteWheelEmotes"]
 				if info.Emote1 then EmoteWheelEmotes.Emote1 = info.Emote1 end
 				if info.Emote2 then EmoteWheelEmotes.Emote2 = info.Emote2 end
@@ -3941,7 +4060,7 @@ local function CreateGui()
 			elseif categoryName == "AdditionalData" then
 				if data["AdditionalData"].DefaultWalkSpeed then
 					DefaultWalkSpeed = data["AdditionalData"].DefaultWalkSpeed
-					print("Chaged DefaultWalkSpeed to "..DefaultWalkSpeed)
+					if DebugInfoEnabled then print("Chaged DefaultWalkSpeed to "..DefaultWalkSpeed) end
 				elseif data["AdditionalData"].AnimationHandlerName then
 					AnimationHandler = data["AdditionalData"].AnimationHandlerName
 				end
@@ -3951,7 +4070,7 @@ local function CreateGui()
 	end
 
 	if not IsInStudio then
-		print("Adding Emotes from files...")
+		print("Adding animations from files...")
 		if LoadGithubCustomAnimsEnabled then
 			AdditionalAnimsOperation()
 		end
@@ -3978,7 +4097,6 @@ local function CreateGui()
 	CreateDivideFrame("Weird", 4, "Spec")
 	CreateDivideFrame("Attack", 5, "Spec")
 
-	print("Loading Emote wheel and other functions...")
 	if not ScrollingFrameSpecific:FindFirstChildOfClass("TextButton") then
 		DefaultSection.Visible = false
 		CurrentSection = "Default"
@@ -4083,7 +4201,6 @@ local function CreateGui()
 
 
 	-- UI Decorations
-	print("Decorating GUI...")
 	local UiCornerParts = {"SpecGameSection", "DefaultSection", "Emote1", "Emote2", "Emote3", "Emote4", "Emote5", "Emote6", "Emote7", "Emote8", "ResetButton", "CustomAnimFrame", "PlayAnimButton", "CustomAnimButton", "HotkeysEditOption", "SaveSettingsButton", "LaunchIdDetectorButton", "GithubLinkButton", "HotkeysFrame", "SettingsFrame", "SettingsButton", "GuiTopFrame", "CloseGUI", "DestroyGUI", "GuiBottomFrame", "SpeedValue", "SideFrame", "OpenGUI", "ViewportFrame", "OptionsFrame", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "SitButton", "EmoteWheelButton", "ReversePlayButton", "SearchFrame", "SearchButton"}
 	local UiStrokeParts = {"SpecGameSection", "DefaultSection", "Emote1", "Emote2", "Emote3", "Emote4", "Emote5", "Emote6", "Emote7", "Emote8", "CustomAnimFrame", "HotkeysFrame", "SettingsFrame", "GuiTopFrame", "GuiBottomFrame", "SideFrame", "ScrollingFrame", "ScrollingFrameR15", "ScrollingFrameSpecific", "OptionsFrame", "SearchFrame"}
 	local UiStroke1Parts = {"ResetButton", "PlayAnimButton", "IdBox", "HotkeysEditOption", "SaveSettingsButton", "LaunchIdDetectorButton", "GithubLinkButton", "SpeedValue", "SearchBox", "PauseAnimsButton", "StopDefAnimsButton", "PauseAnimateButton", "SitButton", "EmoteWheelButton", "ReversePlayButton"}
@@ -4251,11 +4368,10 @@ local function CreateGui()
 
 	GuiEmoter = Emoter
 	GuiLoaded = true
-	print("Script loaded!")
 
 	local RestartPlayer
 	RestartPlayer = Player.CharacterAdded:Connect(function()
-		if not GuiActive or not GuiRestarted then
+		if not GuiActive or GuiRestarted then
 			RestartPlayer:Disconnect()
 		end
 		if GuiActive and GuiRestarted == false and Player.Character:WaitForChild("Humanoid") then
@@ -4266,6 +4382,7 @@ local function CreateGui()
 		end
 		GuiRestarted = true
 	end)
+	print("Script loaded!")
 end
 
 function OnRestart()
