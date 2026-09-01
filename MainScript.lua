@@ -3752,28 +3752,28 @@ local function CreateGui()
 						table.insert(ToolIdleAnimsList, tostring(id))
 					end
 				end
-			elseif categoryName == "R6EmoteWheelEmotes" and #data["EmoteWheelEmotes"] ~= 0 and RigType == "R6" then
+			elseif categoryName == "R6EmoteWheelEmotes" and RigType == "R6" then
 				print("[SpecGameAnims File]: Adding EmoteWhell Data")
-				local info = data["EmoteWheelEmotes"]
-				EmoteWheelEmotes.Emote1 = info.Emote1
-				EmoteWheelEmotes.Emote2 = info.Emote2
-				EmoteWheelEmotes.Emote3 = info.Emote3
-				EmoteWheelEmotes.Emote4 = info.Emote4
-				EmoteWheelEmotes.Emote5 = info.Emote5
-				EmoteWheelEmotes.Emote6 = info.Emote6
-				EmoteWheelEmotes.Emote7 = info.Emote7
-				EmoteWheelEmotes.Emote8 = info.Emote8
-			elseif categoryName == "R15EmoteWheelEmotes" and #data["EmoteWheelEmotes"] ~= 0 and RigType == "R15" then
+				local info = data["R6EmoteWheelEmotes"]
+				if info.Emote1 then EmoteWheelEmotes.Emote1 = info.Emote1 end
+				if info.Emote2 then EmoteWheelEmotes.Emote2 = info.Emote2 end
+				if info.Emote3 then EmoteWheelEmotes.Emote3 = info.Emote3 end
+				if info.Emote4 then EmoteWheelEmotes.Emote4 = info.Emote4 end
+				if info.Emote5 then EmoteWheelEmotes.Emote5 = info.Emote5 end
+				if info.Emote6 then EmoteWheelEmotes.Emote6 = info.Emote6 end
+				if info.Emote7 then EmoteWheelEmotes.Emote7 = info.Emote7 end
+				if info.Emote8 then EmoteWheelEmotes.Emote8 = info.Emote8 end
+			elseif categoryName == "R15EmoteWheelEmotes" and RigType == "R15" then
 				print("[SpecGameAnims File]: Adding EmoteWhell Data")
-				local info = data["EmoteWheelEmotes"]
-				EmoteWheelEmotes.Emote1 = info.Emote1
-				EmoteWheelEmotes.Emote2 = info.Emote2
-				EmoteWheelEmotes.Emote3 = info.Emote3
-				EmoteWheelEmotes.Emote4 = info.Emote4
-				EmoteWheelEmotes.Emote5 = info.Emote5
-				EmoteWheelEmotes.Emote6 = info.Emote6
-				EmoteWheelEmotes.Emote7 = info.Emote7
-				EmoteWheelEmotes.Emote8 = info.Emote8
+				local info = data["R15EmoteWheelEmotes"]
+				if info.Emote1 then EmoteWheelEmotes.Emote1 = info.Emote1 end
+				if info.Emote2 then EmoteWheelEmotes.Emote2 = info.Emote2 end
+				if info.Emote3 then EmoteWheelEmotes.Emote3 = info.Emote3 end
+				if info.Emote4 then EmoteWheelEmotes.Emote4 = info.Emote4 end
+				if info.Emote5 then EmoteWheelEmotes.Emote5 = info.Emote5 end
+				if info.Emote6 then EmoteWheelEmotes.Emote6 = info.Emote6 end
+				if info.Emote7 then EmoteWheelEmotes.Emote7 = info.Emote7 end
+				if info.Emote8 then EmoteWheelEmotes.Emote8 = info.Emote8 end
 			end
 		end
 		print("[CustomAnims File]: Loaded Data!")
@@ -3829,17 +3829,17 @@ local function CreateGui()
 						table.insert(ToolIdleAnimsList, tostring(id))
 					end
 				end
-			elseif categoryName == "EmoteWheelEmotes" and #data["EmoteWheelEmotes"] ~= 0 then
+			elseif categoryName == "EmoteWheelEmotes" then
 				print("[SpecGameAnims File]: Adding EmoteWhell Data")
 				local info = data["EmoteWheelEmotes"]
-				EmoteWheelEmotes.Emote1 = info.Emote1
-				EmoteWheelEmotes.Emote2 = info.Emote2
-				EmoteWheelEmotes.Emote3 = info.Emote3
-				EmoteWheelEmotes.Emote4 = info.Emote4
-				EmoteWheelEmotes.Emote5 = info.Emote5
-				EmoteWheelEmotes.Emote6 = info.Emote6
-				EmoteWheelEmotes.Emote7 = info.Emote7
-				EmoteWheelEmotes.Emote8 = info.Emote8
+				if info.Emote1 then EmoteWheelEmotes.Emote1 = info.Emote1 end
+				if info.Emote2 then EmoteWheelEmotes.Emote2 = info.Emote2 end
+				if info.Emote3 then EmoteWheelEmotes.Emote3 = info.Emote3 end
+				if info.Emote4 then EmoteWheelEmotes.Emote4 = info.Emote4 end
+				if info.Emote5 then EmoteWheelEmotes.Emote5 = info.Emote5 end
+				if info.Emote6 then EmoteWheelEmotes.Emote6 = info.Emote6 end
+				if info.Emote7 then EmoteWheelEmotes.Emote7 = info.Emote7 end
+				if info.Emote8 then EmoteWheelEmotes.Emote8 = info.Emote8 end
 			elseif categoryName == "AdditionalData" then
 				if data["AdditionalData"].DefaultWalkSpeed then
 					DefaultWalkSpeed = data["AdditionalData"].DefaultWalkSpeed
@@ -3930,14 +3930,14 @@ local function CreateGui()
 			elseif categoryName == "EmoteWheelEmotes" then
 				print("[SpecGameAnims File]: Adding EmoteWhell Data")
 				local info = data["EmoteWheelEmotes"]
-				EmoteWheelEmotes.Emote1 = info.Emote1
-				EmoteWheelEmotes.Emote2 = info.Emote2
-				EmoteWheelEmotes.Emote3 = info.Emote3
-				EmoteWheelEmotes.Emote4 = info.Emote4
-				EmoteWheelEmotes.Emote5 = info.Emote5
-				EmoteWheelEmotes.Emote6 = info.Emote6
-				EmoteWheelEmotes.Emote7 = info.Emote7
-				EmoteWheelEmotes.Emote8 = info.Emote8
+				if info.Emote1 then EmoteWheelEmotes.Emote1 = info.Emote1 end
+				if info.Emote2 then EmoteWheelEmotes.Emote2 = info.Emote2 end
+				if info.Emote3 then EmoteWheelEmotes.Emote3 = info.Emote3 end
+				if info.Emote4 then EmoteWheelEmotes.Emote4 = info.Emote4 end
+				if info.Emote5 then EmoteWheelEmotes.Emote5 = info.Emote5 end
+				if info.Emote6 then EmoteWheelEmotes.Emote6 = info.Emote6 end
+				if info.Emote7 then EmoteWheelEmotes.Emote7 = info.Emote7 end
+				if info.Emote8 then EmoteWheelEmotes.Emote8 = info.Emote8 end
 			elseif categoryName == "AdditionalData" then
 				if data["AdditionalData"].DefaultWalkSpeed then
 					DefaultWalkSpeed = data["AdditionalData"].DefaultWalkSpeed
