@@ -1,17 +1,17 @@
 {
 	"CustomEmotes": [
 		["DigginOut", "Digginп out", "Spec", 2, "18886065814", 0.1, 1, "PriorLow", false],
-		["Idle", "Idle", "Spec", 4, "75647669693840", 0.1, 1, "PriorLow", true],
+		["Idle", "Idle", "Spec", 4, "75647669693840", 0.1, 1, "PriorLowIdle", true],
 		["StrangeInvisible", "Invisibility", "Spec", 5, "115509603980568", 0.1, 1, "PriorLowPause", true],
 		["Mesmerizer", "Mesmerizer", "Spec", 1, "102332849201255", 0.1, 1, "PriorLow", true],
 		["Rambunctious", "Rambunctious", "Spec", 1, "134229395028226", 0.1, 1, "PriorLow", true],
-		["Coolpose", "Cool pose", "Spec", 4, "80383984466125", 0.1, 1, "PriorLow", true],
+		["Coolpose", "Cool pose", "Spec", 4, "80383984466125", 0.1, 1, "PriorLowIdle", true],
 		["StartPraying", "Start Praying", "Spec", 2, "127491355272189", 0.1, 1, "PriorLow", false],
 		["Praying", "Praying", "Spec", 2, "129590492517737", 0.1, 1, "PriorLow", true],
 		["Running", "Running", "Spec", 3, "136252471123500", 0.1, 0.6, "PriorLowRunning", true],
-		["C00lkiddRunning", "Coolkidd Running", "Spec", 3, "96571077893813", 0.1, 0.7, "PriorLowRunning", true],
+		["C00lkiddRunning", "Coolkidd Running", "Spec", 3, "96571077893813", 0.3, 0.7, "PriorLowRunning16", true],
 		["Static", "Static", "Spec", 1, "94425494947119", 0.1, 1, "PriorLow", true],
-		["Swaying", "Swaying", "Spec", 4, "73853033197617", 0.1, 1, "PriorLow", true],
+		["Swaying", "Swaying", "Spec", 4, "73853033197617", 0.1, 1, "PriorLowIdle", true],
 		["Lonely", "Lonely Dance", "Spec", 1, "138019937280193", 0.1, 1, "PriorLow", true],
 		["RunninAround", "RunninAround", "Spec", 1, "109569860731042", 0.1, 1, "PriorLow", true],
 		["ComeHere", "Come here", "Spec", 2, "111705502957527", 0.1, 1, "PriorLow", false],
@@ -30,7 +30,7 @@
 		["RussianKick", "Russian Kick", "Spec", 1, "83225211078144", 0.1, 1, "PriorLow", true],
 		["Subject3", "Subject3 Dance", "Spec", 1, "75193609204744", 0.1, 1, "PriorLow", true],
 		["Backflip", "Backflip", "Spec", 3, "136079742365611", 0.1, 1, "PriorLow", true],
-		["Frontflip", "Frontlip", "Spec", 3, "136079742365611", 0.1, -1, "PriorLow", true],
+		["Frontflip", "Frontlip", "Spec", 3, "136079742365611", 0.1, -0.7, "PriorLowRunning5", true],
 		["StockDance", "Stock Dance", "Spec", 1, "133140863961315", 0.1, 1, "PriorLow", true],
 		["TheHero", "The Hero", "Spec", 1, "133160365635320", 0.1, 1, "PriorLow", true],
 		["Assumptions", "Assumptions Dance", "Spec", 1, "128492573270955", 0.1, 1, "PriorLow", true],
@@ -50,19 +50,24 @@
 		["Moonwalk", "Moonwalk", "Spec", 3, "92806215347393", 0.1, 1, "PriorLow", true],
 		["BagUp", "Bag Up", "Spec", 1, "117853129871362", 0.1, 1, "PriorLow", true],
 		["NosferatuRun", "Nosferatu Run", "Spec", 3, "125580704385106", 0.1, 1, "PriorLow", true],
-		["NosferatuFly", "Nosferatu Fly", "Spec", 3, "103995840833619", 0.5, 0.8, "PriorHighRunning17", true],
+		["NosferatuFly", "Nosferatu Fly", "Spec", 3, "103995840833619", 0.3, 0.8, "PriorHighRunning17", true],
 		["TennaDance", "Tenna Dance", "Spec", 1, 134545227541599, 0.1, 1, "PriorLow", true],
 		["TennaDance2", "Tenna Dance2", "Spec", 1, 139299160503081, 0.1, 1, "PriorLow", true],
-		["Walk", "Walk", "Spec", 3, "108018357044094", 0.1, 1, "PriorLow", true]
+		["Walk", "Walk", "Spec", 3, "108018357044094", 0.1, 1, "PriorLow", true],
+		["GatitoSlap", "Gatito Slap", "Spec", 6, "106427068964975", 0.1, 1, "PriorLow", false],
+		["GatitoRun", "Gatito Run", "Spec", 3, "82453647377666", 0.3, 0.8, "PriorLowRunning17", true],
+		["GasharpoonRun", "Gasharpoon Run", "Spec", 3, "132653655520682", 0.2, 0.7, "PriorLowRunning17", true],
+		["KrystalSpin", "Krystal Spin", "Spec", 5, "102638845899011", 0.1, 1, "PriorLow", true],
+		["KrystalRun", "Krystal Run", "Spec", 3, "140644979041384", 0.2, 0.6, "PriorLowRunning17", true]
 	],
 	"DefaultAnims": 
 		[],
 	"ToolActionAnims": 
-		["131696603025265", "107339108383093", "139321362207112", "81533966558979", "135884061951801", "114356208094580", "92243093913547", "94039555054855", "126896426760253", "139835501033932", "91758760621955", "104346486636049", "97515610375937", "91449068245117", "87657274257308", "86694530630728", "79706339461226", "72270656710889", "137084281954748", "136579150929627", "130164726362915", "118244995522202", "106779785928420", "98456918873918", "106776364623742", "18885909645", "18885919947", "18885915433", "116618003477002", "107074146593306", "76937407515711", "127802146383565", "82691533602949", "109869078763813", "83635673319417", "121858217776572"],
+		["131696603025265", "107339108383093", "139321362207112", "81533966558979", "135884061951801", "114356208094580", "92243093913547", "94039555054855", "126896426760253", "139835501033932", "91758760621955", "104346486636049", "97515610375937", "91449068245117", "87657274257308", "86694530630728", "79706339461226", "72270656710889", "137084281954748", "136579150929627", "130164726362915", "118244995522202", "106779785928420", "98456918873918", "106776364623742", "18885909645", "18885919947", "18885915433", "116618003477002", "107074146593306", "76937407515711", "127802146383565", "82691533602949", "109869078763813", "83635673319417", "121858217776572", "72606705105660", "82723416428651", "96789868247953", "106427068964975", "78307725415680", "138577533658545", "128783927544474", "104765852095054", "119750400299818", "81724926473026", "113546049960219", "120760647437242", "102638845899011", "103079163311325"],
 	"ToolIdleAnims": 
 		[],
 	"EmoteWheelEmotes": 
-		{"Emote1": "R6Wave", "Emote2": "SpecFrontflip", "Emote3": "SpecRambunctious", "Emote4": "SpecRussianKick", "Emote5": "SpecBunnyHop", "Emote6": "SpecNosferatuRun", "Emote7": "SpecNosferatuFly", "Emote8": "SpecChickenDance"},
+		[],
 	"AdditionalData": {
 		
 	}
