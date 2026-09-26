@@ -1,66 +1,80 @@
-## V1:
-- Added abibily to change animation speed. The number you write in the window is adding to the default speed, 
-if you type negative number, it will make animation slower, but if summary speed will be negative, animation won't work, 
-and if summary is 0,animation will stuck on first frames. 
-- Changed how Gui looks
-- Gui will reappear on Player.CharacterAdded so it prevents Gui to disappear or stop working on death
-- Button to Destroy Gui
-- Added, edited and deleted some R6 animations
-- changed Frame dragging from Frame.Draggable to using UiDragDetector (Now the Frame won't stop dragging even if you move mouse very quick)
+### V5.5:
+- Fixed Id for animations: FloatChillSit, FortniteDance and TakeTheL. Along with it any animation that can't be loaded will be marked by red
+- Added Ability to play non-Running/non-Idle animations as Running or Idle (RightAlt+Click for Running and RightControl+Click for Idle). Priority Change hotkey now works only for LeftAlt
+- Now when you use **LeftAlt+Click** on Animation foth Action4 priority, it will have Action3 Priority
+- Added "Top Most" setting. When enabled, it will be on top of **ANY** Gui
+- Now if you use settings saved for a specific game, it will be indicated on **top-left** corner of settings window. Also if you will be warned if you will try to save settings to main file
+- Now Animations Frame, textboxes and checkboxes doesn't share the same color
+- Added "Reset Character" hotkey
+- Added hints for hotheys on hover
+- Added Gui animations and made Gui dragging smoother. You can edit smoothness in settings, on **0** Gui will drag the same as before update
+- Deleted some unnecessary lines when disabling UICorners
+- Fixed some text in Settings not change it's color when switching to black theme
+- Now you can see which animation data loaded from files by hovering on "Animation" icon on **top-left** corner of settings window
+- Now DisableAnimate option won't work if there's no such script found in Character
+- Now PreviewFrame has UIStroke with color of type of animation you hovered on
+- Now you won't see Settings window popping up for a moment every time when Gui appears
+- Fixed EmoteWheel hotkey disabling along with others when disabling hotkeys
+- Now you can see an error notification appearing if script is broken
 
-  <img width="476" height="299" alt="image" src="https://github.com/user-attachments/assets/60f24374-a56a-4e04-83f3-54ce7c427b31" />
-  
-## V2:
-- Optimized script and made it easier to edit and add new emotes. Now it uses Functions for making anim buttons and playing anims insted of doing code for each button,
-  which saved almost 1000 lines of code before i added more animations (Now it saves even more)
-- Made various types and functions for animations
-- Now some anims can be paused after 1 second by "Pause" option
-- Now you can change LayoutOrder for animations to group them (No visual separations for groups though because of UIGridLayout)
-- All anmations now have Action3 or Action4 priority (PriorLow/PriorHigh in script) so you can normally use animations playable by /e
-- More R6/R15 animations (88 R15 anims and pair of R6 ones), deleted all previous R15 anims because of their awfulness
-- Button to delete Gui
-- Showing text for some buttons on hover
-- Changed colors in some places and some other changes
-- Buttons for currently playing animations are more visible
-- You can loop unlooped anims by clicking RMB on them now
+### V5.2:
+- Now you can save settings separately for each game by clicking RMB on save button
+- Deleted some useless console outputs and made others to show only when Show debug info setting is enabled
+- Updated animations pausing function: now it immediately pauses ANY animation if it starting to play
+- Added setting so ANY animation can be played automatically after restarting GUI/character reappearing (found a reason for adding it)
 
-  <img width="472" height="299" alt="image" src="https://github.com/user-attachments/assets/6b81659d-1763-4d45-8d4f-7aa5f98ef2dc" />
+### V5.1:
+- Fixed some critical bugs
+- Changed how EmoteWheelEmotes reads information from file
 
-### V2.2:
-- Fixed Gui Reset when Character reappears (death or something else)
-- Fixed colors binding to BgColor
+### V5.0.2:
+- Fixed GUI not changing old GUI's state to Restarted which was making a lot of errors
 
-### V2.6:
-- Fixed "Pause" anim function bug when it pauses wrong if you quick enough to play anim with "Pause" Type again
-- Added anim Preview Frame (Unexpected, actually). Disabled by default because can be not useful and you can disable it in Gui
+### V5.0.1:
+- Added a tip for new players if there's no SGA
 
-### V2.8:
-- Added Options
-- Added UiGradient
+## V5.0:
+- Updated AutoPause function for animation. Now you can put a number right after "Pause" keyword. This number is time when animation should be paused. Also changed time logic
+- "HigherPriority" Setting for games that use Action4 animation priority. But sometimes animations looks kinda buggy with it (and i can't fix this), so better use it only when needed
+- **"Running" and "Idle" types for animations. "Running" type will change AnimationSpeed depending on the character's speed and stop when character isn't moving (staying). "Idle" type will play whed you're staying. It has a lot of configurations, so check more info on how to use it in my Wiki**
+- Made size changing setting
+- Added Hints for settings
+- Added More R15 animations (Mostly of "Running" and "Idle" types)
+- Changed icon when launching
+- Fixed a situation where a lot of errors appears in console when deleting/restarting GUI
+- Now you can Change priority of animation easily by **Alt+Click**
+- Added new category for SGA - "AdditionalData". It handles default walk speed for games (needed for "Running" type) and name of In-game Animation handler (like "Animate" script)
+- "Running" and "Idle" types for animations can be played automatically after restarting GUI/character reappearing (made only for these types as i don't think it needs to be for every animation)
+- Updated ToolAnimPriority function: now it uses `Humanoid.AnimationPlayed()` instead of `while true do`
+- Moved some R15 useless (for me) animations to "AdditionalAnimations" Github file. you can disable it in settings
 
-  <img width="234" height="134" alt="image" src="https://github.com/user-attachments/assets/dd2b59fd-7b3d-48fa-9746-8ae2271cbf54" />
 
-### V2.9:
-- Added Divide Frames to visually separate animation buttons (By changing from UIGridLayout to UIListLayout)
-- Fixed some UIPadding things
+### V4.3.6:
+- Added setting do disable loading SGA (Specific Game Anims) from Github
 
-  <img width="473" height="300" alt="image" src="https://github.com/user-attachments/assets/9297a64e-7428-4c3c-a283-d346d3fa942a" />
+### V4.3.5:
+- Now script uses GameId instead PlaceId
+- Now There won't be a message for a category if it's in the file but empty
+- Now there won't be duplicates of anims from SpecificGameAnims file if it was loaded from Github file already
 
-### V2.9.5:
-- Added Search
-- Maded some values positions to save on restart
+### V4.3:
+- Fixed Adding Anims from file to ToolAnims lists
+- Added more R15 anims
+- Changed "algorythm" of UIStroke colors of AnimButtons
+- Added VersionText in settings
+- Fixed Hotkeys ScrollingFrame being not scrollable if you scroll Settings ScrollFrame
+- More fixes
 
-## V3:
-- Added SAVEABLE Settings (Moved PreviewEnabled button along with it)
-- Added Ragdoll fall function
-- Added Custom Animation player
-  
-<img width="720" height="357" alt="image" src="https://github.com/user-attachments/assets/ada667c4-50fe-4215-a0e0-6419ac5dc734" />
+### V4.2:
+- Changed Current speed value in Bottom Frame. Now it's Current Anim Info and you can see it by hovering on a "[info]" text. It will show you some info (Speed and Priority) of ALL currently playing animations.
+- Set IgnoreGuiInset to true
 
-### V3.1:
-- Fixed Custom Animation Player and changed how it works: now it adds a new animation button to start of Gui (instead of just playing it)
-- Fixed check for Preview Frame if character has "Animate" script
-- Some other fixes
+<img width="277" height="225" alt="image" src="https://github.com/user-attachments/assets/9c82ef5f-567d-4569-af74-eac39444ce68" />
+
+### V4.1:
+- Separated ToolAnim Priority setting specifically for Idle and Action anims
+- Optimised PlayAnim function
+- Binded UIGradient and UICorner settings to save
 
 ## V4:
 - Added more hotkeys
@@ -80,79 +94,68 @@ I will add it manually and you could add files for yourself in your files folder
   <img width="496" height="493" alt="image" src="https://github.com/user-attachments/assets/2172a07a-6be2-460d-a588-422ef495af50" />
 
 
-### V4.1:
-- Separated ToolAnim Priority setting specifically for Idle and Action anims
-- Optimised PlayAnim function
-- Binded UIGradient and UICorner settings to save
+### V3.1:
+- Fixed Custom Animation Player and changed how it works: now it adds a new animation button to start of Gui (instead of just playing it)
+- Fixed check for Preview Frame if character has "Animate" script
+- Some other fixes
 
-### V4.2:
-- Changed Current speed value in Bottom Frame. Now it's Current Anim Info and you can see it by hovering on a "[info]" text. It will show you some info (Speed and Priority) of ALL currently playing animations.
-- Set IgnoreGuiInset to true
+## V3:
+- Added SAVEABLE Settings (Moved PreviewEnabled button along with it)
+- Added Ragdoll fall function
+- Added Custom Animation player
+  
+<img width="720" height="357" alt="image" src="https://github.com/user-attachments/assets/ada667c4-50fe-4215-a0e0-6419ac5dc734" />
 
-<img width="277" height="225" alt="image" src="https://github.com/user-attachments/assets/9c82ef5f-567d-4569-af74-eac39444ce68" />
 
-### V4.3:
-- Fixed Adding Anims from file to ToolAnims lists
-- Added more R15 anims
-- Changed "algorythm" of UIStroke colors of AnimButtons
-- Added VersionText in settings
-- Fixed Hotkeys ScrollingFrame being not scrollable if you scroll Settings ScrollFrame
-- More fixes
+### V2.9.5:
+- Added Search
+- Maded some values positions to save on restart
 
-### V4.3.5:
-- Now script uses GameId instead PlaceId
-- Now There won't be a message for a category if it's in the file but empty
-- Now there won't be duplicates of anims from SpecificGameAnims file if it was loaded from Github file already
+### V2.9:
+- Added Divide Frames to visually separate animation buttons (By changing from UIGridLayout to UIListLayout)
+- Fixed some UIPadding things
 
-### V4.3.6:
-- Added setting do disable loading SGA (Specific Game Anims) from Github
+  <img width="473" height="300" alt="image" src="https://github.com/user-attachments/assets/9297a64e-7428-4c3c-a283-d346d3fa942a" />
 
-## V5.0:
-- Updated AutoPause function for animation. Now you can put a number right after "Pause" keyword. This number is time when animation should be paused. Also changed time logic
-- "HigherPriority" Setting for games that use Action4 animation priority. But sometimes animations looks kinda buggy with it (and i can't fix this), so better use it only when needed
-- **"Running" and "Idle" types for animations. "Running" type will change AnimationSpeed depending on the character's speed and stop when character isn't moving (staying). "Idle" type will play whed you're staying. It has a lot of configurations, so check more info on how to use it in my Wiki**
-- Made size changing setting
-- Added Hints for settings
-- Added More R15 animations (Mostly of "Running" and "Idle" types)
-- Changed icon when launching
-- Fixed a situation where a lot of errors appears in console when deleting/restarting GUI
-- Now you can Change priority of animation easily by **Alt+Click**
-- Added new category for SGA - "AdditionalData". It handles default walk speed for games (needed for "Running" type) and name of In-game Animation handler (like "Animate" script)
-- "Running" and "Idle" types for animations can be played automatically after restarting GUI/character reappearing (made only for these types as i don't think it needs to be for every animation)
-- Updated ToolAnimPriority function: now it uses `Humanoid.AnimationPlayed()` instead of `while true do`
-- Moved some R15 useless (for me) animations to "AdditionalAnimations" Github file. you can disable it in settings
+### V2.8:
+- Added Options
+- Added UiGradient
 
-### V5.0.1:
-- Added a tip for new players if there's no SGA
+### V2.6:
+- Fixed "Pause" anim function bug when it pauses wrong if you quick enough to play anim with "Pause" Type again
+- Added anim Preview Frame (Unexpected, actually). Disabled by default because can be not useful and you can disable it in Gui
 
-### V5.0.2:
-- Fixed GUI not changing old GUI's state to Restarted which was making a lot of errors
+### V2.2:
+- Fixed Gui Reset when Character reappears (death or something else)
+- Fixed colors binding to BgColor
 
-### V5.1:
-- Fixed some critical bugs
-- Changed how EmoteWheelEmotes reads information from file
+## V2:
+- Optimized script and made it easier to edit and add new emotes. Now it uses Functions for making anim buttons and playing anims insted of doing code for each button,
+  which saved almost 1000 lines of code before i added more animations (Now it saves even more)
+- Made various types and functions for animations
+- Now some anims can be paused after 1 second by "Pause" option
+- Now you can change LayoutOrder for animations to group them (No visual separations for groups though because of UIGridLayout)
+- All anmations now have Action3 or Action4 priority (PriorLow/PriorHigh in script) so you can normally use animations playable by /e
+- More R6/R15 animations (88 R15 anims and pair of R6 ones), deleted all previous R15 anims because of their awfulness
+- Button to delete Gui
+- Showing text for some buttons on hover
+- Changed colors in some places and some other changes
+- Buttons for currently playing animations are more visible
+- You can loop unlooped anims by clicking RMB on them now
 
-### V5.2:
-- Now you can settings separately for each game by clicking RMB on save button
-- Deleted some useless console outputs and made others to show only when Show debug info setting is enabled
-- Updated animations pausing function: now it immediately pauses ANY animation if it starting to play
-- Added setting so ANY animation can be played automatically after restarting GUI/character reappearing (found a reason for adding it)
+  <img width="472" height="299" alt="image" src="https://github.com/user-attachments/assets/6b81659d-1763-4d45-8d4f-7aa5f98ef2dc" />
 
-### V5.5:
-- Fixed Id for animations: FloatChillSit, FortniteDance and TakeTheL. Along with it any animation that can't be loaded will be marked by red
-- Added Ability to play non-Running/non-Idle animations as Running or Idle (RightAlt+Click for Running and RightControl+Click for Idle). Priority Change hotkey now works only for LeftAlt
-- Now when you use **LeftAlt+Click** on Animation foth Action4 priority, it will have Action3 Priority
-- Added "Top Most" setting. When enabled, it will be on top of **ANY** Gui
-- Now if you use settings saved for a specific game, it will be indicated on **top-left** corner of settings window. Also if you will be warned if you will try to save settings to main file
-- Now Animations Frame, textboxes and checkboxes doesn't share the same color
-- Added "Reset Character" hotkey
-- Added hints for hotheys on hover
-- Added Gui animations and made Gui dragging smoother. You can edit smoothness in settings, on **0** Gui will drag the same as before update
-- Deleted some unnecessary lines when disabling UICorners
-- Fixed some text in Settings not change it's color when switching to black theme
-- Now you can see which animation data loaded from files by hovering on "Animation" icon on **top-left** corner of settings window
-- Now DisableAnimate option won't work if there's no such script found in Character
-- Now PreviewFrame has UIStroke with color of type of animation you hovered on
-- Now you won't see Settings window popping up for a moment every time when Gui appears
-- Fixed EmoteWheel hotkey disabling along with others when disabling hotkeys
-- Now you can see an error notification appearing if script is broken
+
+## V1:
+- Added abibily to change animation speed. The number you write in the window is adding to the default speed, 
+if you type negative number, it will make animation slower, but if summary speed will be negative, animation won't work, 
+and if summary is 0,animation will stuck on first frames. 
+- Changed how Gui looks
+- Gui will reappear on Player.CharacterAdded so it prevents Gui to disappear or stop working on death
+- Button to Destroy Gui
+- Added, edited and deleted some R6 animations
+- changed Frame dragging from Frame.Draggable to using UiDragDetector (Now the Frame won't stop dragging even if you move mouse very quick)
+
+  <img width="476" height="299" alt="image" src="https://github.com/user-attachments/assets/60f24374-a56a-4e04-83f3-54ce7c427b31" />
+
+  <img width="234" height="134" alt="image" src="https://github.com/user-attachments/assets/dd2b59fd-7b3d-48fa-9746-8ae2271cbf54" />
