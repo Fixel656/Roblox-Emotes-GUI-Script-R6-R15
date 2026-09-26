@@ -2,7 +2,8 @@
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
 
-local ScriptVersion = "V5.2"
+local ScriptVersion = 5.5
+local LastUsedVersion = 5.5 --Unused for now
 local GuiActive = true
 local GuiEmoter = nil
 local AnimationHandler = "Animate"
@@ -21,8 +22,9 @@ local AnimPreviewEnabled = true
 local DebugInfoEnabled = false
 local AnalyticsEnabled = true
 local LoadAnimationsOnRestart = true
-local LoadAllAnimationsOnRestart = true
+local LoadAllAnimationsOnRestart = false
 local TopMost = false
+local DragDelay = 0.1
 
 local ToolIdleAnimHighPriorEnabled = false
 local ToolActionAnimHighPriorEnabled = true
@@ -39,7 +41,7 @@ local RunningTypeMinSpeedEnabled = true
 local RunningTypeStopJumpingEnabled = true
 local RunningTypeStopClimbingEnabled = true
 
-local theme = "LightPurple"
+local Theme = "LightPurple"
 local UIGradientEnabled = true
 local UICornerEnabled = true
 local XSize = 460
@@ -51,7 +53,8 @@ local LoadLocalSGAEnabled = true
 local LoadLocalCustomAnimsEnabled = true
 
 local HotkeysEnabled = true
-local DoubleHotkeyEnabled = false
+local DoubleHotkey = Instance.new("StringValue")
+local EmoteWheelHotkey = Instance.new("StringValue")
 local SearchHotkey = Instance.new("StringValue")
 local CloseHotkey = Instance.new("StringValue")
 local SitHotkey = Instance.new("StringValue")
@@ -59,19 +62,22 @@ local SwitchAnimHotkey = Instance.new("StringValue")
 local AnimFadeHotkey = Instance.new("StringValue")
 local SettingsHotkey = Instance.new("StringValue")
 local StopAnimsHotkey = Instance.new("StringValue")
-local EmoteWheelHotkey = Instance.new("StringValue")
+local ResetCharHotkey = Instance.new("StringValue")
 
 CloseHotkey.Value = "T"
 SettingsHotkey.Value = "Y"
-SearchHotkey.Value = "H"
+SearchHotkey.Value = "DoubleH"
 SitHotkey.Value = "J"
 SwitchAnimHotkey.Value = "V"
 StopAnimsHotkey.Value = "N"
 AnimFadeHotkey.Value = "B"
+ResetCharHotkey.Value = "DoubleR"
 
+DoubleHotkey.Value = "LeftControl" --A secondary key for activating a DoubleHotkey
 EmoteWheelHotkey.Value = "Comma" --Not affected by "Hotkeys Enabled" setting
 
 --Loading & Saving
+local IsDefaultSettings = true
 local ConfigFile = "EmoterData/EmoterConfig.json"
 if not IsInStudio then	
 	local targetNumber = tostring(game.GameId)
@@ -90,16 +96,17 @@ if not IsInStudio then
 			if extractedNumber == targetNumber then
 				fileFound = true
 				ConfigFile = filePath
+				IsDefaultSettings = false
 				print("Found settings specifically for this game, loading...")
 				break
 			end
 		end
 	end
-	
+
 	if isfile(ConfigFile) then
 		local rawData = readfile(ConfigFile)
-		
 		local DecodedSettings = HttpService:JSONDecode(rawData)
+
 		-- Accessing the loaded data
 		AnimPreviewEnabled = DecodedSettings.ConfAnimPreviewEnabled
 		DebugInfoEnabled = DecodedSettings.ConfDebugInfoEnabled
@@ -107,6 +114,7 @@ if not IsInStudio then
 		LoadAnimationsOnRestart = DecodedSettings.ConfLoadAnimationsOnRestart
 		LoadAllAnimationsOnRestart = DecodedSettings.ConfLoadAllAnimationsOnRestart
 		TopMost = DecodedSettings.ConfTopMost
+		if DecodedSettings.ConfDragDelay then DragDelay = DecodedSettings.ConfDragDelay end
 
 		ToolIdleAnimHighPriorEnabled = DecodedSettings.ConfToolIdleAnimHighPriorEnabled
 		ToolActionAnimHighPriorEnabled = DecodedSettings.ConfToolActionAnimHighPriorEnabled
@@ -123,7 +131,7 @@ if not IsInStudio then
 		RunningTypeStopJumpingEnabled = DecodedSettings.ConfRunningTypeStopJumpingEnabled
 		RunningTypeStopClimbingEnabled = DecodedSettings.ConfRunningTypeStopClimbingEnabled
 
-		theme = DecodedSettings.ConfTheme
+		Theme = DecodedSettings.ConfTheme
 		UIGradientEnabled = DecodedSettings.ConfUIGradientEnabled
 		UICornerEnabled = DecodedSettings.ConfUICornerEnabled
 		XSize = DecodedSettings.ConfXSize
@@ -135,17 +143,19 @@ if not IsInStudio then
 		LoadLocalCustomAnimsEnabled = DecodedSettings.ConfLoadLocalCustomAnimsEnabled
 
 		HotkeysEnabled = DecodedSettings.ConfHotkeysEnabled
-		DoubleHotkeyEnabled = DecodedSettings.ConfDoubleHotkeyEnabled
-		SearchHotkey.Value = tostring(DecodedSettings.ConfSearchHotkey)
-		CloseHotkey.Value = tostring(DecodedSettings.ConfCloseHotkey)
-		SitHotkey.Value = tostring(DecodedSettings.ConfSitHotkey)
-		SwitchAnimHotkey.Value = tostring(DecodedSettings.ConfSwitchAnimHotkey)
-		AnimFadeHotkey.Value = tostring(DecodedSettings.ConfAnimFadeHotkey)
-		SettingsHotkey.Value = tostring(DecodedSettings.ConfSettingsHotkey)
-		StopAnimsHotkey.Value = tostring(DecodedSettings.StopAnimsHotkey)
-		EmoteWheelHotkey.Value = tostring(DecodedSettings.ConfEmoteWheelHotkey)
+		if DecodedSettings.ConfDoubleHotkey then DoubleHotkey.Value = tostring(DecodedSettings.ConfDoubleHotkey) end
+		if DecodedSettings.ConfEmoteWheelHotkey then EmoteWheelHotkey.Value = tostring(DecodedSettings.ConfEmoteWheelHotkey) end
+		if DecodedSettings.ConfCloseHotkey then CloseHotkey.Value = tostring(DecodedSettings.ConfCloseHotkey) end
+		if DecodedSettings.ConfSettingsHotkey then SettingsHotkey.Value = tostring(DecodedSettings.ConfSettingsHotkey) end
+		if DecodedSettings.ConfSearchHotkey then SearchHotkey.Value = tostring(DecodedSettings.ConfSearchHotkey) end
+		if DecodedSettings.ConfSitHotkey then SitHotkey.Value = tostring(DecodedSettings.ConfSitHotkey) end
+		if DecodedSettings.ConfSwitchAnimHotkey then SwitchAnimHotkey.Value = tostring(DecodedSettings.ConfSwitchAnimHotkey) end
+		if DecodedSettings.ConfAnimFadeHotkey then AnimFadeHotkey.Value = tostring(DecodedSettings.ConfAnimFadeHotkey) end
+		if DecodedSettings.ConfStopAnimsHotkey then StopAnimsHotkey.Value = tostring(DecodedSettings.ConfStopAnimsHotkey) end
+		if DecodedSettings.ConfResetCharHotkey then ResetCharHotkey.Value = tostring(DecodedSettings.ConfResetCharHotkey) end
 	end
 end
+
 local function SaveData(Type)
 	local SettingsToSave = {
 		ConfAnimPreviewEnabled = AnimPreviewEnabled,
@@ -154,6 +164,7 @@ local function SaveData(Type)
 		ConfLoadAnimationsOnRestart = LoadAnimationsOnRestart,
 		ConfLoadAllAnimationsOnRestart = LoadAllAnimationsOnRestart,
 		ConfTopMost = TopMost,
+		ConfDragDelay = DragDelay,
 
 		ConfToolIdleAnimHighPriorEnabled = ToolIdleAnimHighPriorEnabled,
 		ConfToolActionAnimHighPriorEnabled = ToolActionAnimHighPriorEnabled,
@@ -170,7 +181,7 @@ local function SaveData(Type)
 		ConfRunningTypeStopJumpingEnabled = RunningTypeStopJumpingEnabled,
 		ConfRunningTypeStopClimbingEnabled = RunningTypeStopClimbingEnabled,
 
-		ConfTheme = theme,
+		ConfTheme = Theme,
 		ConfUIGradientEnabled = UIGradientEnabled,
 		ConfUICornerEnabled = UICornerEnabled,
 		ConfXSize = XSize,
@@ -182,15 +193,16 @@ local function SaveData(Type)
 		ConfLoadLocalCustomAnimsEnabled = LoadLocalCustomAnimsEnabled,
 
 		ConfHotkeysEnabled = HotkeysEnabled,
-		ConfDoubleHotkeyEnabled = DoubleHotkeyEnabled,
-		ConfSearchHotkey = SearchHotkey.Value,
+		ConfDoubleHotkey = DoubleHotkey.Value,
+		ConfEmoteWheelHotkey = EmoteWheelHotkey.Value,
 		ConfCloseHotkey = CloseHotkey.Value,
+		ConfSettingsHotkey = SettingsHotkey.Value,
+		ConfSearchHotkey = SearchHotkey.Value,
 		ConfSitHotkey = SitHotkey.Value,
 		ConfSwitchAnimHotkey = SwitchAnimHotkey.Value,
 		ConfAnimFadeHotkey = AnimFadeHotkey.Value,
-		ConfSettingsHotkey = SettingsHotkey.Value,
-		StopAnimsHotkey = StopAnimsHotkey.Value,
-		ConfEmoteWheelHotkey = EmoteWheelHotkey.Value
+		ConfStopAnimsHotkey = StopAnimsHotkey.Value,
+		ConfResetCharHotkey = ResetCharHotkey.Value
 	}
 	local encodedData = HttpService:JSONEncode(SettingsToSave)
 
@@ -234,10 +246,12 @@ if AnalyticsEnabled and not IsInStudio then task.spawn(function() loadstring(gam
 local BgColor = Color3.fromRGB(137, 165, 255)
 local ScrollBgColor = Color3.fromRGB(240, 255, 255)
 local UiButColor = Color3.new(0, 0, 0) -- Color of GUI's buttons and Texts
+local TextBgColor = Color3.fromRGB(255, 255, 255)
 local ButtonCol = Color3.fromRGB(192, 191, 211) -- R6 Button Color
 local ButtonSelectCol = Color3.fromRGB(255, 255, 255) -- R6 Button darker color (idk how to make it just darker BgColor yet)
 
 --Restart Values
+local FirstLaunch = true
 local GuiPos = nil
 local SettingsPos = nil
 local ScrollingFramePos = nil
@@ -246,7 +260,9 @@ local GuiClosed = false
 local OptionsOpened = false
 local SettingsOpened = false
 local CurrentSection = "Default"
-local AltPressed = false
+local PriorityAltPressed = false
+local RunAltPressed = false
+local IdleAltPressed = false
 
 local PrevAnimSpeedValue = ""
 local SearchOpened = false
@@ -279,11 +295,83 @@ else
 end
 
 
+--GUI stuff and tables (Moved most of locales are here cuz of that stupid 200 locales limit in a single function and i have no idea how to fix it in another way)
+local DefaultAnimsNameList
+local ToolIdleAnimsList
+local ToolActionAnimsList
+local Emoter
+local MainFrame
+local ViewportFrame
+local SideFrame
+local SideFrameTitle
+local OpenGUI
+local SFDestroyGUI
+local GuiTopFrame
+local DestroyGUI
+local CloseGUI
+local Title
+local GuiBottomFrame
+local SpeedFrame
+local CurAnimInfoTitle
+local OptionsButton
+local ScrollingFrame
+local ScrollingFrameR15
+local ScrollingFrameSpecific
+local ScrollingFramesList
+local OptionsFrame
+local StopAnimsEvent
+local PauseAnimsButton
+local PauseAnimsOption
+local StopDefAnimsButton
+local PauseAnimateButton
+local SitButton
+local ReversePlayButton
+local EmoteWheelButton
+local SearchFrame
+local SearchButton
+local SearchBox
+local BackButton
+local CustomAnimFrame
+local CustomAnimButton
+local IdBox
+local CustomAnimBackButton
+local PlayAnimButton
+local DefaultSection
+local SpecGameSection
+local EmoteWheel
+local EmoteWheelText local Emote1 local Emote2 local Emote3 local Emote4 local Emote5 local Emote6 local Emote7 local Emote8
+local SettingsFrame
+local GuiName
+local AutorText
+local VersionText
+local SGSNotification
+local DataNotification
+local SettingsStuff
+local DragDelayOption
+local DragOptionText
+local DelayNumBox
+local ThemeOption
+local ThemeOptionText
+local PurpleThemeColor
+local OrangeThemeColor
+local YellowThemeColor
+local BlackThemeColor
+local HotkeysEditOption
+local HotkeysFrame
+local HotkeysStuff
+local HotkeyFrameName
+local MoreButtonsFrame
+local SaveSettingsButton
+local LaunchIdDetectorButton
+local ResetButton
+local GithubLinkButton
+
 local function CreateGui()
 	print("Loading Emoter GUI...")
 
 	local SpeedNum = 0 --Value, adding to default speed of animation
 	local AnimInfo = Instance.new("StringValue")
+	local AddedDataInfo = Instance.new("StringValue")
 	local NegativeNumber = 1
 	local DefaultWalkSpeed = 16
 	local Humanoid = nil
@@ -299,116 +387,128 @@ local function CreateGui()
 		RigType = "R15"
 	end
 
-	local DefaultAnimsNameList = {"Animation1", "Animation2", "Animation3", "ClimbAnim", "FallAnim", "JumpAnim", "RunAnim", "SitAnim", "ToolNoneAnim", "WalkAnim", "CheerAnim", "LaughAnim", "PointAnim", "Swim", "SwimIdle", "ToolLungeAnim", "ToolSlashAnim", "WaveAnim"}
-	local ToolIdleAnimsList = {"ToolNoneAnim", "507768375", "182393478"}
-	local ToolActionAnimsList = {"ToolLungeAnim", "ToolSlashAnim", "522638767", "522635514", "129967390", "129967478"}
+	DefaultAnimsNameList = {"Animation1", "Animation2", "Animation3", "ClimbAnim", "FallAnim", "JumpAnim", "RunAnim", "SitAnim", "ToolNoneAnim", "WalkAnim", "CheerAnim", "LaughAnim", "PointAnim", "Swim", "SwimIdle", "ToolLungeAnim", "ToolSlashAnim", "WaveAnim"}
+	ToolIdleAnimsList = {"ToolNoneAnim", "507768375", "182393478"}
+	ToolActionAnimsList = {"ToolLungeAnim", "ToolSlashAnim", "522638767", "522635514", "129967390", "129967478"}
 
-	local Emoter = Instance.new("ScreenGui") --The actual GUI
-	local MainFrame = Instance.new("Frame") --All of the stuff on the main frame
-	local ViewportFrame = Instance.new("ViewportFrame") --Frame with animation preview
+	Emoter = Instance.new("ScreenGui") --The actual GUI
+	MainFrame = Instance.new("Frame") --All of the stuff on the main frame
+	local MFUIScale = Instance.new("UIScale", MainFrame)
+	ViewportFrame = Instance.new("ViewportFrame") --Frame with animation preview
 
-	local SideFrame = Instance.new("Frame") --Visible when GUI is closed
-	local SideFrameTitle = Instance.new("TextLabel")
-	local OpenGUI = Instance.new("ImageButton")
-	local SFDestroyGUI = Instance.new("TextButton")
+	SideFrame = Instance.new("Frame") --Visible when GUI is closed
+	local SFUIScale = Instance.new("UIScale", SideFrame)
+	SideFrameTitle = Instance.new("TextLabel")
+	OpenGUI = Instance.new("ImageButton")
+	SFDestroyGUI = Instance.new("TextButton")
 
-	local GuiTopFrame = Instance.new("Frame") --Top of the main frame
-	local DestroyGUI = Instance.new("TextButton")
-	local CloseGUI = Instance.new("ImageButton")
-	local Title = Instance.new("TextLabel")
+	GuiTopFrame = Instance.new("Frame") --Top of the main frame
+	DestroyGUI = Instance.new("TextButton")
+	CloseGUI = Instance.new("ImageButton")
+	Title = Instance.new("TextLabel")
 
-	local GuiBottomFrame = Instance.new("Frame") --Bottom of the main frame
-	local SpeedFrame = Instance.new("Frame") -- Frame of Speed Changer
-	local CurAnimInfoTitle = Instance.new("TextLabel")
-	local OptionsButton = Instance.new("ImageButton")
+	GuiBottomFrame = Instance.new("Frame") --Bottom of the main frame
+	SpeedFrame = Instance.new("Frame") -- Frame of Speed Changer
+	CurAnimInfoTitle = Instance.new("TextLabel")
+	OptionsButton = Instance.new("ImageButton")
 
-	local ScrollingFrame = Instance.new("ScrollingFrame") --Scrolling frame of R6 animations
-	local ScrollingFrameR15 = Instance.new("ScrollingFrame") --Scrolling frame of R15 animations
-	local ScrollingFrameSpecific = Instance.new("ScrollingFrame") --Scrolling frame of specific game animations
-	local ScrollingFramesList = {
+	ScrollingFrame = Instance.new("ScrollingFrame") --Scrolling frame of R6 animations
+	ScrollingFrameR15 = Instance.new("ScrollingFrame") --Scrolling frame of R15 animations
+	ScrollingFrameSpecific = Instance.new("ScrollingFrame") --Scrolling frame of specific game animations
+	ScrollingFramesList = {
 		ScrollingFrame,
 		ScrollingFrameR15,
 		ScrollingFrameSpecific
 	}
 
-	local OptionsFrame = Instance.new("Frame") --Frame of additional options
-	local StopAnimsEvent = Instance.new("BindableEvent") --Event to stop animations when disabling StopDefaultAnims option
-	local PauseAnimsButton = Instance.new("ImageButton")
-	local PauseAnimsOption = false
-	local StopDefAnimsButton = Instance.new("ImageButton")
-	local PauseAnimateButton = Instance.new("ImageButton")
-	local SitButton = Instance.new("ImageButton")
-	local ReversePlayButton = Instance.new("ImageButton")
-	local EmoteWheelButton = Instance.new("ImageButton")
+	OptionsFrame = Instance.new("Frame") --Frame of additional options
+	StopAnimsEvent = Instance.new("BindableEvent") --Event to stop animations when disabling StopDefaultAnims option
+	PauseAnimsButton = Instance.new("ImageButton")
+	PauseAnimsOption = false
+	StopDefAnimsButton = Instance.new("ImageButton")
+	PauseAnimateButton = Instance.new("ImageButton")
+	SitButton = Instance.new("ImageButton")
+	ReversePlayButton = Instance.new("ImageButton")
+	EmoteWheelButton = Instance.new("ImageButton")
 
-	local SearchFrame = Instance.new("Frame") --Frame for searching anims
-	local SearchButton = Instance.new("ImageButton")
-	local SearchBox = Instance.new("TextBox")
-	local BackButton = Instance.new("ImageButton")
+	SearchFrame = Instance.new("Frame") --Frame for searching anims
+	SearchButton = Instance.new("ImageButton")
+	SearchBox = Instance.new("TextBox")
+	BackButton = Instance.new("ImageButton")
 
-	local CustomAnimFrame = Instance.new("Frame") --Frame for adding anims by it's Id
-	local CustomAnimButton = Instance.new("ImageButton")
-	local IdBox = Instance.new("TextBox")
-	local CustomAnimBackButton = Instance.new("ImageButton")
-	local PlayAnimButton = Instance.new("ImageButton")
+	CustomAnimFrame = Instance.new("Frame") --Frame for adding anims by it's Id
+	CustomAnimButton = Instance.new("ImageButton")
+	IdBox = Instance.new("TextBox")
+	CustomAnimBackButton = Instance.new("ImageButton")
+	PlayAnimButton = Instance.new("ImageButton")
 
-	local DefaultSection = Instance.new("TextButton") --Sections in case when you have specific game anims
-	local SpecGameSection = Instance.new("TextButton")
+	DefaultSection = Instance.new("TextButton") --Sections in case when you have specific game anims
+	SpecGameSection = Instance.new("TextButton")
 
-	local EmoteWheel = Instance.new("Frame") --Emote wheel 
-	local EmoteWheelText = Instance.new("TextLabel")
-	local Emote1 = Instance.new("TextButton")
-	local Emote2 = Instance.new("TextButton")
-	local Emote3 = Instance.new("TextButton")
-	local Emote4 = Instance.new("TextButton")
-	local Emote5 = Instance.new("TextButton")
-	local Emote6 = Instance.new("TextButton")
-	local Emote7 = Instance.new("TextButton")
-	local Emote8 = Instance.new("TextButton")
+	EmoteWheel = Instance.new("Frame") --Emote wheel 
+	EmoteWheelText = Instance.new("TextLabel")
+	Emote1 = Instance.new("TextButton")
+	Emote2 = Instance.new("TextButton")
+	Emote3 = Instance.new("TextButton")
+	Emote4 = Instance.new("TextButton")
+	Emote5 = Instance.new("TextButton")
+	Emote6 = Instance.new("TextButton")
+	Emote7 = Instance.new("TextButton")
+	Emote8 = Instance.new("TextButton")
 
-	local SettingsFrame = Instance.new("Frame") --Settings
-	local GuiName = Instance.new("TextLabel")
-	local AutorText = Instance.new("TextLabel")
-	local VersionText = Instance.new("TextLabel")
-	local SettingsStuff = Instance.new("ScrollingFrame")
-	local ThemeOption = Instance.new("Frame")
-	local ThemeOptionText = Instance.new("TextLabel")
-	local PurpleThemeColor = Instance.new("TextButton")
-	local OrangeThemeColor = Instance.new("TextButton")
-	local YellowThemeColor = Instance.new("TextButton")
-	local BlackThemeColor = Instance.new("TextButton")
-	local HotkeysEditOption = Instance.new("TextButton")
-	local HotkeysFrame = Instance.new("Frame")
-	local HotkeysStuff = Instance.new("ScrollingFrame")
-	local HotkeyFrameName = Instance.new("TextLabel")
-	local MoreButtonsFrame = Instance.new("Frame")
-	local SaveSettingsButton = Instance.new("ImageButton")
-	local LaunchIdDetectorButton = Instance.new("ImageButton")
-	local ResetButton = Instance.new("ImageButton")
-	local GithubLinkButton = Instance.new("ImageButton")
+	SettingsFrame = Instance.new("Frame") --Settings
+	GuiName = Instance.new("TextLabel")
+	AutorText = Instance.new("TextLabel")
+	VersionText = Instance.new("TextLabel")
+	local WarningText = Instance.new("TextLabel")
+	SGSNotification = Instance.new("ImageButton")
+	DataNotification = Instance.new("ImageButton")
+	SettingsStuff = Instance.new("ScrollingFrame")
+	DragDelayOption = Instance.new("Frame")
+	DragOptionText = Instance.new("TextLabel")
+	DelayNumBox = Instance.new("TextBox")
+	ThemeOption = Instance.new("Frame")
+	ThemeOptionText = Instance.new("TextLabel")
+	PurpleThemeColor = Instance.new("TextButton")
+	OrangeThemeColor = Instance.new("TextButton")
+	YellowThemeColor = Instance.new("TextButton")
+	BlackThemeColor = Instance.new("TextButton")
+	HotkeysEditOption = Instance.new("TextButton")
+	HotkeysFrame = Instance.new("Frame")
+	HotkeysStuff = Instance.new("ScrollingFrame")
+	HotkeyFrameName = Instance.new("TextLabel")
+	MoreButtonsFrame = Instance.new("Frame")
+	SaveSettingsButton = Instance.new("ImageButton")
+	LaunchIdDetectorButton = Instance.new("ImageButton")
+	ResetButton = Instance.new("ImageButton")
+	GithubLinkButton = Instance.new("ImageButton")
 
-	if theme == "LightOrange" then
+	if Theme == "LightOrange" then
 		BgColor = Color3.fromRGB(255, 171, 35)
 		ScrollBgColor = Color3.fromRGB(240, 255, 255)
 		UiButColor = Color3.new(0, 0, 0)
+		TextBgColor = Color3.fromRGB(255, 255, 255)
 		ButtonCol = Color3.fromRGB(192, 191, 211)
 		ButtonSelectCol = Color3.fromRGB(255, 255, 255)
-	elseif theme == "LightPurple" then
+	elseif Theme == "LightPurple" then
 		BgColor = Color3.fromRGB(137, 165, 255)
 		ScrollBgColor = Color3.fromRGB(240, 255, 255)
 		UiButColor = Color3.new(0, 0, 0)
+		TextBgColor = Color3.fromRGB(255, 255, 255)
 		ButtonCol = Color3.fromRGB(192, 191, 211)
 		ButtonSelectCol = Color3.fromRGB(255, 255, 255)
-	elseif theme == "LightYellow" then
+	elseif Theme == "LightYellow" then
 		BgColor = Color3.fromRGB(255, 250, 112)
 		ScrollBgColor = Color3.fromRGB(240, 255, 255)
 		UiButColor = Color3.new(0, 0, 0)
+		TextBgColor = Color3.fromRGB(255, 255, 255)
 		ButtonCol = Color3.fromRGB(192, 191, 211)
 		ButtonSelectCol = Color3.fromRGB(255, 255, 255)
-	elseif theme == "Black" then
+	elseif Theme == "Black" then
 		BgColor = Color3.fromRGB(65, 65, 65)
 		ScrollBgColor = Color3.fromRGB(20, 20, 20)
 		UiButColor = Color3.new(1, 1, 1)
+		TextBgColor = Color3.fromRGB(30, 30, 30)
 		ButtonCol = Color3.fromRGB(65, 65, 65)
 		ButtonSelectCol = Color3.fromRGB(129, 129, 129)
 	end
@@ -425,6 +525,10 @@ local function CreateGui()
 		ViewportFrame.LightColor = Color3.fromRGB(208, 208, 208)
 		local UICorner = Instance.new("UICorner")
 		UICorner.Parent = ViewportFrame
+		local UIStroke = Instance.new("UIStroke")
+		UIStroke.Parent = ViewportFrame
+		UIStroke.Thickness = 5
+		UIStroke.BorderStrokePosition = Enum.BorderStrokePosition.Outer
 
 		local WorldModel = Instance.new("WorldModel")
 		WorldModel.Parent = ViewportFrame
@@ -470,7 +574,7 @@ local function CreateGui()
 	end
 	AddVPF()
 
-	local function AddHoverText(Object, Text)
+	local function AddHoverText(Object, Text, Hotkey)
 		local TextLabel = nil
 		Object.MouseEnter:connect(function()
 			TextLabel = Instance.new("TextLabel")
@@ -487,9 +591,14 @@ local function CreateGui()
 			TextLabel.TextXAlignment = Enum.TextXAlignment.Left
 			TextLabel.RichText = true
 
-
 			if Text.Value then
 				TextLabel.Text = Text.Value
+			elseif Hotkey ~= nil and Hotkey.Value ~= "" then
+				if Hotkey.Value:find("Double") then
+					TextLabel.Text = Text.." ["..DoubleHotkey.Value.." + "..Hotkey.Value:gsub("Double", "").."]"
+				else
+					TextLabel.Text = Text.." ["..Hotkey.Value.."]"
+				end
 			else
 				TextLabel.Text = Text
 			end
@@ -520,7 +629,7 @@ local function CreateGui()
 	end
 
 	local PlayingEmoteData = {}
-	local function updateTextLabel()
+	local function UpdateAnimInfo()
 		local TextTable = {}
 
 		for _, item in ipairs(PlayingEmoteData) do
@@ -534,7 +643,7 @@ local function CreateGui()
 			CurAnimInfoTitle.Visible = true
 		end
 	end
-	local function AddEmote(EmoteName, SpeedValue, PriorityValue)
+	local function AddEmoteInfo(EmoteName, SpeedValue, PriorityValue)
 		for index, item in ipairs(PlayingEmoteData) do
 			if item.Name == EmoteName then
 				table.remove(PlayingEmoteData, index)
@@ -543,16 +652,16 @@ local function CreateGui()
 		end
 
 		table.insert(PlayingEmoteData, 1, {Name = EmoteName, Speed = SpeedValue, Priotity = PriorityValue})
-		updateTextLabel()
+		UpdateAnimInfo()
 	end
-	local function RemoveEmote(EmoteName)
+	local function RemoveEmoteInfo(EmoteName)
 		for index, item in ipairs(PlayingEmoteData) do
 			if item.Name == EmoteName then
 				table.remove(PlayingEmoteData, index)
 				break
 			end
 		end
-		updateTextLabel()
+		UpdateAnimInfo()
 	end
 
 	local function CreateAnimButton(Object, Name, Text, Type, LayoutPos)
@@ -589,6 +698,22 @@ local function CreateGui()
 		Button.TextScaled = true
 		Button.LayoutOrder = LayoutPos
 
+		local UIStroke = Instance.new("UIStroke")
+		UIStroke.Parent = Button
+		UIStroke.Thickness = 1
+		UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+		if UICornerEnabled then
+			local UICorner = Instance.new("UICorner")
+			UICorner.Parent = Button
+			UICorner.CornerRadius = UDim.new(0, 3)
+		end
+		if UIGradientEnabled then
+			local UIGradient = Instance.new("UIGradient")
+			UIGradient.Parent = Button
+			UIGradient.Color = ColorSequence.new(Color3.fromRGB(207, 207, 207), Color3.fromRGB(255, 255, 255))
+			UIGradient.Rotation = -90
+		end
+
 		local ButtonPadding = Instance.new("UIPadding")
 		ButtonPadding.Parent = Button
 		ButtonPadding.PaddingLeft = UDim.new(0, 2)
@@ -602,28 +727,60 @@ local function CreateGui()
 		elseif Button.Parent.Name == "ScrollingFrameSpecific" then Frame = "Spec"
 		end
 
+		local AnimSpeed = nil
+		local PauseAnimsOption = false
+		local SwitchModeFactor = false
+		local IsMoving = false
+		local IsPlaying = false
+		local IsRunning = false
+		local IsIdle = false
+		local AnimACTIVE = false
+
 		Button:SetAttribute("Looped", LoopedVal)
 		if LoopedVal == false then
 			AddHoverText(Button, "Click RMB to loop")
+		end
+
+		if Type:find("Running") then
+			IsRunning = true
+		elseif Type:find("Idle") then
+			IsIdle = true
 		end
 
 		local Humanoid = Player.Character:WaitForChild("Humanoid")
 		local Anim = Instance.new("Animation")
 		Anim.Name = "AAnimation"
 		Anim.AnimationId = "rbxassetid://"..ID
-		local track = Humanoid:LoadAnimation(Anim)
+		local track = Humanoid:WaitForChild("Animator"):LoadAnimation(Anim)
+
+		local AnimLoaded = true
+		task.spawn(function()
+			while wait() do
+				if game:GetService("ContentProvider"):GetAssetFetchStatus(Anim.AnimationId) == Enum.AssetFetchStatus.Success then
+					return
+				elseif game:GetService("ContentProvider"):GetAssetFetchStatus(Anim.AnimationId) == Enum.AssetFetchStatus.Failure then
+					AnimLoaded = false
+					warn("Error with animation: ".. ID)
+					Button.UIStroke.Thickness = 2
+					Button.UIStroke.Color = Color3.new(0.945098, 0, 0)
+					AddHoverText(Button, "Couldn't load this animation by it's Id. Please type right Id and make sure this animation is working in this game")
+					return
+				end
+			end
+		end)
+
+		local CurLooped = Button:GetAttribute("Looped")
+		if CurLooped == false then
+			track.Looped = false
+		elseif CurLooped == true then
+			track.Looped = true
+		end
+
 		if Type:find("PriorLow") then
 			track.Priority = Enum.AnimationPriority.Action3
 		elseif Type:find("PriorHigh") then
 			track.Priority = Enum.AnimationPriority.Action4
 		end		
-
-		local AnimSpeed = nil
-		local PauseAnimsOption = false
-		local SwitchModeFactor = false
-		local IsMoving = false
-		local IsPlaying = false
-		local AnimACTIVE = false
 
 		Button.Destroying:Connect(function()
 			if GuiLoaded == false then
@@ -637,8 +794,31 @@ local function CreateGui()
 		local function StartAnim()
 			if DebugInfoEnabled then print(Button.Name.." - Id: "..string.match(track.Animation.AnimationId, "%d+")..", AnimLength: "..track.Length..", AnimSpeed: "..track.Speed..", AnimType: "..Type..", Looped: "..tostring(track.Looped)) end
 
+			if RunAltPressed then
+				if Type:find("Running") then
+					IsRunning = false
+				else
+					IsRunning = true
+				end
+			else
+				if Type:find("Running") then
+					IsRunning = true
+				end
+			end
+			if IdleAltPressed then
+				if Type:find("Idle") then
+					IsIdle = false
+				else
+					IsIdle = true
+				end
+			else
+				if Type:find("Idle") then
+					IsIdle = true
+				end
+			end
+
 			if AnimSwitchModeEnabled == true then
-				if not (((Type:find("Running") and RunningTypeEnabled) or (Type:find("Idle") and IdleTypeEnabled)) and AnimSwitchModeRunIdleExceptionEnabled) then
+				if not (((IsRunning and RunningTypeEnabled) or (IsIdle and IdleTypeEnabled)) and AnimSwitchModeRunIdleExceptionEnabled) then
 					SwitchModeFactor = true
 					StopAnimsEvent:Fire()
 					AnimACTIVE = true
@@ -662,10 +842,18 @@ local function CreateGui()
 				end
 			end
 
-			if AltPressed then
-				track.Priority = Enum.AnimationPriority.Action4
-				if HigherPriorityEnabled then
-					AnimWeight = 20000
+			if PriorityAltPressed then
+				if Type:find("PriorLow") then
+					track.Priority = Enum.AnimationPriority.Action4
+					if HigherPriorityEnabled then
+						AnimWeight = 20000
+					end
+				elseif Type:find("PriorHigh") then
+					track.Priority = Enum.AnimationPriority.Action3
+					if HigherPriorityEnabled then
+						track.Priority = Enum.AnimationPriority.Action4
+						AnimWeight = 10000
+					end
 				end
 			end
 
@@ -673,11 +861,11 @@ local function CreateGui()
 			ViewportFrame.Visible = false
 			Button.BackgroundColor3 = ButtonSelectCol
 			Button.UIStroke.Thickness = 2
-			AddEmote(Button.Name, Speed + SpeedNum, track.Priority.Name)
+			AddEmoteInfo(Button.Name, Speed + SpeedNum, track.Priority.Name)
 
-			if Type:find("Running") and RunningTypeEnabled then
+			if IsRunning and RunningTypeEnabled then
 				Button.UIStroke.Color = Color3.new(0, 0.898039, 0.478431)
-			elseif Type:find("Idle") and IdleTypeEnabled then
+			elseif IsIdle and IdleTypeEnabled then
 				Button.UIStroke.Color = Color3.new(0.741176, 0, 0.890196)
 			elseif Type:find("Pause") then
 				Button.UIStroke.Color = Color3.new(0.835294, 0.85098, 0)
@@ -689,8 +877,8 @@ local function CreateGui()
 				end
 			end
 
-			if Type:find("Running") and RunningTypeEnabled and RunningTypeStopStandingEnabled and IsMoving == false then return end
-			if Type:find("Idle") and IdleTypeEnabled and IsMoving == true then return end
+			if IsRunning and RunningTypeEnabled and RunningTypeStopStandingEnabled and IsMoving == false then return end
+			if IsIdle and IdleTypeEnabled and IsMoving == true then return end
 
 			if AnimSmoothFadeEnabled == true then
 				track:Play(FadeTime, AnimWeight, (Speed + SpeedNum) * NegativeNumber)
@@ -731,6 +919,13 @@ local function CreateGui()
 				track.Priority = Enum.AnimationPriority.Action4
 			end	
 
+			if not Type:find("Running") then
+				IsRunning = false
+			end
+			if not Type:find("Idle") then
+				IsIdle = false
+			end
+
 			if AnimSmoothFadeEnabled == false then
 				track:Stop(0)
 				track:Stop()
@@ -744,10 +939,11 @@ local function CreateGui()
 			Button.BackgroundColor3 = ButtonCol
 			Button.UIStroke.Thickness = 1
 			Button.UIStroke.Color = Color3.new(0, 0, 0)
-			RemoveEmote(Button.Name)
+			RemoveEmoteInfo(Button.Name)
 		end
 
 		Button.MouseButton1Click:connect(function()
+			if AnimLoaded == false then return end
 			AnimACTIVE = not AnimACTIVE
 			if AnimACTIVE then
 				StartAnim()
@@ -756,6 +952,7 @@ local function CreateGui()
 			end
 		end)
 		Button.MouseButton2Click:connect(function()
+			if AnimLoaded == false then return end
 			local CurLooped = Button:GetAttribute("Looped")
 			if CurLooped == false then
 				AnimACTIVE = not AnimACTIVE
@@ -782,7 +979,7 @@ local function CreateGui()
 		end)
 
 		Button.Changed:connect(function()
-			if GuiRestarted == true or GuiActive == false then return end
+			if GuiRestarted == true or GuiActive == false or not AnimLoaded then return end
 			if Button.BackgroundColor3 == ButtonCol and AnimACTIVE then
 				AnimACTIVE = false
 				StopAnim()
@@ -793,17 +990,17 @@ local function CreateGui()
 		end)
 
 		track.Ended:connect(function()
-			if (Type:find("Running") and RunningTypeEnabled) or (Type:find("Idle") and IdleTypeEnabled) then return end
+			if (IsRunning and RunningTypeEnabled) or (IsIdle and IdleTypeEnabled) then return end
 			AnimACTIVE = false
 			Button.BackgroundColor3 = ButtonCol
 			Button.UIStroke.Thickness = 1
 			Button.UIStroke.Color = Color3.new(0, 0, 0)
-			RemoveEmote(Button.Name)
+			RemoveEmoteInfo(Button.Name)
 		end)
 
 		StopAnimsEvent.Event:Connect(function(Reason)
-			if not (Reason == "Reset/Destroy" or Reason == "Forced") and AnimSwitchModeRunIdleExceptionEnabled and ((Type:find("Running") and RunningTypeEnabled) or (Type:find("Idle") and IdleTypeEnabled)) then return end
-			if AnimACTIVE == false then return end
+			if not (Reason == "Reset/Destroy" or Reason == "Forced") and AnimSwitchModeRunIdleExceptionEnabled and ((IsRunning and RunningTypeEnabled) or (IsIdle and IdleTypeEnabled)) then return end
+			if AnimACTIVE == false or not AnimLoaded then return end
 
 			if (Reason == "Reset/Destroy") and (LoadAnimationsOnRestart or LoadAllAnimationsOnRestart) then
 				local Name = Button.Name
@@ -816,7 +1013,7 @@ local function CreateGui()
 						table.insert(RestartAnimations, Frame..Name)
 					end
 				end
-				
+
 			end
 
 			if SwitchModeFactor == true then 
@@ -839,28 +1036,100 @@ local function CreateGui()
 		if tonumber(MinWalkSpeedNumStr) ~= nil then AddHoverText(Button, "Minimal WalkSpeed to play:"..MinWalkSpeedNum) end
 		local RunningConnection
 		local IdleConnection
-		
-		if Type:find("Running") then
-			if RunningTypeMinSpeedEnabled == false then
-				MinWalkSpeedNum = 0.5
+
+		if RunningTypeMinSpeedEnabled == false then
+			MinWalkSpeedNum = 0.5
+		end
+		RunningConnection = Humanoid.Running:Connect(function(currentSpeed)
+			if not IsRunning then return end
+			if GuiActive and GuiRestarted == false then
+				if currentSpeed > 0.5 then
+					IsMoving = true
+				else
+					IsMoving = false
+				end
+			else
+				RunningConnection:Disconnect()
 			end
-			RunningConnection = Humanoid.Running:Connect(function(currentSpeed)
-				if GuiActive and GuiRestarted == false then
-					if currentSpeed > 0.5 then
-						IsMoving = true
-					else
-						IsMoving = false
+
+			if AnimACTIVE and RunningTypeEnabled and GuiActive and GuiRestarted == false then
+				if RunningTypeMinSpeedEnabled == false then
+					MinWalkSpeedNum = 0.5
+				end
+				if currentSpeed > 0.5 and Humanoid.WalkSpeed >= MinWalkSpeedNum then
+
+					local AnimWeight = 1
+					if HigherPriorityEnabled then
+						if Type:find("PriorHigh") then
+							AnimWeight = 250
+						elseif Type:find("PriorLow") then
+							track.Priority = Enum.AnimationPriority.Action4
+							AnimWeight = 100
+						end
+					end
+
+					if not IsPlaying then
+						if AnimSmoothFadeEnabled == true then
+							track:Play(FadeTime, AnimWeight, (Speed + SpeedNum) * NegativeNumber)
+						else
+							track:Play(0, AnimWeight, (Speed + SpeedNum) * NegativeNumber)
+						end
+						IsPlaying = true
+					end
+
+					local characterRelativeSpeed = currentSpeed / DefaultWalkSpeed
+					if RunningTypeStopStandingEnabled == false then
+						characterRelativeSpeed = Humanoid.WalkSpeed / DefaultWalkSpeed
+					end
+
+					local finalAnimationSpeed = characterRelativeSpeed * (Speed + SpeedNum) * NegativeNumber
+					if RunningTypeCharSpeedEnabled then
+						track:AdjustSpeed(finalAnimationSpeed)
 					end
 				else
-					RunningConnection:Disconnect()
-				end
-				
-				if AnimACTIVE and RunningTypeEnabled and GuiActive and GuiRestarted == false then
-					if RunningTypeMinSpeedEnabled == false then
-						MinWalkSpeedNum = 0.5
+					if IsPlaying and RunningTypeStopStandingEnabled then
+						if AnimSmoothFadeEnabled == false then
+							track:Stop(0)
+							track:Stop()
+						else
+							track:Stop()
+						end
+						IsPlaying = false
 					end
-					if currentSpeed > 0.5 and Humanoid.WalkSpeed >= MinWalkSpeedNum then
+				end
+			elseif GuiActive and GuiRestarted == false then
+				if IsPlaying and RunningTypeEnabled then
+					if AnimSmoothFadeEnabled == false then
+						track:Stop(0)
+						track:Stop()
+					else
+						track:Stop()
+					end
+					IsPlaying = false
+				end
+			end
+		end)
 
+		IdleConnection = Humanoid.Running:Connect(function(currentSpeed)
+			if not IsIdle then return end
+			if GuiActive and GuiRestarted == false then
+				if currentSpeed > 0.5 then
+					IsMoving = true
+				else
+					IsMoving = false
+				end
+			else
+				IdleConnection:Disconnect()
+			end
+
+			if AnimACTIVE and IdleTypeEnabled and GuiActive and GuiRestarted == false then
+				if currentSpeed > 0.5 then
+					if IsPlaying then
+						track:Stop()
+						IsPlaying = false
+					end
+				else
+					if IsPlaying == false then
 						local AnimWeight = 1
 						if HigherPriorityEnabled then
 							if Type:find("PriorHigh") then
@@ -880,156 +1149,93 @@ local function CreateGui()
 							IsPlaying = true
 						end
 
-						local characterRelativeSpeed = currentSpeed / DefaultWalkSpeed
-						if RunningTypeStopStandingEnabled == false then
-							characterRelativeSpeed = Humanoid.WalkSpeed / DefaultWalkSpeed
-						end
-
-						local finalAnimationSpeed = characterRelativeSpeed * (Speed + SpeedNum) * NegativeNumber
-						if RunningTypeCharSpeedEnabled then
-							track:AdjustSpeed(finalAnimationSpeed)
-						end
+						IsPlaying = true
+					end
+				end
+			elseif GuiActive and GuiRestarted == false then
+				if IsPlaying and IdleTypeEnabled then
+					if AnimSmoothFadeEnabled == false then
+						track:Stop(0)
+						track:Stop()
 					else
-						if IsPlaying and RunningTypeStopStandingEnabled then
-							if AnimSmoothFadeEnabled == false then
-								track:Stop(0)
-								track:Stop()
-							else
-								track:Stop(FadeTime)
-							end
-							IsPlaying = false
-						end
+						track:Stop(FadeTime)
 					end
-				elseif GuiActive and GuiRestarted == false then
-					if IsPlaying and RunningTypeEnabled then
-						if AnimSmoothFadeEnabled == false then
-							track:Stop(0)
-							track:Stop()
-						else
-							track:Stop(FadeTime)
-						end
-						IsPlaying = false
-					end
+					IsPlaying = false
 				end
-			end)
+			end
+		end)
 
-			Humanoid.Swimming:Connect(function()
-				if IsPlaying and RunningTypeEnabled then
-					track:Stop()
-					IsPlaying = false
-				end
-			end)
-			Humanoid.Jumping:Connect(function()
-				if IsPlaying and RunningTypeEnabled and RunningTypeStopJumpingEnabled then
-					track:Stop()
-					IsPlaying = false
-				end
-			end)
-			Humanoid.FreeFalling:Connect(function()
-				if IsPlaying and RunningTypeEnabled and RunningTypeStopJumpingEnabled then
-					track:Stop()
-					IsPlaying = false
-				end
-			end)
-			Humanoid.Climbing:Connect(function()
-				if IsPlaying and RunningTypeEnabled and RunningTypeStopClimbingEnabled then
-					track:Stop()
-					IsPlaying = false
-				end
-			end)
+		if not AnimLoaded then
+			RunningConnection:Disconnect()
+			IdleConnection:Disconnect()
 		end
 
-		if Type:find("Idle") then
-			IdleConnection = Humanoid.Running:Connect(function(currentSpeed)
-				if GuiActive and GuiRestarted == false then
-					if currentSpeed > 0.5 then
-						IsMoving = true
-					else
-						IsMoving = false
-					end
-				else
-					IdleConnection:Disconnect()
-				end
-				
-				if AnimACTIVE and IdleTypeEnabled and GuiActive and GuiRestarted == false then
-					if currentSpeed > 0.5 then
-						if IsPlaying then
-							track:Stop()
-							IsPlaying = false
-						end
-					else
-						if IsPlaying == false then
-							local AnimWeight = 1
-							if HigherPriorityEnabled then
-								if Type:find("PriorHigh") then
-									AnimWeight = 250
-								elseif Type:find("PriorLow") then
-									track.Priority = Enum.AnimationPriority.Action4
-									AnimWeight = 100
-								end
-							end
-
-							if not IsPlaying then
-								if AnimSmoothFadeEnabled == true then
-									track:Play(FadeTime, AnimWeight, (Speed + SpeedNum) * NegativeNumber)
-								else
-									track:Play(0, AnimWeight, (Speed + SpeedNum) * NegativeNumber)
-								end
-								IsPlaying = true
-							end
-
-							IsPlaying = true
-						end
-					end
-				elseif GuiActive and GuiRestarted == false then
-					if IsPlaying and IdleTypeEnabled then
-						if AnimSmoothFadeEnabled == false then
-							track:Stop(0)
-							track:Stop()
-						else
-							track:Stop(FadeTime)
-						end
-						IsPlaying = false
-					end
-				end
-			end)
-
-			Humanoid.Swimming:Connect(function()
-				if IsPlaying and IdleTypeEnabled then
-					track:Stop()
-					IsPlaying = false
-				end
-			end)
-			Humanoid.Jumping:Connect(function()
-				if IsPlaying and IdleTypeEnabled then
-					track:Stop()
-					IsPlaying = false
-				end
-			end)
-			Humanoid.FreeFalling:Connect(function()
-				if IsPlaying and IdleTypeEnabled then
-					track:Stop()
-					IsPlaying = false
-				end
-			end)
-			Humanoid.Climbing:Connect(function()
-				if IsPlaying and IdleTypeEnabled then
-					track:Stop()
-					IsPlaying = false
-				end
-			end)
-			Humanoid.Seated:Connect(function()
-				if IsPlaying and IdleTypeEnabled then
-					track:Stop()
-					IsPlaying = false
-				end
-			end)
-		end
+		Humanoid.Swimming:Connect(function()
+			if IsPlaying and IdleTypeEnabled and IsIdle then
+				track:Stop()
+				IsPlaying = false
+			end
+			if IsPlaying and RunningTypeEnabled and IsRunning then
+				track:Stop()
+				IsPlaying = false
+			end
+		end)
+		Humanoid.Jumping:Connect(function()
+			if IsPlaying and IdleTypeEnabled and IsIdle then
+				track:Stop()
+				IsPlaying = false
+			end
+			if IsPlaying and RunningTypeEnabled and RunningTypeStopJumpingEnabled and IsRunning then
+				track:Stop()
+				IsPlaying = false
+			end
+		end)
+		Humanoid.FreeFalling:Connect(function()
+			if IsPlaying and IdleTypeEnabled and IsIdle then
+				track:Stop()
+				IsPlaying = false
+			end
+			if IsPlaying and RunningTypeEnabled and RunningTypeStopJumpingEnabled and IsRunning then
+				track:Stop()
+				IsPlaying = false
+			end
+		end)
+		Humanoid.Climbing:Connect(function()
+			if IsPlaying and IdleTypeEnabled and IsIdle then
+				track:Stop()
+				IsPlaying = false
+			end
+			if IsPlaying and RunningTypeEnabled and RunningTypeStopClimbingEnabled and IsRunning then
+				track:Stop()
+				IsPlaying = false
+			end
+		end)
+		Humanoid.Seated:Connect(function()
+			if IsPlaying and IdleTypeEnabled and IsIdle then
+				track:Stop()
+				IsPlaying = false
+			end
+		end)
 
 		local VPFtrack = ClonedChar:WaitForChild("Humanoid"):LoadAnimation(Anim)
 		local VPFActive = false
 		Button.MouseEnter:connect(function()
+			if not AnimLoaded then return end
 			if AnimPreviewEnabled and not AnimACTIVE then
+				if Type:find("Running") and RunningTypeEnabled then
+					ViewportFrame.UIStroke.Color = Color3.new(0, 0.898039, 0.478431)
+				elseif Type:find("Idle") and IdleTypeEnabled then
+					ViewportFrame.UIStroke.Color = Color3.new(0.741176, 0, 0.890196)
+				elseif Type:find("Pause") then
+					ViewportFrame.UIStroke.Color = Color3.new(0.835294, 0.85098, 0)
+				else
+					if track.Looped == true then
+						ViewportFrame.UIStroke.Color = Color3.new(0.0392157, 0.501961, 1)
+					else
+						ViewportFrame.UIStroke.Color = Color3.new(0.972549, 0.670588, 0.0627451)
+					end
+				end
+
 				VPFActive = true
 				VPFtrack.Looped = true
 				VPFtrack:Play(0, 1, (Speed + SpeedNum) * NegativeNumber)
@@ -1074,10 +1280,15 @@ local function CreateGui()
 			end
 
 			if prefix == Frame and suffix == Button.Name then
-				print("working")
 				task.spawn(function()
+					while true do
+						if GuiLoaded then
+							break
+						end
+						wait()
+					end
 					Button:WaitForChild("UIStroke")
-					if Button ~= nil then
+					if Button ~= nil and AnimLoaded then
 						AnimACTIVE = true
 						StartAnim()
 					end
@@ -1103,7 +1314,7 @@ local function CreateGui()
 		CheckImage.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		CheckImage.Position = UDim2.new(0, 0, 0.5, 0)
 		CheckImage.BorderSizePixel = 1
-		CheckImage.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		CheckImage.BackgroundColor3 = TextBgColor
 		CheckImage.Image = "rbxassetid://130396712201457"
 		CheckImage.ImageColor3 = UiButColor
 		CheckImage.Parent = OptionButton
@@ -1111,9 +1322,6 @@ local function CreateGui()
 			CheckImage.Image = "rbxassetid://130396712201457"
 		else
 			CheckImage.Image = ""
-		end
-		if theme == "Black" then
-			CheckImage.BackgroundColor3 = ButtonCol
 		end
 
 		local UIStroke = Instance.new("UIStroke")
@@ -1142,15 +1350,52 @@ local function CreateGui()
 		UIPadding.Parent = TextLabel
 	end
 
-	local function AddHotkey(Hotkey, FrameName, Text)
+	local function AddHotkey(Hotkey, FrameName, Text, Function)
+		local IsDoubleKey = false
+		local Key = Hotkey.Value:gsub("Double", "")
+
+		if Hotkey.Value:find("Double") then 
+			IsDoubleKey = true 
+		end
+
+		local function FunctionHotkey(ActionName, InputState, InputObject)
+			if InputState.Name ~= "Begin" then return end
+			if Hotkey.Value:find("Double") then
+				if not UserInputService:IsKeyDown(Enum.KeyCode[DoubleHotkey.Value]) then return Enum.ContextActionResult.Pass end
+			end	
+
+			Function()
+
+			if Hotkey.Value:find("Double") then
+				return Enum.ContextActionResult.Sink
+			end
+			return Enum.ContextActionResult.Pass
+		end
+		local function BindHotkey()
+			if FrameName == "DoubleHotkey" then return end
+			ContextActionService:UnbindAction("Emoter"..FrameName)
+			ContextActionService:BindAction("Emoter"..FrameName, FunctionHotkey, false, Enum.KeyCode[Key])
+		end
+
+		if GuiActive == false or GuiRestarted or not HotkeysEnabled then
+			ContextActionService:UnbindAction("Emoter"..FrameName)
+			return
+		end
+		BindHotkey()
+
+		if HotkeysStuff:FindFirstChild(FrameName) then return end
+
 		local HotkeyFrame = Instance.new("Frame")
+		local HotkeyText = Instance.new("TextLabel")
+		local RebindButton = Instance.new("TextButton")
+		local DoubleButton = Instance.new("TextButton")
+
 		HotkeyFrame.Name = FrameName
 		HotkeyFrame.Size = UDim2.new(1, 0, 0, 25)
 		HotkeyFrame.BackgroundTransparency = 1
 		HotkeyFrame.Parent = HotkeysStuff
 
-		local HotkeyText = Instance.new("TextLabel")
-		HotkeyText.Size = UDim2.new(0.8241132, -10, 0, 25)
+		HotkeyText.Size = UDim2.new(0, 135, 0, 25)
 		HotkeyText.BackgroundTransparency = 1
 		HotkeyText.TextColor3 = UiButColor
 		HotkeyText.TextSize = 14
@@ -1159,22 +1404,49 @@ local function CreateGui()
 		HotkeyText.Font = Enum.Font.SourceSans
 		HotkeyText.TextXAlignment = Enum.TextXAlignment.Left
 		HotkeyText.Parent = HotkeyFrame
-
 		local UIPadding = Instance.new("UIPadding")
 		UIPadding.PaddingBottom = UDim.new(0, 2)
 		UIPadding.Parent = HotkeyText
 
-		local RebindButton = Instance.new("TextButton")
 		RebindButton.AnchorPoint = Vector2.new(1, 0.5)
-		RebindButton.Size = UDim2.new(0.234, 0, 0, 21)
+		RebindButton.Size = UDim2.new(0, 43, 0, 21)
 		RebindButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		RebindButton.Position = UDim2.new(1, 0, 0.5, 0)
 		RebindButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		RebindButton.TextColor3 = Color3.new(0, 0, 0)
 		RebindButton.TextSize = 14
-		RebindButton.Text = Hotkey.Value or "..."
+		RebindButton.Text = Key or "..."
 		RebindButton.Font = Enum.Font.SourceSans
 		RebindButton.Parent = HotkeyFrame
+
+		DoubleButton.Parent = HotkeyFrame
+		DoubleButton.Name = "DoubleButton"
+		DoubleButton.AnchorPoint = Vector2.new(1, 0.5)
+		DoubleButton.Size = UDim2.new(0, 15, 0, 15)
+		DoubleButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		DoubleButton.Position = UDim2.new(1, -48, 0.5, 0)
+		DoubleButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		DoubleButton.TextSize = 22
+		DoubleButton.TextColor3 = Color3.fromRGB(129, 129, 129)
+		DoubleButton.Text = "+"
+		DoubleButton.TextWrapped = true
+		DoubleButton.Font = Enum.Font.SourceSansBold
+		if IsDoubleKey then
+			DoubleButton.BorderSizePixel = 2
+			DoubleButton.BorderColor3 = Color3.fromRGB(0, 174, 255)
+			DoubleButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+		end
+		AddHoverText(DoubleButton, "Activate Double Hotkey")
+
+		if FrameName == "DoubleHotkey" then
+			RebindButton.Size = UDim2.new(0, 65, 0, 21)
+			DoubleButton:Destroy() 
+		elseif FrameName == "EmoteWheelHotkey" then
+			local SeparateFrame = Instance.new("Frame")
+			SeparateFrame.Size = UDim2.new(1, 0, 0, 10)
+			SeparateFrame.BackgroundTransparency = 1
+			SeparateFrame.Parent = HotkeysStuff
+		end
 
 		local isListening = false
 		RebindButton.MouseButton1Click:Connect(function()
@@ -1184,21 +1456,54 @@ local function CreateGui()
 			RebindButton.Text = "..."
 		end)
 
+		DoubleButton.MouseButton1Click:Connect(function()
+			if isListening then return end
+			IsDoubleKey = not IsDoubleKey
+			if Key ~= "" then
+				if IsDoubleKey then
+					DoubleButton.BorderColor3 = Color3.fromRGB(0, 174, 255)
+					DoubleButton.BorderSizePixel = 2
+					DoubleButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+					Hotkey.Value = "Double"..Key
+					BindHotkey()
+				else
+					DoubleButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+					DoubleButton.BorderSizePixel = 1
+					DoubleButton.TextColor3 = Color3.fromRGB(129, 129, 129)
+					Hotkey.Value = Key
+					BindHotkey()
+				end
+			end
+			if DebugInfoEnabled then print(Hotkey.Value) end
+		end)
+
 		UserInputService.InputBegan:Connect(function(input, gameProcessed)
-			if gameProcessed then return end 
+			if gameProcessed or not GuiActive or GuiRestarted then return end 
 
 			if isListening then
 				if input.UserInputType == Enum.UserInputType.Keyboard then
 					if input.KeyCode.Name == "Backspace" or input.KeyCode.Name == "Enter" then
-						Hotkey.Value = nil
+						Hotkey.Value = ""
+						Key = ""
 						isListening = false
-						RebindButton.Text = "..."
+						RebindButton.Text = ""
+						DoubleButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+						DoubleButton.BorderSizePixel = 1
+						DoubleButton.TextColor3 = Color3.fromRGB(129, 129, 129)
+						ContextActionService:UnbindAction("Emoter"..FrameName)
+						if DebugInfoEnabled then print("Unbinded") end
 						return
 					end
-					Hotkey.Value = tostring(input.KeyCode.Name)
+					Key = tostring(input.KeyCode.Name)
+					if IsDoubleKey then
+						Hotkey.Value = "Double"..tostring(input.KeyCode.Name)
+					else
+						Hotkey.Value = tostring(input.KeyCode.Name)
+					end
 					isListening = false
-					RebindButton.Text = Hotkey.Value
-					print(Hotkey.Value)
+					RebindButton.Text = Key
+					BindHotkey()
+					if DebugInfoEnabled then print(Hotkey.Value) end
 				end
 				return
 			end
@@ -1274,6 +1579,30 @@ local function CreateGui()
 		end
 	end
 
+	local function DraggingFunction(Trigger, Frame) --System originally made by Real_IceyDev (@lceyDex) and modernized by me
+		local DragToggle = nil
+		local DragStart = nil
+		local StartPos = nil
+
+		local function updateInput(Input)
+			local Delta = Input - DragStart
+			local position = UDim2.new(StartPos.X.Scale, StartPos.X.Offset + Delta.X, StartPos.Y.Scale, StartPos.Y.Offset + Delta.Y)
+			game:GetService('TweenService'):Create(Frame, TweenInfo.new(DragDelay), {Position = position}):Play()
+		end
+		Trigger.DragStart:Connect(function(input)
+			DragToggle = true
+			DragStart = input
+			StartPos = Frame.Position
+		end)
+		Trigger.DragEnd:Connect(function()
+			DragToggle = false
+		end)
+		Trigger.DragContinue:Connect(function(input)
+			if DragToggle then
+				updateInput(input)
+			end
+		end)
+	end
 
 	-- Creating Objects
 	Emoter.Name = "Emoter"
@@ -1305,13 +1634,16 @@ local function CreateGui()
 
 	local UIDragDetectorSideFrame = Instance.new("UIDragDetector")
 	UIDragDetectorSideFrame.Parent = SideFrame
+	UIDragDetectorSideFrame.DragStyle = Enum.UIDragDetectorDragStyle.Scriptable
+	UIDragDetectorSideFrame.ResponseStyle = Enum.UIDragDetectorResponseStyle.CustomOffset
+	DraggingFunction(UIDragDetectorSideFrame, SideFrame)
 
 	SideFrameTitle.Name = "SideFrameTitle"
 	SideFrameTitle.Parent = SideFrame
 	SideFrameTitle.AnchorPoint = Vector2.new(0.5, 0.5)
 	SideFrameTitle.BackgroundTransparency = 1
 	SideFrameTitle.Position = UDim2.new(0.5, 0, 0.5, 0)
-	SideFrameTitle.Size = UDim2.new(0, 119, 0, 31)
+	SideFrameTitle.Size = UDim2.new(0, 0, 0, 31)
 	SideFrameTitle.Font = Enum.Font.SourceSansBold
 	SideFrameTitle.TextColor3 = Color3.new(1, 1, 1)
 	SideFrameTitle.Text = "Emote GUI"
@@ -1321,7 +1653,7 @@ local function CreateGui()
 	SFDestroyGUI.Name = "DestroyGUI"
 	SFDestroyGUI.Parent = SideFrame
 	SFDestroyGUI.AnchorPoint = Vector2.new(1, 0.5)
-	SFDestroyGUI.BackgroundTransparency = 0
+	SFDestroyGUI.BorderSizePixel = 0
 	SFDestroyGUI.Position = UDim2.new(1, 0, 0.5, 0)
 	SFDestroyGUI.Size = UDim2.new(0, 32, 0, 32)
 	SFDestroyGUI.BackgroundColor3 = BgColor
@@ -1335,13 +1667,13 @@ local function CreateGui()
 	OpenGUI.Name = "OpenGUI"
 	OpenGUI.Parent = SideFrame
 	OpenGUI.AnchorPoint = Vector2.new(0, 0.5)
-	OpenGUI.BackgroundTransparency = 0
+	OpenGUI.BorderSizePixel = 0
 	OpenGUI.BackgroundColor3 = BgColor
 	OpenGUI.Position = UDim2.new(0, 0, 0.5, 0)
 	OpenGUI.Size = UDim2.new(0, 32, 0, 32)
 	OpenGUI.Image = "rbxassetid://101249930107274"
 	OpenGUI.ImageColor3 = UiButColor
-	AddHoverText(OpenGUI, "Open/Close GUI")
+	AddHoverText(OpenGUI, "Open/Close GUI", CloseHotkey)
 
 
 	-- MainFrame
@@ -1353,10 +1685,6 @@ local function CreateGui()
 	MainFrame.Size = UDim2.new(0, XSize, 0, YSize)
 	MainFrame.Position = UDim2.new(0, 10, 0, 70)
 
-	local UIDragDetectorMainFrame = Instance.new("UIDragDetector")
-	UIDragDetectorMainFrame.Parent = MainFrame
-
-
 	-- GuiTopFrame
 	GuiTopFrame.Name = "GuiTopFrame"
 	GuiTopFrame.Parent = MainFrame
@@ -1367,7 +1695,7 @@ local function CreateGui()
 	DestroyGUI.Name = "DestroyGUI"
 	DestroyGUI.Parent = GuiTopFrame
 	DestroyGUI.AnchorPoint = Vector2.new(1, 0.5)
-	DestroyGUI.BackgroundTransparency = 0
+	DestroyGUI.BorderSizePixel = 0
 	DestroyGUI.BackgroundColor3 = BgColor
 	DestroyGUI.Position = UDim2.new(1, 0, 0.5, 0)
 	DestroyGUI.Size = UDim2.new(0, 32, 0, 32)
@@ -1382,23 +1710,24 @@ local function CreateGui()
 	CloseGUI.Parent = GuiTopFrame
 	CloseGUI.AnchorPoint = Vector2.new(0, 0.5)
 	CloseGUI.BackgroundColor3 = BgColor
-	CloseGUI.BackgroundTransparency = 0
+	CloseGUI.BorderSizePixel = 0
 	CloseGUI.Position = UDim2.new(0, 0, 0.5, 0)
 	CloseGUI.Size = UDim2.new(0, 32, 0, 32)
 	CloseGUI.Image = "rbxassetid://105612912027138"
 	CloseGUI.ImageColor3 = UiButColor
-	AddHoverText(CloseGUI, "Open/Close GUI")
+	AddHoverText(CloseGUI, "Open/Close GUI", CloseHotkey)
 
 	local SettingsButton = Instance.new("ImageButton")
 	SettingsButton.Parent = GuiTopFrame
 	SettingsButton.Name = "SettingsButton"
+	SettingsButton.BorderSizePixel = 0
 	SettingsButton.AnchorPoint = Vector2.new(1, 0.5)
 	SettingsButton.Size = UDim2.new(0, 32, 0, 32)
 	SettingsButton.Position = UDim2.new(1, -32, 0.5, 0)
 	SettingsButton.BackgroundColor3 = BgColor
 	SettingsButton.ImageColor3 = UiButColor
 	SettingsButton.Image = "rbxassetid://129555881355020"
-	AddHoverText(SettingsButton, "Settings")
+	AddHoverText(SettingsButton, "Settings", SettingsHotkey)
 
 	Title.Name = "Title"
 	Title.Parent = GuiTopFrame
@@ -1406,7 +1735,7 @@ local function CreateGui()
 	Title.Position = UDim2.new(0.5, 0, 0.5, 0)
 	Title.BackgroundColor3 = Color3.new(1, 1, 1)
 	Title.BackgroundTransparency = 1
-	Title.Size = UDim2.new(0, 119, 0, 31)
+	Title.Size = UDim2.new(0, 0, 0, 31)
 	Title.Text = "Emoter GUI"
 	Title.Font = Enum.Font.SourceSansBold
 	Title.TextColor3 = Color3.new(1, 1, 1)
@@ -1414,6 +1743,11 @@ local function CreateGui()
 	Title.TextStrokeTransparency = 0
 	Title.TextWrapped = false
 
+	local UIDragDetectorGuiTopFrame = Instance.new("UIDragDetector")
+	UIDragDetectorGuiTopFrame.Parent = GuiTopFrame
+	UIDragDetectorGuiTopFrame.DragStyle = Enum.UIDragDetectorDragStyle.Scriptable
+	UIDragDetectorGuiTopFrame.ResponseStyle = Enum.UIDragDetectorResponseStyle.CustomOffset
+	DraggingFunction(UIDragDetectorGuiTopFrame, MainFrame)
 
 	-- GuiBottomFrame
 	GuiBottomFrame.Name = "GuiBottomFrame"
@@ -1457,7 +1791,7 @@ local function CreateGui()
 	SpeedValue.Size = UDim2.new(0, 100, 0, 40)
 	SpeedValue.LayoutOrder = 2
 	SpeedValue.Position = UDim2.new(0.5, 0, 0, 0)
-	SpeedValue.BackgroundColor3 = ScrollBgColor
+	SpeedValue.BackgroundColor3 = TextBgColor
 	SpeedValue.TextColor3 = UiButColor
 	SpeedValue.Text = ""
 	SpeedValue.PlaceholderText = "0 = Default"
@@ -1588,7 +1922,13 @@ local function CreateGui()
 	StopDefAnimsButton.Image = "rbxassetid://116957047917442"
 	StopDefAnimsButton.Parent = OptionsFrame
 	StopDefAnimsButton.ZIndex = 0
-	AddHoverText(StopDefAnimsButton, "Stop Default Anims. May not work on some games")
+	if not Player.Character:FindFirstChild(AnimationHandler) then
+		StopDefAnimsButton.ImageTransparency = 0.5
+		StopDefAnimsButton.Interactable = false
+		AddHoverText(StopDefAnimsButton, "This feature isn't supported on this game. Check Wiki for more info")
+	else
+		AddHoverText(StopDefAnimsButton, "Stop Default Anims. May not work on some games")
+	end
 
 	PauseAnimateButton.Name = "PauseAnimateButton"
 	PauseAnimateButton.Size = UDim2.new(0, 100, 0, 100)
@@ -1598,7 +1938,13 @@ local function CreateGui()
 	PauseAnimateButton.Image = "rbxassetid://109849420482663"
 	PauseAnimateButton.Parent = OptionsFrame
 	PauseAnimateButton.ZIndex = 0
-	AddHoverText(PauseAnimateButton, "Pause Default Animate Script (will look like you're lagging)")
+	if not Player.Character:FindFirstChild(AnimationHandler) then
+		PauseAnimateButton.ImageTransparency = 0.5
+		PauseAnimateButton.Interactable = false
+		AddHoverText(PauseAnimateButton, "This feature isn't supported on this game. Check Wiki for more info")
+	else
+		AddHoverText(PauseAnimateButton, "Pause Default Animate Script (will look like you're lagging)")
+	end
 
 	ReversePlayButton.Parent = OptionsFrame
 	ReversePlayButton.Name = "ReversePlayButton"
@@ -1620,7 +1966,7 @@ local function CreateGui()
 	SitButton.ImageColor3 = Color3.fromRGB(255, 255, 255)
 	SitButton.Parent = OptionsFrame
 	SitButton.ZIndex = 0
-	AddHoverText(SitButton, "Ragdoll-like falling with sit animation")
+	AddHoverText(SitButton, "Ragdoll-like falling with sit animation", SitHotkey)
 
 	EmoteWheelButton.Parent = OptionsFrame
 	EmoteWheelButton.Name = "EmoteWheelButton"
@@ -1632,7 +1978,7 @@ local function CreateGui()
 	EmoteWheelButton.ImageColor3 = UiButColor
 	EmoteWheelButton.Image = "rbxassetid://104869367027493"
 	EmoteWheelButton.ScaleType = Enum.ScaleType.Crop
-	AddHoverText(EmoteWheelButton, "Show Emote wheel")
+	AddHoverText(EmoteWheelButton, "Show Emote wheel", EmoteWheelHotkey)
 
 
 	--Search Box
@@ -1659,7 +2005,7 @@ local function CreateGui()
 	SearchButton.Image = "rbxassetid://118685771787843"
 	SearchButton.ImageColor3 = UiButColor
 	SearchButton.Parent = SearchFrame
-	AddHoverText(SearchButton, "Search")
+	AddHoverText(SearchButton, "Search", SearchHotkey)
 
 	SearchBox.Name = "SearchBox"
 	SearchBox.ZIndex = 0
@@ -1668,7 +2014,7 @@ local function CreateGui()
 	SearchBox.Size = UDim2.new(0, 139, 0, 29)
 	SearchBox.LayoutOrder = 1
 	SearchBox.Position = UDim2.new(0.469697, 0, 0.075, 0)
-	SearchBox.BackgroundColor3 = ScrollBgColor
+	SearchBox.BackgroundColor3 = TextBgColor
 	SearchBox.TextColor3 = UiButColor
 	SearchBox.PlaceholderText = "Search..."
 	SearchBox.Text = ""
@@ -1736,7 +2082,7 @@ local function CreateGui()
 	IdBox.Size = UDim2.new(0, 140, 0, 29)
 	IdBox.LayoutOrder = 1
 	IdBox.Position = UDim2.new(0.469697, 0, 0.075, 0)
-	IdBox.BackgroundColor3 = ScrollBgColor
+	IdBox.BackgroundColor3 = TextBgColor
 	IdBox.TextWrapped = true
 	IdBox.TextColor3 = UiButColor
 	IdBox.PlaceholderText = "Enter Id..."
@@ -1979,7 +2325,7 @@ local function CreateGui()
 	SettingsFrame.AnchorPoint = Vector2.new(0.5, 0)
 	SettingsFrame.Size = UDim2.new(0, 220, 0, 286)
 	SettingsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	SettingsFrame.Position = MainFrame.Position + UDim2.new(0, 590, 0, 0)
+	SettingsFrame.Position = MainFrame.Position + UDim2.new(-1, 0, 0, 0)
 	SettingsFrame.BorderSizePixel = 0
 	SettingsFrame.BackgroundColor3 = ScrollBgColor
 	SettingsFrame.Visible = false
@@ -1989,30 +2335,60 @@ local function CreateGui()
 	UIShadow.Transparency = 0.5
 	UIShadow.Parent = SettingsFrame
 
-	local UIDragDetector = Instance.new("UIDragDetector")
-	UIDragDetector.DragUDim2 = UDim2.new(0, -89, 0, 32)
-	UIDragDetector.Parent = SettingsFrame
+	local UIDragDetectorSettings = Instance.new("UIDragDetector")
+	UIDragDetectorSettings.Parent = SettingsFrame
+	UIDragDetectorSettings.DragStyle = Enum.UIDragDetectorDragStyle.Scriptable
+	UIDragDetectorSettings.ResponseStyle = Enum.UIDragDetectorResponseStyle.CustomOffset
+	DraggingFunction(UIDragDetectorSettings, SettingsFrame)
+
+	SGSNotification.Parent = SettingsFrame
+	SGSNotification.Name = "SGSNotification"
+	SGSNotification.AutoButtonColor = false
+	SGSNotification.Size = UDim2.new(0, 20, 0, 20)
+	SGSNotification.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	SGSNotification.BackgroundTransparency = 1
+	SGSNotification.Position = UDim2.new(0, 2, 0, 28)
+	SGSNotification.BorderSizePixel = 0
+	SGSNotification.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	SGSNotification.Image = "rbxassetid://76962094933629"
+	AddHoverText(SGSNotification, "The settings was loaded from file for only <b>this</b> game (click RMB to delete this file)")
+	if IsDefaultSettings then
+		SGSNotification.Visible = false
+	end
+
+	DataNotification.Parent = SettingsFrame
+	DataNotification.Visible = false
+	DataNotification.Name = "AddedDataNotification"
+	DataNotification.AutoButtonColor = false
+	DataNotification.Size = UDim2.new(0, 25, 0, 25)
+	DataNotification.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	DataNotification.BackgroundTransparency = 1
+	DataNotification.Position = UDim2.new(0, 0, 0, 1)
+	DataNotification.BorderSizePixel = 0
+	DataNotification.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	DataNotification.Image = "rbxassetid://85975257618857"
+	AddHoverText(DataNotification, AddedDataInfo)
 
 	GuiName.Name = "Name"
-	GuiName.Size = UDim2.new(1, 0, 0.0022999, 25)
+	GuiName.AnchorPoint = Vector2.new(0.5, 0)
+	GuiName.Size = UDim2.new(0, 0, 0, 25)
 	GuiName.BackgroundTransparency = 1
-	GuiName.Position = UDim2.new(0, 0, 0.0175439, 0)
-	GuiName.TextSize = 14
+	GuiName.Position = UDim2.new(0.5, 0, 0, 5)
+	GuiName.TextSize = 25
 	GuiName.Text = "Emoter GUI"
 	GuiName.Font = Enum.Font.Highway
-	GuiName.TextScaled = true
 	GuiName.TextColor3 = UiButColor
 	GuiName.Parent = SettingsFrame
 
 	AutorText.Name = "AutorText"
-	AutorText.Size = UDim2.new(1, 0, -0.025, 25)
+	AutorText.AnchorPoint = Vector2.new(0.5, 0)
+	AutorText.Size = UDim2.new(0, 0, -0.025, 25)
 	AutorText.LayoutOrder = 1
 	AutorText.BackgroundTransparency = 1
-	AutorText.Position = UDim2.new(-0.0069782, 0, 0.0940293, 0)
-	AutorText.TextSize = 14
+	AutorText.Position = UDim2.new(0.5, 0, 0, 27)
+	AutorText.TextSize = 17
 	AutorText.Text = "by Fixel"
 	AutorText.Font = Enum.Font.SourceSans
-	AutorText.TextScaled = true
 	AutorText.TextColor3 = UiButColor
 	AutorText.Parent = SettingsFrame
 
@@ -2024,12 +2400,34 @@ local function CreateGui()
 	VersionText.BackgroundTransparency = 1
 	VersionText.Position = UDim2.new(1, -2, 0, 0)
 	VersionText.TextSize = 14
-	VersionText.Text = ScriptVersion
+	VersionText.Text = "V"..ScriptVersion
 	VersionText.TextColor3 = Color3.fromRGB(147, 147, 147)
 	VersionText.TextWrapped = true
 	VersionText.Font = Enum.Font.SourceSans
 	VersionText.TextXAlignment = Enum.TextXAlignment.Right
 	VersionText.TextYAlignment = Enum.TextYAlignment.Top
+
+	WarningText.Parent = SettingsFrame
+	WarningText.Name = "WarningText"
+	WarningText.Visible = false
+	WarningText.AnchorPoint = Vector2.new(0.5, 0)
+	WarningText.Size = UDim2.new(0, 220, 0, 35)
+	WarningText.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	WarningText.BackgroundTransparency = 1
+	WarningText.Position = UDim2.new(0.5, 0, 1, 5)
+	WarningText.TextStrokeColor3 = Color3.fromRGB(255, 255, 255)
+	WarningText.TextStrokeTransparency = 0
+	WarningText.TextSize = 14
+	WarningText.RichText = true
+	WarningText.TextColor3 = Color3.fromRGB(0, 0, 0)
+	WarningText.Text = "Do you want to save settings to main file while having specific settings? (Click again to proceed)"
+	WarningText.TextWrapped = true
+	WarningText.Font = Enum.Font.SourceSans
+
+	local UIStroke = Instance.new("UIStroke")
+	UIStroke.Color = Color3.fromRGB(255, 255, 255)
+	UIStroke.Thickness = 2
+	UIStroke.Parent = WarningText
 
 	SettingsStuff.Name = "SettingsStuff"
 	SettingsStuff.Size = UDim2.new(1, 0, 0.648, 0)
@@ -2136,7 +2534,7 @@ local function CreateGui()
 	YSizeOptionText.Size = UDim2.new(0, 94, 0, 25)
 	YSizeOptionText.BackgroundTransparency = 1
 	YSizeOptionText.TextSize = 14
-	YSizeOptionText.TextColor3 = Color3.fromRGB(0, 0, 0)
+	YSizeOptionText.TextColor3 = UiButColor
 	YSizeOptionText.Text = "Vertical size"
 	YSizeOptionText.Font = Enum.Font.SourceSans
 	YSizeOptionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -2198,7 +2596,7 @@ local function CreateGui()
 	XSizeOptionText.Size = UDim2.new(0, 104, 0, 25)
 	XSizeOptionText.BackgroundTransparency = 1
 	XSizeOptionText.TextSize = 14
-	XSizeOptionText.TextColor3 = Color3.fromRGB(0, 0, 0)
+	XSizeOptionText.TextColor3 = UiButColor
 	XSizeOptionText.Text = "Horizontal size"
 	XSizeOptionText.Font = Enum.Font.SourceSans
 	XSizeOptionText.TextXAlignment = Enum.TextXAlignment.Left
@@ -2271,6 +2669,42 @@ local function CreateGui()
 	AddSettings(LoadLocalSGAEnabled, "LoadLocalSGAOption", "Load SpecificGameAnims from local", 5)
 	AddSettings(LoadLocalCustomAnimsEnabled, "LoadLocalCustomAnimOption", "Load AdditionalAnims from local", 5)
 
+	DragDelayOption.Parent = SettingsStuff
+	DragDelayOption.LayoutOrder = 3
+	DragDelayOption.Name = "DragDelayOption"
+	DragDelayOption.Size = UDim2.new(1, 0, 0, 25)
+	DragDelayOption.BackgroundTransparency = 1
+	AddHoverText(DragDelayOption, "Number of drag smoothness. Еhe higher the number the smoother and slower GUI element will move. If at 0, it will move without smooth")
+
+	local UIListLayout = Instance.new("UIListLayout")
+	UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+	UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	UIListLayout.Padding = UDim.new(0, 5)
+	UIListLayout.Parent = DragDelayOption
+
+	DragOptionText.Name = "DragOptionText"
+	DragOptionText.Size = UDim2.new(0, 164, 0, 25)
+	DragOptionText.BackgroundTransparency = 1
+	DragOptionText.TextSize = 14
+	DragOptionText.TextColor3 = UiButColor
+	DragOptionText.Text = "Drag Smoothness"
+	DragOptionText.Font = Enum.Font.SourceSans
+	DragOptionText.TextXAlignment = Enum.TextXAlignment.Left
+	DragOptionText.Parent = DragDelayOption
+
+	DelayNumBox.Size = UDim2.new(0, 35, 0, 20)
+	DelayNumBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	DelayNumBox.BackgroundColor3 = TextBgColor
+	DelayNumBox.TextSize = 14
+	DelayNumBox.TextColor3 = UiButColor
+	DelayNumBox.ClearTextOnFocus = false
+	DelayNumBox.Text = DragDelay
+	DelayNumBox.PlaceholderText = "0"
+	DelayNumBox.CursorPosition = -1
+	DelayNumBox.Font = Enum.Font.SourceSans
+	DelayNumBox.Parent = DragDelayOption
+
 	HotkeysEditOption.Name = "HotkeysEditOption"
 	HotkeysEditOption.Size = UDim2.new(0.55, 0, 0, 20)
 	HotkeysEditOption.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -2294,7 +2728,7 @@ local function CreateGui()
 
 	HotkeysFrame.Name = "HotkeysFrame"
 	HotkeysFrame.AnchorPoint = Vector2.new(0, 0.5)
-	HotkeysFrame.Size = UDim2.new(0, 190, 0, 138)
+	HotkeysFrame.Size = UDim2.new(0, 220, 0, 138)
 	HotkeysFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	HotkeysFrame.Position = UDim2.new(1, 10, 0.76, 0)
 	HotkeysFrame.BorderSizePixel = 0
@@ -2329,15 +2763,6 @@ local function CreateGui()
 	HotkeyFrameName.Font = Enum.Font.Highway
 	HotkeyFrameName.TextScaled = true
 	HotkeyFrameName.Parent = HotkeysFrame
-
-	AddHotkey(SearchHotkey, "SearchHotkey", "Search")
-	AddHotkey(CloseHotkey, "CloseHotkey", "Close/Open Gui")
-	AddHotkey(SitHotkey, "SitHotkey", "Ragdoll-like falling")
-	AddHotkey(SettingsHotkey, "SettingsHotkey", "Open Settings")
-	AddHotkey(SwitchAnimHotkey, "SwitchAnimHotkey", "Switch Anim Setting")
-	AddHotkey(AnimFadeHotkey, "AnimFadeHotkey", "Animation Fade Setting")
-	AddHotkey(StopAnimsHotkey, "StopAnimsHotkey", "Stop all Animations")
-	AddHotkey(EmoteWheelHotkey, "EmoteWheelHotkey", "Open Emote Wheel")
 
 	MoreButtonsFrame.Parent = SettingsFrame
 	MoreButtonsFrame.Name = "MoreButtonsFrame"
@@ -2394,29 +2819,120 @@ local function CreateGui()
 	AddHoverText(GithubLinkButton, "Get the Github for Tutorials and more Info! (Copy Link)")
 
 
+	--Hotkey Functions
+	local function CloseGuiFunction()
+		if MainFrame.Visible == true then
+			SideFrame.Position = MainFrame.Position
+		else
+			MainFrame.Position = SideFrame.Position
+		end
+		MainFrame.Visible = not MainFrame.Visible
+		SideFrame.Visible = not SideFrame.Visible
+		if MainFrame.Visible == false then
+			MFUIScale.Scale = 0.8
+			game.TweenService:Create(SFUIScale, TweenInfo.new(.15, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Scale = 1}):Play()
+		else
+			game.TweenService:Create(MFUIScale, TweenInfo.new(.15, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Scale = 1}):Play()
+			SFUIScale.Scale = 1.2
+		end
+	end
+
+	local function OpenSettingsFunction()
+		SettingsFrame.Visible = not SettingsFrame.Visible
+	end
+
+	local SearchButtonClick = true
+	local function OpenSearchFunction()
+		if MainFrame.Visible == true then
+			SearchBox:CaptureFocus()
+			if SearchBox.Visible == false then
+				SearchButtonClick = false
+				SearchButton.Visible = false
+				BackButton.Visible = true
+				SearchBox.Visible = true
+				SFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+				game.TweenService:Create(SearchFrame, TweenInfo.new(.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Position = UDim2.new(1, 164, 0.119, 0)}):Play()
+				wait(.3)
+				SearchButtonClick = true
+			end
+		end
+	end
+	local SwitchOptionButton = SettingsStuff.SwitchOption
+	local function SwitchAnimsFunction()
+		AnimSwitchModeEnabled = not AnimSwitchModeEnabled
+		if AnimSwitchModeEnabled == true then
+			SwitchOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			SwitchOptionButton.CheckImage.Image = ""
+		end
+	end
+	local AnimFadeOptionButton = SettingsStuff.AnimFadeOption
+	local function AnimSmoothFadeFunction()
+		AnimSmoothFadeEnabled = not AnimSmoothFadeEnabled
+		if AnimSmoothFadeEnabled == true then
+			AnimFadeOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			AnimFadeOptionButton.CheckImage.Image = ""
+		end
+	end
+	local function StopAnimsFunction()
+		StopAnimsEvent:Fire("Forced")
+	end
+	local function OpenEmoteWheelFunction()
+		EmoteWheel.Visible = not EmoteWheel.Visible
+	end
+	local function SitFunction()
+		if Humanoid.Sit == false then
+			Humanoid.Sit = true
+		else
+			Humanoid.Sit = false
+		end
+	end
+	local function ResetFunction()
+		Player.Character.Humanoid.Health = 0
+	end
+
+	local function BindHotkeys(Reason)
+		AddHotkey(DoubleHotkey, "DoubleHotkey", "Key for Double Hotkey")
+		if Reason ~= "EnableHotkeys" then
+			AddHotkey(EmoteWheelHotkey, "EmoteWheelHotkey", "Open Emote Wheel*", OpenEmoteWheelFunction)
+		end
+		AddHotkey(SearchHotkey, "SearchHotkey", "Search", OpenSearchFunction)
+		AddHotkey(CloseHotkey, "CloseHotkey", "Close/Open Gui", CloseGuiFunction)
+		AddHotkey(SitHotkey, "SitHotkey", "Ragdoll-like falling", SitFunction)
+		AddHotkey(SettingsHotkey, "SettingsHotkey", "Open Settings", OpenSettingsFunction)
+		AddHotkey(SwitchAnimHotkey, "SwitchAnimHotkey", "Switch Anim Setting", SwitchAnimsFunction)
+		AddHotkey(AnimFadeHotkey, "AnimFadeHotkey", "Animation Fade Setting", AnimSmoothFadeFunction)
+		AddHotkey(StopAnimsHotkey, "StopAnimsHotkey", "Stop all Animations", StopAnimsFunction)
+		AddHotkey(ResetCharHotkey, "ResetCharHotkey", "Reset character", ResetFunction)
+	end
+	BindHotkeys()
+	AddHoverText(HotkeysStuff:FindFirstChild("DoubleHotkey").TextLabel, "A secondary key needed for activating a Double Hotkey")
+	AddHoverText(HotkeysStuff:FindFirstChild("EmoteWheelHotkey").TextLabel, "WARNING! This Hotkey is NOT affected by EnableHotkeys setting. To disable it you can press Backspace to unbind")
+
 	-- Buttons and other functions
-	DestroyGUI.MouseButton1Click:connect(function()
+	local function DestroyGuiFunction()
 		GuiActive = false
+		BindHotkeys()
 		StopAnimsEvent:Fire("Reset/Destroy")
+		SettingsFrame.Visible = false
+		EmoteWheel.Visible = false
+		game.TweenService:Create(MFUIScale, TweenInfo.new(.2, Enum.EasingStyle.Cubic, Enum.EasingDirection.In), {Scale = 0}):Play()
+		game.TweenService:Create(SFUIScale, TweenInfo.new(.2, Enum.EasingStyle.Cubic, Enum.EasingDirection.In), {Scale = 0}):Play()
+		wait(.3)
 		Emoter:Destroy()
-	end)
-	SFDestroyGUI.MouseButton1Click:connect(function()
-		GuiActive = false
-		StopAnimsEvent:Fire("Reset/Destroy")
-		Emoter:Destroy()
-	end)
+	end
+	DestroyGUI.MouseButton1Click:connect(DestroyGuiFunction)
+	SFDestroyGUI.MouseButton1Click:connect(DestroyGuiFunction)
+
 	OpenGUI.MouseButton1Click:connect(function()
-		MainFrame.Visible = true
-		SideFrame.Visible = false
-		MainFrame.Position = SideFrame.Position
+		CloseGuiFunction()
 	end)
 	CloseGUI.MouseButton1Click:connect(function()
-		MainFrame.Visible = false
-		SideFrame.Visible = true
-		SideFrame.Position = MainFrame.Position
+		CloseGuiFunction()
 	end)
 	SettingsButton.MouseButton1Click:Connect(function()
-		SettingsFrame.Visible = not SettingsFrame.Visible
+		OpenSettingsFunction()
 	end)
 
 	if RigType == "R15" then
@@ -2431,8 +2947,8 @@ local function CreateGui()
 		SideFrameTitle.Text = "Emoter GUI (R6)"
 	end
 
-	SpeedValue.Changed:Connect(function()
-		SpeedNum = SpeedValue.Text
+	SpeedValue:GetPropertyChangedSignal("Text"):Connect(function()
+		SpeedNum = SpeedValue.Text 
 		if SpeedValue.Text == "" then
 			SpeedNum = 0
 		end
@@ -2459,7 +2975,6 @@ local function CreateGui()
 
 
 	--Searchbox
-	local SearchButtonClick = true
 	SearchButton.MouseButton1Click:Connect(function()
 		if SearchButtonClick == true then
 			SearchButtonClick = false
@@ -2493,7 +3008,7 @@ local function CreateGui()
 		SearchFrame.Position = UDim2.new(1, 164, 0, 34)
 	end
 
-	SearchBox.Changed:Connect(function()
+	SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
 		for _, ScrollFrame in ipairs(ScrollingFramesList) do
 			for _, Button in ipairs(ScrollFrame:GetDescendants()) do
 				if Button:IsA("TextButton") and string.find(Button.Text:lower(), SearchBox.Text) then
@@ -2614,6 +3129,9 @@ local function CreateGui()
 	PauseAnimsButton.MouseButton1Click:Connect(function()
 		PauseAnimsOption = not PauseAnimsOption
 		if PauseAnimsOption then
+			if Player.Character:FindFirstChild(AnimationHandler) then
+				Player.Character:FindFirstChild(AnimationHandler).Disabled = true
+			end
 			local playingTracks = Player.Character.Humanoid:GetPlayingAnimationTracks()
 			for _, animtrack in ipairs(playingTracks) do
 				if animtrack.Name ~= "AAnimation" then
@@ -2621,6 +3139,9 @@ local function CreateGui()
 				end
 			end
 		else
+			if Player.Character:FindFirstChild(AnimationHandler) then
+				Player.Character:FindFirstChild(AnimationHandler).Disabled = false
+			end
 			local playingTracks = Player.Character.Humanoid:GetPlayingAnimationTracks()
 			for _, animtrack in ipairs(playingTracks) do
 				if animtrack.Name ~= "AAnimation" then
@@ -2698,7 +3219,19 @@ local function CreateGui()
 		end
 	end)
 
+
 	--Settings buttons
+	SGSNotification.MouseButton2Click:Connect(function()
+		delfile(ConfigFile)
+		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Deleted", Text = "Deleted specific game settings file", Duration = 3})
+	end)
+
+	DelayNumBox:GetPropertyChangedSignal("Text"):Connect(function()
+		DragDelay = tonumber(DelayNumBox.Text)
+		if DelayNumBox.Text == "" then
+			DragDelay = 0
+		end
+	end)
 	local PreviewOptionButton = SettingsStuff.PreviewOption
 	PreviewOptionButton.MouseButton1Click:Connect(function()
 		AnimPreviewEnabled = not AnimPreviewEnabled
@@ -2760,8 +3293,7 @@ local function CreateGui()
 			Emoter.DisplayOrder = -1
 			TopMostButton.CheckImage.Image = ""
 		end
-	end)
-	
+	end)	
 
 	if ToolIdleAnimHighPriorEnabled or ToolActionAnimHighPriorEnabled then
 		ToolAnimHighPriorEnabled = true
@@ -2778,6 +3310,14 @@ local function CreateGui()
 					if item:IsA("TextButton") and item.BackgroundColor3 == ButtonSelectCol then
 						anyTrue = true
 						break
+					end
+				end
+			end
+
+			if PauseAnimsOption then
+				for _, animtrack in ipairs(playingTracks) do
+					if animtrack.Name ~= "AAnimation" then
+						animtrack:AdjustSpeed(0)
 					end
 				end
 			end
@@ -2818,7 +3358,7 @@ local function CreateGui()
 			end
 		end
 	end
-	
+
 	local function PauseAnimation()
 		if PauseAnimsOption then
 			local playingTracks = Player.Character.Humanoid:GetPlayingAnimationTracks()
@@ -2872,8 +3412,7 @@ local function CreateGui()
 		ToolAnimPriorityCheck()
 	end)
 
-	local SwitchOptionButton = SettingsStuff.SwitchOption
-	AddHoverText(SwitchOptionButton, "<b>Switching</b> animations instead of <b>layering</b>")
+	AddHoverText(SwitchOptionButton, "<b>Switching</b> animations instead of <b>layering</b>", SwitchAnimHotkey)
 	SwitchOptionButton.MouseButton1Click:Connect(function()
 		AnimSwitchModeEnabled = not AnimSwitchModeEnabled
 		if AnimSwitchModeEnabled == true then
@@ -2894,8 +3433,7 @@ local function CreateGui()
 		end
 	end)
 
-	local AnimFadeOptionButton = SettingsStuff.AnimFadeOption
-	AddHoverText(AnimFadeOptionButton, "Enables <b>FadeTime</b> of animation. If disabled, animations will play instantly")
+	AddHoverText(AnimFadeOptionButton, "Enables <b>FadeTime</b> of animation. If disabled, animations will play instantly", AnimFadeHotkey)
 	AnimFadeOptionButton.MouseButton1Click:Connect(function()
 		AnimSmoothFadeEnabled = not AnimSmoothFadeEnabled
 		if AnimSmoothFadeEnabled == true then
@@ -2993,33 +3531,24 @@ local function CreateGui()
 		end
 	end)
 
-	local HotkeysOptionButton = SettingsStuff.HotkeysOption
-	HotkeysOptionButton.MouseButton1Click:Connect(function()
-		HotkeysEnabled = not HotkeysEnabled
-		if HotkeysEnabled == true then
-			HotkeysOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
-		else
-			HotkeysOptionButton.CheckImage.Image = ""
-		end
-	end)
 	HotkeysEditOption.MouseButton1Click:Connect(function()
 		HotkeysFrame.Visible = not HotkeysFrame.Visible
 	end)
 
 	PurpleThemeColor.MouseButton1Click:Connect(function()
-		theme = "LightPurple"
+		Theme = "LightPurple"
 		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Changed theme", Text = "Changed theme to LightPurple, please restart GUI", Duration = 3})
 	end)
 	OrangeThemeColor.MouseButton1Click:Connect(function()
-		theme = "LightOrange"
+		Theme = "LightOrange"
 		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Changed theme", Text = "Changed theme to LightOrange, please restart GUI", Duration = 3})
 	end)
 	YellowThemeColor.MouseButton1Click:Connect(function()
-		theme = "LightYellow"
+		Theme = "LightYellow"
 		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Changed theme", Text = "Changed theme to LightYellow, please restart GUI", Duration = 3})
 	end)
 	BlackThemeColor.MouseButton1Click:Connect(function()
-		theme = "Black"
+		Theme = "Black"
 		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Changed theme", Text = "Changed theme to Black, please restart GUI", Duration = 3})
 	end)
 
@@ -3052,7 +3581,6 @@ local function CreateGui()
 		ScrollingFrameR15.Size = UDim2.new(1, 0, 1, -69)
 		ScrollingFrameSpecific.Size = UDim2.new(1, 0, 1, -69)
 	end)
-
 	X1YSize.MouseButton1Click:Connect(function()
 		YSize = 285
 		MainFrame.Size = UDim2.new(0, XSize, 0, YSize)
@@ -3060,7 +3588,6 @@ local function CreateGui()
 		ScrollingFrameR15.Size = UDim2.new(1, 0, 1, -69)
 		ScrollingFrameSpecific.Size = UDim2.new(1, 0, 1, -69)
 	end)
-
 	X15YSize.MouseButton1Click:Connect(function()
 		YSize = 450
 		MainFrame.Size = UDim2.new(0, XSize, 0, YSize)
@@ -3068,7 +3595,6 @@ local function CreateGui()
 		ScrollingFrameR15.Size = UDim2.new(1, 0, 1, -69)
 		ScrollingFrameSpecific.Size = UDim2.new(1, 0, 1, -69)
 	end)
-
 	X2YSize.MouseButton1Click:Connect(function()
 		YSize = 660
 		MainFrame.Size = UDim2.new(0, XSize, 0, YSize)
@@ -3091,7 +3617,6 @@ local function CreateGui()
 			Title.Text = "Emoter R6"
 		end
 	end)
-
 	X3Size.MouseButton1Click:Connect(function()
 		XSize = 350
 		MainFrame.Size = UDim2.new(0, XSize, 0, YSize)
@@ -3106,7 +3631,6 @@ local function CreateGui()
 			Title.Text = "Emoter GUI (R6)"
 		end
 	end)
-
 	X4Size.MouseButton1Click:Connect(function()
 		XSize = 460
 		MainFrame.Size = UDim2.new(0, XSize, 0, YSize)
@@ -3121,7 +3645,6 @@ local function CreateGui()
 			Title.Text = "Emoter GUI (R6)"
 		end
 	end)
-
 	X5Size.MouseButton1Click:Connect(function()
 		XSize = 571
 		MainFrame.Size = UDim2.new(0, XSize, 0, YSize)
@@ -3134,6 +3657,19 @@ local function CreateGui()
 			Title.Text = "Emoter GUI (R15)"
 		else
 			Title.Text = "Emoter GUI (R6)"
+		end
+	end)
+
+	local HotkeysOptionButton = SettingsStuff.HotkeysOption
+	HotkeysOptionButton.MouseButton1Click:Connect(function()
+		HotkeysEnabled = not HotkeysEnabled
+
+		if HotkeysEnabled == true then
+			BindHotkeys()
+			HotkeysOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
+		else
+			BindHotkeys("EnableHotkeys")
+			HotkeysOptionButton.CheckImage.Image = ""
 		end
 	end)
 
@@ -3180,9 +3716,30 @@ local function CreateGui()
 			LoadLocalCustomAnimOptionButton.CheckImage.Image = ""
 		end
 	end)
-	
+
+	local WarningDelay = false
 	SaveSettingsButton.MouseButton1Click:Connect(function()
-		SaveData("Default")
+		if ConfigFile == "EmoterData/EmoterConfig.json" then
+			SaveData("Default")
+		else
+			if WarningDelay == false then
+				task.spawn(function()
+					WarningDelay = true
+					WarningText.Visible = true
+					task.wait(7)
+					game.TweenService:Create(WarningText, TweenInfo.new(.5, Enum.EasingStyle.Linear), {TextTransparency = 1}):Play()
+					game.TweenService:Create(WarningText.UIStroke, TweenInfo.new(.5, Enum.EasingStyle.Linear), {Transparency = 1}):Play()
+					wait(.5)
+					WarningText.Visible = false
+					WarningText.TextTransparency = 0
+					WarningText.UIStroke.Transparency = 0
+					WarningDelay = false
+				end)
+			else
+				SaveData("Default")
+			end
+		end
+		--SaveData("Default")
 	end)
 	SaveSettingsButton.MouseButton2Click:Connect(function()
 		SaveData("Specific")
@@ -3198,6 +3755,7 @@ local function CreateGui()
 		StopAnimsEvent:Fire("Reset/Destroy")
 		SettingsFrame.Visible = false
 		GuiRestarted = true
+		BindHotkeys()
 		OnRestart()
 	end)
 
@@ -3206,75 +3764,9 @@ local function CreateGui()
 		game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Copied", Text = "Copied link to your clipboard!", Duration = 3})
 	end)
 
-	--Hotkey Functions
 	UserInputService.InputBegan:Connect(function(input, processed)
-
 		if processed then return end
-		if GuiActive == false or GuiRestarted == true then return end
-
-		if input.KeyCode.Name == SearchHotkey.Value and HotkeysEnabled then
-			if MainFrame.Visible == true then
-				SearchBox:CaptureFocus()
-				if SearchBox.Visible == false then
-					SearchButtonClick = false
-					SearchButton.Visible = false
-					BackButton.Visible = true
-					SearchBox.Visible = true
-					SFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
-					game.TweenService:Create(SearchFrame, TweenInfo.new(.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Position = UDim2.new(1, 164, 0.119, 0)}):Play()
-					wait(.3)
-					SearchButtonClick = true
-				end
-			end
-		end
-
-		if tostring(input.KeyCode.Name) == CloseHotkey.Value and HotkeysEnabled then
-			if MainFrame.Visible == true then
-				SideFrame.Position = MainFrame.Position
-			else
-				MainFrame.Position = SideFrame.Position
-			end
-			MainFrame.Visible = not MainFrame.Visible
-			SideFrame.Visible = not SideFrame.Visible
-		end
-
-		if tostring(input.KeyCode.Name) == SettingsHotkey.Value and HotkeysEnabled then
-			SettingsFrame.Visible = not SettingsFrame.Visible
-		end
-
-		if tostring(input.KeyCode.Name) == SwitchAnimHotkey.Value and HotkeysEnabled then
-			AnimSwitchModeEnabled = not AnimSwitchModeEnabled
-			if AnimSwitchModeEnabled == true then
-				SwitchOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
-			else
-				SwitchOptionButton.CheckImage.Image = ""
-			end
-		end
-
-		if tostring(input.KeyCode.Name) == AnimFadeHotkey.Value and HotkeysEnabled then
-			AnimSmoothFadeEnabled = not AnimSmoothFadeEnabled
-			if AnimSmoothFadeEnabled == true then
-				AnimFadeOptionButton.CheckImage.Image = "rbxassetid://130396712201457"
-			else
-				AnimFadeOptionButton.CheckImage.Image = ""
-			end
-		end
-
-		if tostring(input.KeyCode.Name) == StopAnimsHotkey.Value and HotkeysEnabled then
-			StopAnimsEvent:Fire("Forced")
-		end
-
-		if tostring(input.KeyCode.Name) == EmoteWheelHotkey.Value then
-			EmoteWheel.Visible = not EmoteWheel.Visible
-		end
-
-		if tostring(input.KeyCode.Name) == SitHotkey.Value and HotkeysEnabled then
-			if Humanoid.Sit == false then
-				Humanoid.Sit = true
-			else
-				Humanoid.Sit = false
-			end
-		end
+		if GuiActive == false then return end
 
 		--EmoteWheelClosing
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -3299,15 +3791,31 @@ local function CreateGui()
 				end
 			end
 		end
-
-		if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
-			AltPressed = true
-		end
 	end)
 
+	UserInputService.InputBegan:Connect(function(input, processed)
+		if processed then return end
+		if GuiActive == false then return end
+
+		if input.KeyCode == Enum.KeyCode.LeftAlt then
+			PriorityAltPressed = true
+		end
+		if input.KeyCode == Enum.KeyCode.RightAlt then
+			RunAltPressed = true
+		end
+		if input.KeyCode == Enum.KeyCode.RightControl then
+			IdleAltPressed = true
+		end
+	end) 
 	UserInputService.InputEnded:Connect(function(input)
-		if input.KeyCode == Enum.KeyCode.LeftAlt or input.KeyCode == Enum.KeyCode.RightAlt then
-			AltPressed = false
+		if input.KeyCode == Enum.KeyCode.LeftAlt then
+			PriorityAltPressed = false
+		end
+		if input.KeyCode == Enum.KeyCode.RightAlt then
+			RunAltPressed = false
+		end
+		if input.KeyCode == Enum.KeyCode.RightControl then
+			IdleAltPressed = false
 		end
 	end)
 
@@ -3486,7 +3994,7 @@ local function CreateGui()
 		PlayAnim(IWantMoneyDance, "115781688996859", .1, 1, "PriorLow", true)
 		local FortniteDance = Instance.new("TextButton")
 		CreateAnimButton(FortniteDance, "FortniteDance", "Fortnite Dance", "R15", 1)
-		PlayAnim(FortniteDance, "126199405283943", .1, 1, "PriorLow", true)
+		PlayAnim(FortniteDance, "88455578674030", .1, 1, "PriorLow", true)
 		local GangnamStyle = Instance.new("TextButton")
 		CreateAnimButton(GangnamStyle, "GangnamStyle", "Gangnam Style", "R15", 1)
 		PlayAnim(GangnamStyle, "129764254213842", .1, 0.9, "PriorLow", true)
@@ -3516,7 +4024,7 @@ local function CreateGui()
 		PlayAnim(TennaSwingDance, "77984841414450", .1, 1, "PriorLow", true)
 		local TakeTheL = Instance.new("TextButton")
 		CreateAnimButton(TakeTheL, "TakeTheL", "Take The L", "R15", 1)
-		PlayAnim(TakeTheL, "117865821073911", .1, 1, "PriorLow", true)
+		PlayAnim(TakeTheL, "78870781032132", .1, 1, "PriorLow", true)
 		local JumpJacks = Instance.new("TextButton")
 		CreateAnimButton(JumpJacks, "JumpJacks", "Jump Jacks", "R15", 1)
 		PlayAnim(JumpJacks, "10714375667", .1, 1, "PriorLow", true)
@@ -3633,9 +4141,9 @@ local function CreateGui()
 		local MedusaWalk = Instance.new("TextButton")
 		CreateAnimButton(MedusaWalk, "MedusaWalk", "Medusa Walk", "R15", 3)
 		PlayAnim(MedusaWalk, "131663132818596", .1, 1.5, "PriorLowRunning", true)
-		local TallCreatureWalk = Instance.new("TextButton")
-		CreateAnimButton(TallCreatureWalk, "TallCreatureWalk", "Tall Creature Walk", "R15", 3)
-		PlayAnim(TallCreatureWalk, "134010853417610", .1, 1.5, "PriorLowRunning", true)
+		local TallWalk = Instance.new("TextButton")
+		CreateAnimButton(TallWalk, "TallWalk", "Tall Walk", "R15", 3)
+		PlayAnim(TallWalk, "134010853417610", .1, 1.5, "PriorLowRunning", true)
 		local ShadowRun = Instance.new("TextButton")
 		CreateAnimButton(ShadowRun, "ShadowRun", "Shadow Running", "R15", 3)
 		PlayAnim(ShadowRun, "82598234841035", .1, 0.8, "PriorLowRunning", true)
@@ -3664,12 +4172,15 @@ local function CreateGui()
 		local TallIdle = Instance.new("TextButton")
 		CreateAnimButton(TallIdle, "TallIdle", "Tall Idle", "R15", 4)
 		PlayAnim(TallIdle, "73645108622491", .1, 1, "PriorLowIdle", true)
+		local WheelIdle = Instance.new("TextButton")
+		CreateAnimButton(WheelIdle, "WheelIdle", "Wheel Idle", "R15", 4)
+		PlayAnim(WheelIdle, "116700088132671", .1, 0, "PriorLowIdle", true)
 		local FloatingHeadSitting = Instance.new("TextButton")
 		CreateAnimButton(FloatingHeadSitting, "FloatingHeadSitting", "Floating Head Sit", "R15", 4)
 		PlayAnim(FloatingHeadSitting, "111681053387222", .1, 1, "PriorLow", true)
 		local FloatChillSit = Instance.new("TextButton")
 		CreateAnimButton(FloatChillSit, "FloatChillSit", "Float Chill Sit", "R15", 4)
-		PlayAnim(FloatChillSit, "97361223864206", .1, 0.5, "PriorLow", true)
+		PlayAnim(FloatChillSit, "110211186840347", .1, 0.5, "PriorLow", true)
 		local FloatIdle = Instance.new("TextButton")
 		CreateAnimButton(FloatIdle, "FloatIdle", "Float Idle", "R15", 4)
 		PlayAnim(FloatIdle, "90055248227279", .1, 1, "PriorLowIdle", true)
@@ -3788,289 +4299,323 @@ local function CreateGui()
 		R15Anims()
 	end
 
-	local function AdditionalAnimsOperation()
-		if DebugInfoEnabled then print("[AdditionalAnims File]: Adding animations from AdditionalAnims file in Github") end
+	local CAOutput = "<b>CustomAnims:</b>\n"
+	local GSGAOutput = "<b>GameSpecificAnims from Github:</b>\n"
+	local LSGAOutput = "<b>GameSpecificAnims from local file:</b>\n"
+	local function AddDataOperation()
+		AddedDataInfo.Value = "<b>ADDED DATA FROM FILES:</b>\n\n"
 
-		local finalUrl = "https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/SpecificGameAnimations/AdditionalAnimations"
+		local function AdditionalAnimsOperation()
+			if DebugInfoEnabled then print("[AdditionalAnims File]: Adding animations from AdditionalAnims file in Github") end
+			local finalUrl = "https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/SpecificGameAnimations/AdditionalAnimations"
+			local success, fileContent = pcall(function()
+				return game:HttpGet(finalUrl)
+			end)
+			if not success or not fileContent or fileContent == "404: Not Found" then
+				if DebugInfoEnabled then warn("[AdditionalAnims File]: AdditionalAnims file wasn't found") end
+				return 
+			end
+			local success2, data = pcall(function()
+				return HttpService:JSONDecode(fileContent)
+			end)
+			if not success2 or not data then
+				warn("[AdditionalAnims File]: Error in JSON structure in AdditionalAnims file")
+				return
+			end
 
-		local success, fileContent = pcall(function()
-			return game:HttpGet(finalUrl)
-		end)
-		if not success or not fileContent or fileContent == "404: Not Found" then
-			if DebugInfoEnabled then warn("[AdditionalAnims File]: AdditionalAnims file wasn't found") end
-			return 
-		end
-		local success2, data = pcall(function()
-			return HttpService:JSONDecode(fileContent)
-		end)
-		if not success2 or not data then
-			warn("[AdditionalAnims File]: Error in JSON structure in AdditionalAnims file")
-			return
-		end
-		for categoryName, animationsList in pairs(data) do
-			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
-				if DebugInfoEnabled then print("[AdditionalAnims File]: Extracting Animations") end
-				for _, info in ipairs(animationsList) do
-					local danceButton = Instance.new("TextButton")
-					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
-					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
-				end
-			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
-				if DebugInfoEnabled then print("[AdditionalAnims File]: Adding Default animations")end
-				for _, id in ipairs(data["DefaultAnims"]) do
-					if not table.find(DefaultAnimsNameList, id) then
-						table.insert(DefaultAnimsNameList, tostring(id))
+			for categoryName, animationsList in pairs(data) do
+				if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
+					if DebugInfoEnabled then print("[AdditionalAnims File]: Extracting Animations") end
+					for _, info in ipairs(animationsList) do
+						local danceButton = Instance.new("TextButton")
+						CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
+						PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
+					end
+				elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
+					if DebugInfoEnabled then print("[AdditionalAnims File]: Adding Default animations")end
+					for _, id in ipairs(data["DefaultAnims"]) do
+						if not table.find(DefaultAnimsNameList, id) then
+							table.insert(DefaultAnimsNameList, tostring(id))
+						end
 					end
 				end
 			end
+			print("[AdditionalAnims File]: Loaded Data!")
 		end
-		print("[AdditionalAnims File]: Loaded Data!")
-	end
 
-	local function CustomAnimsOperation()
-		if DebugInfoEnabled then print("[CustomAnims File]: Searching CustomAnims file") end
-		local success, fileContent = pcall(function()
-			return readfile("EmoterData/CustomAnims.json")
-		end)
-		if not success or not fileContent then 
-			if DebugInfoEnabled then warn("[CustomAnims File]: CustomAnims file wasn't found") end
-			return 
-		end
-		local success2, data = pcall(function()
-			return HttpService:JSONDecode(fileContent)
-		end)
-		if not success2 or not data then
-			warn("[CustomAnims File]: Error in JSON structure in CustomAnims file")
-			return
-		end
-		for categoryName, animationsList in pairs(data) do
-			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
-				if DebugInfoEnabled then print("[CustomAnims File]: Extracting Animations") end
-				for _, info in ipairs(animationsList) do
-					local danceButton = Instance.new("TextButton")
-					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
-					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
-				end
-			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
-				if DebugInfoEnabled then print("[CustomAnims File]: Adding Default animations") end
-				for _, id in ipairs(data["DefaultAnims"]) do
-					if not table.find(DefaultAnimsNameList, id) then
-						table.insert(DefaultAnimsNameList, tostring(id))
-					end
-				end
-			elseif categoryName == "ToolActionAnims" and #data["ToolActionAnims"] ~= 0 then
-				if DebugInfoEnabled then print("[CustomAnims File]: Adding ToolAction Animations") end
-				for _, id in ipairs(data["ToolActionAnims"]) do
-					if not table.find(ToolActionAnimsList, id) then
-						table.insert(ToolActionAnimsList, tostring(id))
-					end
-				end
-			elseif categoryName == "ToolIdleAnims" and #data["ToolIdleAnims"] ~= 0 then
-				if DebugInfoEnabled then print("[CustomAnims File]: Adding ToolIdle Animations") end
-				for _, id in ipairs(data["ToolIdleAnims"]) do
-					if not table.find(ToolIdleAnimsList, id) then
-						table.insert(ToolIdleAnimsList, tostring(id))
-					end
-				end
-			elseif categoryName == "R6EmoteWheelEmotes" and RigType == "R6" then
-				if DebugInfoEnabled then print("[SpecGameAnims File]: Adding EmoteWhell Data") end
-				local info = data["R6EmoteWheelEmotes"]
-				if info.Emote1 then EmoteWheelEmotes.Emote1 = info.Emote1 end
-				if info.Emote2 then EmoteWheelEmotes.Emote2 = info.Emote2 end
-				if info.Emote3 then EmoteWheelEmotes.Emote3 = info.Emote3 end
-				if info.Emote4 then EmoteWheelEmotes.Emote4 = info.Emote4 end
-				if info.Emote5 then EmoteWheelEmotes.Emote5 = info.Emote5 end
-				if info.Emote6 then EmoteWheelEmotes.Emote6 = info.Emote6 end
-				if info.Emote7 then EmoteWheelEmotes.Emote7 = info.Emote7 end
-				if info.Emote8 then EmoteWheelEmotes.Emote8 = info.Emote8 end
-			elseif categoryName == "R15EmoteWheelEmotes" and RigType == "R15" then
-				if DebugInfoEnabled then print("[SpecGameAnims File]: Adding EmoteWhell Data") end
-				local info = data["R15EmoteWheelEmotes"]
-				if info.Emote1 then EmoteWheelEmotes.Emote1 = info.Emote1 end
-				if info.Emote2 then EmoteWheelEmotes.Emote2 = info.Emote2 end
-				if info.Emote3 then EmoteWheelEmotes.Emote3 = info.Emote3 end
-				if info.Emote4 then EmoteWheelEmotes.Emote4 = info.Emote4 end
-				if info.Emote5 then EmoteWheelEmotes.Emote5 = info.Emote5 end
-				if info.Emote6 then EmoteWheelEmotes.Emote6 = info.Emote6 end
-				if info.Emote7 then EmoteWheelEmotes.Emote7 = info.Emote7 end
-				if info.Emote8 then EmoteWheelEmotes.Emote8 = info.Emote8 end
+		local function CustomAnimsOperation()
+			if DebugInfoEnabled then print("[CustomAnims File]: Searching CustomAnims file") end
+			local success, fileContent = pcall(function()
+				return readfile("EmoterData/CustomAnims.json")
+			end)
+			if not success or not fileContent then 
+				if DebugInfoEnabled then warn("[CustomAnims File]: CustomAnims file wasn't found") end
+				return 
 			end
-		end
-		print("[CustomAnims File]: Loaded Data!")
-	end
+			local success2, data = pcall(function()
+				return HttpService:JSONDecode(fileContent)
+			end)
+			if not success2 or not data then
+				warn("[CustomAnims File]: Error in JSON structure in CustomAnims file")
+				return
+			end
 
-	local function GithubSpecGameAnimsOperation()
-		local baseUrl = "https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/SpecificGameAnimations/"
-		local finalUrl = baseUrl .. tostring(game.GameId)
-
-		if DebugInfoEnabled then print("[SpecGameAnims Github]: Searching Anims file in Github for game ".. game.GameId) end
-
-		local success, fileContent = pcall(function()
-			return game:HttpGet(finalUrl)
-		end)
-		if not success or not fileContent or fileContent == "404: Not Found" then
-			if DebugInfoEnabled then warn("[SpecGameAnims Github]: No file in Github for this game") end
-			return
-		end
-		local success2, data = pcall(function()
-			return HttpService:JSONDecode(fileContent)
-		end)
-		if not success2 or not data then
-			warn("[SpecGameAnims Github]: Error in JSON structure in file")
-			return
-		end
-
-		for categoryName, animationsList in pairs(data) do
-			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
-				if DebugInfoEnabled then print("[SpecGameAnims Github]: Extracting Animations") end
-				for _, info in ipairs(animationsList) do
-					local danceButton = Instance.new("TextButton")
-					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
-					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
-				end
-			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
-				if DebugInfoEnabled then print("[SpecGameAnims Github]: Adding Default animations") end
-				for _, id in ipairs(data["DefaultAnims"]) do
-					if not table.find(DefaultAnimsNameList, id) then
-						table.insert(DefaultAnimsNameList, tostring(id))
+			for categoryName, animationsList in pairs(data) do
+				if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
+					if DebugInfoEnabled then print("[CustomAnims File]: Extracting Animations") end
+					CAOutput = CAOutput.."CustomEmotes\n"
+					for _, info in ipairs(animationsList) do
+						local danceButton = Instance.new("TextButton")
+						CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
+						PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
+					end
+				elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
+					if DebugInfoEnabled then print("[CustomAnims File]: Adding Default animations") end
+					CAOutput = CAOutput.."DefaultAnims\n"
+					for _, id in ipairs(data["DefaultAnims"]) do
+						if not table.find(DefaultAnimsNameList, id) then
+							table.insert(DefaultAnimsNameList, tostring(id))
+						end
+					end
+				elseif categoryName == "ToolActionAnims" and #data["ToolActionAnims"] ~= 0 then
+					if DebugInfoEnabled then print("[CustomAnims File]: Adding ToolAction Animations") end
+					CAOutput = CAOutput.."ToolActionAnims\n"
+					for _, id in ipairs(data["ToolActionAnims"]) do
+						if not table.find(ToolActionAnimsList, id) then
+							table.insert(ToolActionAnimsList, tostring(id))
+						end
+					end
+				elseif categoryName == "ToolIdleAnims" and #data["ToolIdleAnims"] ~= 0 then
+					if DebugInfoEnabled then print("[CustomAnims File]: Adding ToolIdle Animations") end
+					CAOutput = CAOutput.."ToolIdleAnims\n"
+					for _, id in ipairs(data["ToolIdleAnims"]) do
+						if not table.find(ToolIdleAnimsList, id) then
+							table.insert(ToolIdleAnimsList, tostring(id))
+						end
 					end
 				end
-			elseif categoryName == "ToolActionAnims" and #data["ToolActionAnims"] ~= 0 then
-				if DebugInfoEnabled then print("[SpecGameAnims Github]: Adding ToolAction Animations") end
-				for _, id in ipairs(data["ToolActionAnims"]) do
-					if not table.find(ToolActionAnimsList, id) then
-						table.insert(ToolActionAnimsList, tostring(id))
-					end
-				end
-			elseif categoryName == "ToolIdleAnims" and #data["ToolIdleAnims"] ~= 0 then
-				if DebugInfoEnabled then print("[SpecGameAnims Github]: Adding ToolIdle Animations") end
-				for _, id in ipairs(data["ToolIdleAnims"]) do
-					if not table.find(ToolIdleAnimsList, id) then
-						table.insert(ToolIdleAnimsList, tostring(id))
-					end
-				end
-			elseif categoryName == "EmoteWheelEmotes" then
-				if DebugInfoEnabled then print("[SpecGameAnims File]: Adding EmoteWhell Data") end
-				local info = data["EmoteWheelEmotes"]
-				if info.Emote1 then EmoteWheelEmotes.Emote1 = info.Emote1 end
-				if info.Emote2 then EmoteWheelEmotes.Emote2 = info.Emote2 end
-				if info.Emote3 then EmoteWheelEmotes.Emote3 = info.Emote3 end
-				if info.Emote4 then EmoteWheelEmotes.Emote4 = info.Emote4 end
-				if info.Emote5 then EmoteWheelEmotes.Emote5 = info.Emote5 end
-				if info.Emote6 then EmoteWheelEmotes.Emote6 = info.Emote6 end
-				if info.Emote7 then EmoteWheelEmotes.Emote7 = info.Emote7 end
-				if info.Emote8 then EmoteWheelEmotes.Emote8 = info.Emote8 end
-			elseif categoryName == "AdditionalData" then
-				if data["AdditionalData"].DefaultWalkSpeed then
-					DefaultWalkSpeed = data["AdditionalData"].DefaultWalkSpeed
-					if DebugInfoEnabled then print("Chaged DefaultWalkSpeed to "..DefaultWalkSpeed) end
-				elseif data["AdditionalData"].AnimationHandlerName then
-					AnimationHandler = data["AdditionalData"].AnimationHandlerName
+				if categoryName == "R6EmoteWheelEmotes" and RigType == "R6" and next(data.R6EmoteWheelEmotes) ~= nil then
+					if DebugInfoEnabled then print("[SpecGameAnims File]: Adding EmoteWhell Data") end
+					CAOutput = CAOutput.."EmoteWheelEmotes\n"
+					local info = data["R6EmoteWheelEmotes"]
+					if info.Emote1 then EmoteWheelEmotes.Emote1 = info.Emote1 end
+					if info.Emote2 then EmoteWheelEmotes.Emote2 = info.Emote2 end
+					if info.Emote3 then EmoteWheelEmotes.Emote3 = info.Emote3 end
+					if info.Emote4 then EmoteWheelEmotes.Emote4 = info.Emote4 end
+					if info.Emote5 then EmoteWheelEmotes.Emote5 = info.Emote5 end
+					if info.Emote6 then EmoteWheelEmotes.Emote6 = info.Emote6 end
+					if info.Emote7 then EmoteWheelEmotes.Emote7 = info.Emote7 end
+					if info.Emote8 then EmoteWheelEmotes.Emote8 = info.Emote8 end
+				elseif categoryName == "R15EmoteWheelEmotes" and RigType == "R15" and next(data.R15EmoteWheelEmotes) ~= nil then
+					if DebugInfoEnabled then print("[SpecGameAnims File]: Adding EmoteWhell Data") end
+					CAOutput = CAOutput.."EmoteWheelEmotes\n"
+					local info = data["R15EmoteWheelEmotes"]
+					if info.Emote1 then EmoteWheelEmotes.Emote1 = info.Emote1 end
+					if info.Emote2 then EmoteWheelEmotes.Emote2 = info.Emote2 end
+					if info.Emote3 then EmoteWheelEmotes.Emote3 = info.Emote3 end
+					if info.Emote4 then EmoteWheelEmotes.Emote4 = info.Emote4 end
+					if info.Emote5 then EmoteWheelEmotes.Emote5 = info.Emote5 end
+					if info.Emote6 then EmoteWheelEmotes.Emote6 = info.Emote6 end
+					if info.Emote7 then EmoteWheelEmotes.Emote7 = info.Emote7 end
+					if info.Emote8 then EmoteWheelEmotes.Emote8 = info.Emote8 end
 				end
 			end
-		end
-		print("[SpecGameAnims Github]: Loaded Data!")
-	end
-
-	local function FileSpecGameAnimsOperation()
-		if DebugInfoEnabled then print("[SpecGameAnims File]: Searching Specific GameAnims file") end
-		local targetNumber = tostring(game.GameId)
-		local folderPath = "EmoterData/SpecificAnims"
-		local targetFilePath = nil
-		local fileFound = false
-
-		local success, files = pcall(listfiles, folderPath)
-		if not success then
-			if DebugInfoEnabled then warn("[SpecGameAnims File]: Your exploit doesn't support function listfiles() or folder id empty") end
-			return
-		end
-		for _, filePath in ipairs(files) do
-			local fileName = filePath:match("[^/\\]+$") or filePath
-			local extractedNumber = fileName:match("(%d+)")
-
-			if extractedNumber then
-				if DebugInfoEnabled then print("[SpecGameAnims File]: Found file: " .. fileName .. " | Extracted number: " .. extractedNumber) end
-				if extractedNumber == targetNumber then
-					if DebugInfoEnabled then print("[SpecGameAnims File]: Found file: " .. filePath) end
-					fileFound = true
-					targetFilePath = filePath
-					break
-				end
+			print("[CustomAnims File]: Loaded Data!")
+			if CAOutput ~= "<b>CustomAnims:</b> " then
+				AddedDataInfo.Value = AddedDataInfo.Value..CAOutput.."\n"
 			end
 		end
-		if not fileFound then
-			if DebugInfoEnabled then warn("[SpecGameAnims File]: File with number " .. targetNumber .. "hasn't found in files") end
-			return
-		end
-		local success2, fileContent = pcall(function()
-			return readfile(targetFilePath)
-		end)
-		if not success2 or not fileContent then
-			if DebugInfoEnabled then warn("[SpecGameAnims File]: Didn't read file") end
-			return
-		end
-		local success3, data = pcall(function()
-			return HttpService:JSONDecode(fileContent)
-		end)
-		if not success3 or not data then
-			warn("[SpecGameAnims File]: Error in JSON structure in file")
-			return
-		end
 
-		for categoryName, animationsList in pairs(data) do
-			if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
-				if DebugInfoEnabled then print("[SpecGameAnims File]: Extracting Animations") end
-				for _, info in ipairs(animationsList) do
-					local danceButton = Instance.new("TextButton")
-					CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
-					PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
-				end
-			elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
-				if DebugInfoEnabled then print("[SpecGameAnims File]: Adding Default animations") end
-				for _, id in ipairs(data["DefaultAnims"]) do
-					if not table.find(DefaultAnimsNameList, id) then
-						table.insert(DefaultAnimsNameList, tostring(id))
+		local function GithubSpecGameAnimsOperation()
+			if DebugInfoEnabled then print("[SpecGameAnims Github]: Searching Anims file in Github for game ".. game.GameId) end
+
+			local baseUrl = "https://raw.githubusercontent.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/refs/heads/main/SpecificGameAnimations/"
+			local finalUrl = baseUrl .. tostring(game.GameId)
+			local success, fileContent = pcall(function()
+				return game:HttpGet(finalUrl)
+			end)
+			if not success or not fileContent or fileContent == "404: Not Found" then
+				if DebugInfoEnabled then warn("[SpecGameAnims Github]: No file in Github for this game") end
+				return
+			end
+			local success2, data = pcall(function()
+				return HttpService:JSONDecode(fileContent)
+			end)
+			if not success2 or not data then
+				warn("[SpecGameAnims Github]: Error in JSON structure in file")
+				return
+			end
+
+			for categoryName, animationsList in pairs(data) do
+				if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
+					if DebugInfoEnabled then print("[SpecGameAnims Github]: Extracting Animations") end
+					GSGAOutput = GSGAOutput.."CustomEmotes\n"
+					for _, info in ipairs(animationsList) do
+						local danceButton = Instance.new("TextButton")
+						CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
+						PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
 					end
-				end
-			elseif categoryName == "ToolActionAnims" and #data["ToolActionAnims"] ~= 0 then
-				if DebugInfoEnabled then print("[SpecGameAnims File]: Adding ToolAction Animations") end
-				for _, id in ipairs(data["ToolActionAnims"]) do
-					if not table.find(ToolActionAnimsList, id) then
-						table.insert(ToolActionAnimsList, tostring(id))
+				elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
+					if DebugInfoEnabled then print("[SpecGameAnims Github]: Adding Default animations") end
+					GSGAOutput = GSGAOutput.."DefaultAnims\n"
+					for _, id in ipairs(data["DefaultAnims"]) do
+						if not table.find(DefaultAnimsNameList, id) then
+							table.insert(DefaultAnimsNameList, tostring(id))
+						end
 					end
-				end
-			elseif categoryName == "ToolIdleAnims" and #data["ToolIdleAnims"] ~= 0 then
-				if DebugInfoEnabled then print("[SpecGameAnims File]: Adding ToolIdle Animations") end
-				for _, id in ipairs(data["ToolIdleAnims"]) do
-					if not table.find(ToolIdleAnimsList, id) then
-						table.insert(ToolIdleAnimsList, tostring(id))
+				elseif categoryName == "ToolActionAnims" and #data["ToolActionAnims"] ~= 0 then
+					if DebugInfoEnabled then print("[SpecGameAnims Github]: Adding ToolAction Animations") end
+					GSGAOutput = GSGAOutput.."ToolActionAnims\n"
+					for _, id in ipairs(data["ToolActionAnims"]) do
+						if not table.find(ToolActionAnimsList, id) then
+							table.insert(ToolActionAnimsList, tostring(id))
+						end
 					end
+				elseif categoryName == "ToolIdleAnims" and #data["ToolIdleAnims"] ~= 0 then
+					if DebugInfoEnabled then print("[SpecGameAnims Github]: Adding ToolIdle Animations") end
+					GSGAOutput = GSGAOutput.."ToolIdleAnims\n"
+					for _, id in ipairs(data["ToolIdleAnims"]) do
+						if not table.find(ToolIdleAnimsList, id) then
+							table.insert(ToolIdleAnimsList, tostring(id))
+						end
+					end
+				elseif categoryName == "EmoteWheelEmotes" and next(data.EmoteWheelEmotes) ~= nil then
+					if DebugInfoEnabled then print("[SpecGameAnims File]: Adding EmoteWhell Data") end
+					GSGAOutput = GSGAOutput.."EmoteWheelEmotes\n"
+					local info = data["EmoteWheelEmotes"]
+					if info.Emote1 then EmoteWheelEmotes.Emote1 = info.Emote1 end
+					if info.Emote2 then EmoteWheelEmotes.Emote2 = info.Emote2 end
+					if info.Emote3 then EmoteWheelEmotes.Emote3 = info.Emote3 end
+					if info.Emote4 then EmoteWheelEmotes.Emote4 = info.Emote4 end
+					if info.Emote5 then EmoteWheelEmotes.Emote5 = info.Emote5 end
+					if info.Emote6 then EmoteWheelEmotes.Emote6 = info.Emote6 end
+					if info.Emote7 then EmoteWheelEmotes.Emote7 = info.Emote7 end
+					if info.Emote8 then EmoteWheelEmotes.Emote8 = info.Emote8 end
 				end
-			elseif categoryName == "EmoteWheelEmotes" then
-				if DebugInfoEnabled then print("[SpecGameAnims File]: Adding EmoteWhell Data") end
-				local info = data["EmoteWheelEmotes"]
-				if info.Emote1 then EmoteWheelEmotes.Emote1 = info.Emote1 end
-				if info.Emote2 then EmoteWheelEmotes.Emote2 = info.Emote2 end
-				if info.Emote3 then EmoteWheelEmotes.Emote3 = info.Emote3 end
-				if info.Emote4 then EmoteWheelEmotes.Emote4 = info.Emote4 end
-				if info.Emote5 then EmoteWheelEmotes.Emote5 = info.Emote5 end
-				if info.Emote6 then EmoteWheelEmotes.Emote6 = info.Emote6 end
-				if info.Emote7 then EmoteWheelEmotes.Emote7 = info.Emote7 end
-				if info.Emote8 then EmoteWheelEmotes.Emote8 = info.Emote8 end
-			elseif categoryName == "AdditionalData" then
-				if data["AdditionalData"].DefaultWalkSpeed then
-					DefaultWalkSpeed = data["AdditionalData"].DefaultWalkSpeed
-					if DebugInfoEnabled then print("Chaged DefaultWalkSpeed to "..DefaultWalkSpeed) end
-				elseif data["AdditionalData"].AnimationHandlerName then
-					AnimationHandler = data["AdditionalData"].AnimationHandlerName
+				if categoryName == "AdditionalData" and next(data.AdditionalData) ~= nil then
+					GSGAOutput = GSGAOutput.."AdditionalData\n"
+					if data["AdditionalData"].DefaultWalkSpeed then
+						DefaultWalkSpeed = data["AdditionalData"].DefaultWalkSpeed
+						if DebugInfoEnabled then print("Chaged DefaultWalkSpeed to "..DefaultWalkSpeed) end
+					elseif data["AdditionalData"].AnimationHandlerName then
+						AnimationHandler = data["AdditionalData"].AnimationHandlerName
+					end
 				end
 			end
+			print("[SpecGameAnims Github]: Loaded Data!")
+			if GSGAOutput ~= "<b>GameSpecificAnims from Github:</b> " then
+				AddedDataInfo.Value = AddedDataInfo.Value..GSGAOutput.."\n"
+			end
 		end
-		print("[SpecGameAnims File]: Loaded data!")
-	end
 
-	if not IsInStudio then
-		print("Adding animations from files...")
+		local function FileSpecGameAnimsOperation()
+			if DebugInfoEnabled then print("[SpecGameAnims File]: Searching Specific GameAnims file") end
+			local targetNumber = tostring(game.GameId)
+			local folderPath = "EmoterData/SpecificAnims"
+			local targetFilePath = nil
+			local fileFound = false
+
+			local success, files = pcall(listfiles, folderPath)
+			if not success then
+				if DebugInfoEnabled then warn("[SpecGameAnims File]: Your exploit doesn't support function listfiles() or folder id empty") end
+				return
+			end
+			for _, filePath in ipairs(files) do
+				local fileName = filePath:match("[^/\\]+$") or filePath
+				local extractedNumber = fileName:match("(%d+)")
+
+				if extractedNumber then
+					if DebugInfoEnabled then print("[SpecGameAnims File]: Found file: " .. fileName .. " | Extracted number: " .. extractedNumber) end
+					if extractedNumber == targetNumber then
+						if DebugInfoEnabled then print("[SpecGameAnims File]: Found file: " .. filePath) end
+						fileFound = true
+						targetFilePath = filePath
+						break
+					end
+				end
+			end
+			if not fileFound then
+				if DebugInfoEnabled then warn("[SpecGameAnims File]: File with number " .. targetNumber .. "hasn't found in files") end
+				return
+			end
+			local success2, fileContent = pcall(function()
+				return readfile(targetFilePath)
+			end)
+			if not success2 or not fileContent then
+				if DebugInfoEnabled then warn("[SpecGameAnims File]: Didn't read file") end
+				return
+			end
+			local success3, data = pcall(function()
+				return HttpService:JSONDecode(fileContent)
+			end)
+			if not success3 or not data then
+				warn("[SpecGameAnims File]: Error in JSON structure in file")
+				return
+			end
+
+			for categoryName, animationsList in pairs(data) do
+				if categoryName == "CustomEmotes" and #data["CustomEmotes"] ~= 0 then
+					if DebugInfoEnabled then print("[SpecGameAnims File]: Extracting Animations") end
+					LSGAOutput = LSGAOutput.."CustomEmotes\n"
+					for _, info in ipairs(animationsList) do
+						local danceButton = Instance.new("TextButton")
+						CreateAnimButton(danceButton, info[1], info[2], info[3], info[4])
+						PlayAnim(danceButton, info[5], info[6], info[7], info[8], info[9])
+					end
+				elseif categoryName == "DefaultAnims" and #data["DefaultAnims"] ~= 0 then
+					if DebugInfoEnabled then print("[SpecGameAnims File]: Adding Default animations") end
+					LSGAOutput = LSGAOutput.."DefaultAnims\n"
+					for _, id in ipairs(data["DefaultAnims"]) do
+						if not table.find(DefaultAnimsNameList, id) then
+							table.insert(DefaultAnimsNameList, tostring(id))
+						end
+					end
+				elseif categoryName == "ToolActionAnims" and #data["ToolActionAnims"] ~= 0 then
+					if DebugInfoEnabled then print("[SpecGameAnims File]: Adding ToolAction Animations") end
+					LSGAOutput = LSGAOutput.."ToolActionAnims\n"
+					for _, id in ipairs(data["ToolActionAnims"]) do
+						if not table.find(ToolActionAnimsList, id) then
+							table.insert(ToolActionAnimsList, tostring(id))
+						end
+					end
+				elseif categoryName == "ToolIdleAnims" and #data["ToolIdleAnims"] ~= 0 then
+					if DebugInfoEnabled then print("[SpecGameAnims File]: Adding ToolIdle Animations") end
+					LSGAOutput = LSGAOutput.."ToolIdleAnims\n"
+					for _, id in ipairs(data["ToolIdleAnims"]) do
+						if not table.find(ToolIdleAnimsList, id) then
+							table.insert(ToolIdleAnimsList, tostring(id))
+						end
+					end
+				elseif categoryName == "EmoteWheelEmotes" and next(data.EmoteWheelEmotes) ~= nil then
+					if DebugInfoEnabled then print("[SpecGameAnims File]: Adding EmoteWhell Data") end
+					LSGAOutput = LSGAOutput.."EmoteWheelEmotes\n"
+					local info = data["EmoteWheelEmotes"]
+					if info.Emote1 then EmoteWheelEmotes.Emote1 = info.Emote1 end
+					if info.Emote2 then EmoteWheelEmotes.Emote2 = info.Emote2 end
+					if info.Emote3 then EmoteWheelEmotes.Emote3 = info.Emote3 end
+					if info.Emote4 then EmoteWheelEmotes.Emote4 = info.Emote4 end
+					if info.Emote5 then EmoteWheelEmotes.Emote5 = info.Emote5 end
+					if info.Emote6 then EmoteWheelEmotes.Emote6 = info.Emote6 end
+					if info.Emote7 then EmoteWheelEmotes.Emote7 = info.Emote7 end
+					if info.Emote8 then EmoteWheelEmotes.Emote8 = info.Emote8 end
+				end
+				if categoryName == "AdditionalData" and next(data.AdditionalData) ~= nil then
+					LSGAOutput = LSGAOutput.."AdditionalData\n"
+					if data["AdditionalData"].DefaultWalkSpeed then
+						DefaultWalkSpeed = data["AdditionalData"].DefaultWalkSpeed
+						if DebugInfoEnabled then print("Chaged DefaultWalkSpeed to "..DefaultWalkSpeed) end
+					elseif data["AdditionalData"].AnimationHandlerName then
+						AnimationHandler = data["AdditionalData"].AnimationHandlerName
+					end
+				end
+			end
+			print("[SpecGameAnims File]: Loaded data!")
+			if LSGAOutput ~= "<b>GameSpecificAnims from local file:</b> " then
+				AddedDataInfo.Value = AddedDataInfo.Value..LSGAOutput
+			end
+		end
+
+		print("Adding data from files...")
 		if LoadGithubCustomAnimsEnabled then
 			AdditionalAnimsOperation()
 		end
@@ -4083,7 +4628,16 @@ local function CreateGui()
 		if LoadLocalSGAEnabled then
 			FileSpecGameAnimsOperation()
 		end
+
+		if AddedDataInfo.Value ~= "<b>ADDED DATA FROM FILES:</b>\n\n" then
+			DataNotification.Visible = true
+		end
 	end
+
+	if not IsInStudio then
+		AddDataOperation()
+	end
+
 	if DebugInfoEnabled then
 		for index, id in ipairs(ToolActionAnimsList) do
 			print("Номер: " .. index .. " | ID анимации: " .. id)
@@ -4239,26 +4793,8 @@ local function CreateGui()
 			UIGradient.Color = ColorSequence.new(Color3.fromRGB(207, 207, 207), Color3.fromRGB(255, 255, 255))
 			UIGradient.Rotation = -90
 		end
-
-		if (UiPart.Parent.Name == "ScrollingFrame" or UiPart.Parent.Name == "ScrollingFrameR15" or UiPart.Parent.Name == "ScrollingFrameSpecific") and UiPart:IsA("TextButton") then
-			local UIStroke = Instance.new("UIStroke")
-			UIStroke.Parent = UiPart
-			UIStroke.Thickness = 1
-			UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-			if UICornerEnabled then
-				local UICorner = Instance.new("UICorner")
-				UICorner.Parent = UiPart
-				UICorner.CornerRadius = UDim.new(0, 3)
-			end
-			if UIGradientEnabled then
-				local UIGradient = Instance.new("UIGradient")
-				UIGradient.Parent = UiPart
-				UIGradient.Color = ColorSequence.new(Color3.fromRGB(207, 207, 207), Color3.fromRGB(255, 255, 255))
-				UIGradient.Rotation = -90
-			end
-
-		end
 	end
+
 	local function AddUiPadding(Part, left, right, top, bottom)
 		for _, UiPart in ipairs(Emoter:GetDescendants()) do
 			if UiPart.Name == Part then
@@ -4282,6 +4818,7 @@ local function CreateGui()
 	AddUiPadding("SettingsStuff",5,8,3,5)
 	AddUiPadding("SwitchRunIdleExceptionOption", 20)
 	AddUiPadding("ThemeOptionText",0,0,0,2)
+	AddUiPadding("DragOptionText",0,0,0,2)
 	AddUiPadding("HotkeysEditOption",0,0,0,2)
 	AddUiPadding("HotkeysStuff",10,10,5,5)
 	AddUiPadding("SearchFrame",2)
@@ -4300,6 +4837,9 @@ local function CreateGui()
 
 
 	--OnRestart things
+	if FirstLaunch then
+		MFUIScale.Scale = 0
+	end
 	Emoter.Enabled = true
 
 	SettingsFrame.Visible = true --Made this so HotkeysFrame will be scrollable even if you scroll SettingsFrame before opening HotkeysFrame. Idk why it happens
@@ -4307,6 +4847,7 @@ local function CreateGui()
 	wait()
 	SettingsFrame.Visible = false
 	HotkeysFrame.Visible = false
+	SettingsFrame.Position = MainFrame.Position + UDim2.new(0, 590, 0, 0)
 
 	if GuiPos ~= nil then
 		SideFrame.Position = GuiPos
@@ -4319,9 +4860,10 @@ local function CreateGui()
 	end
 	if GuiClosed == true then
 		SideFrame.Visible = true
-	end
-	if GuiClosed == true then
 		MainFrame.Visible = false
+		MFUIScale.Scale = 0.8
+	else
+		SFUIScale.Scale = 1.2
 	end
 	if OptionsOpened == true then
 		OptionsFrame.Visible = true
@@ -4366,8 +4908,13 @@ local function CreateGui()
 		end
 	end
 
+	if FirstLaunch then
+		game.TweenService:Create(MFUIScale, TweenInfo.new(.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Scale = 1}):Play()
+	end
+
 	GuiEmoter = Emoter
 	GuiLoaded = true
+	FirstLaunch = false
 
 	local RestartPlayer
 	RestartPlayer = Player.CharacterAdded:Connect(function()
@@ -4377,6 +4924,8 @@ local function CreateGui()
 		if GuiActive and GuiRestarted == false and Player.Character:WaitForChild("Humanoid") then
 			table.clear(RestartAnimations)
 			StopAnimsEvent:Fire("Reset/Destroy")
+			GuiRestarted = true
+			BindHotkeys()
 			OnRestart()
 			RestartPlayer:Disconnect()
 		end
@@ -4431,7 +4980,17 @@ function OnRestart()
 	PrevCustomAnimId = GuiEmoter.MainFrame.CustomAnimFrame.IdBox.Text
 
 	GuiEmoter:Destroy()
-	CreateGui()
+
+	local CreateGuiOk, result = pcall(function()
+		return CreateGui()
+	end)
+	if not CreateGuiOk then
+		if Emoter and not IsInStudio then
+			Emoter:Destroy()
+		end
+		warn(result)
+	end
+
 	if DebugInfoEnabled then
 		for index, id in ipairs(RestartAnimations) do
 			print("Restored: "..id)
@@ -4440,4 +4999,14 @@ function OnRestart()
 end
 
 game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Welcome to Emoter Gui!", Text = "Wait for script to load!", Duration = 5, Icon = "rbxassetid://87633233506740"})
-CreateGui()
+
+local CreateGuiOk, result = pcall(function()
+	return CreateGui()
+end)
+if not CreateGuiOk then
+	if Emoter and not IsInStudio then
+		Emoter:Destroy()
+	end
+	game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Fatal Error!", Text = "Check Dev Console for more info (F9)", Duration = 5})
+	warn("[FATAL ERROR]: "..result)
+end
