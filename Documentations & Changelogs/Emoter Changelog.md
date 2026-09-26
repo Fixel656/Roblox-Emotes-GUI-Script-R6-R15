@@ -137,3 +137,22 @@ I will add it manually and you could add files for yourself in your files folder
 - Deleted some useless console outputs and made others to show only when Show debug info setting is enabled
 - Updated animations pausing function: now it immediately pauses ANY animation if it starting to play
 - Added setting so ANY animation can be played automatically after restarting GUI/character reappearing (found a reason for adding it)
+
+### V5.5:
+- Fixed Id for animations: FloatChillSit, FortniteDance and TakeTheL. Along with it any animation that can't be loaded will be marked by red
+- Added Ability to play non-Running/non-Idle animations as Running or Idle (RightAlt+Click for Running and RightControl+Click for Idle). Priority Change hotkey now works only for LeftAlt
+- Now when you use **LeftAlt+Click** on Animation foth Action4 priority, it will have Action3 Priority
+- Added "Top Most" setting. When enabled, it will be on top of **ANY** Gui
+- Now if you use settings saved for a specific game, it will be indicated on **top-left** corner of settings window. Also if you will be warned if you will try to save settings to main file
+- Now Animations Frame, textboxes and checkboxes doesn't share the same color
+- Added "Reset Character" hotkey
+- Added hints for hotheys on hover
+- Added Gui animations and made Gui dragging smoother. You can edit smoothness in settings, on **0** Gui will drag the same as before update
+- Deleted some unnecessary lines when disabling UICorners
+- Fixed some text in Settings not change it's color when switching to black theme
+- Now you can see which animation data loaded from files by hovering on "Animation" icon on **top-left** corner of settings window
+- Now DisableAnimate option won't work if there's no such script found in Character
+- Now PreviewFrame has UIStroke with color of type of animation you hovered on
+- Now you won't see Settings window popping up for a moment every time when Gui appears
+- Fixed EmoteWheel hotkey disabling along with others when disabling hotkeys
+- Now you can see an error notification appearing if script is broken
