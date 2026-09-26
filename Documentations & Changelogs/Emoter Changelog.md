@@ -121,6 +121,8 @@ I will add it manually and you could add files for yourself in your files folder
 - Added Options
 - Added UiGradient
 
+  <img width="234" height="134" alt="image" src="https://github.com/user-attachments/assets/dd2b59fd-7b3d-48fa-9746-8ae2271cbf54" />
+
 ### V2.6:
 - Fixed "Pause" anim function bug when it pauses wrong if you quick enough to play anim with "Pause" Type again
 - Added anim Preview Frame (Unexpected, actually). Disabled by default because can be not useful and you can disable it in Gui
@@ -157,5 +159,3 @@ and if summary is 0,animation will stuck on first frames.
 - changed Frame dragging from Frame.Draggable to using UiDragDetector (Now the Frame won't stop dragging even if you move mouse very quick)
 
   <img width="476" height="299" alt="image" src="https://github.com/user-attachments/assets/60f24374-a56a-4e04-83f3-54ce7c427b31" />
-
-  <img width="234" height="134" alt="image" src="https://github.com/user-attachments/assets/dd2b59fd-7b3d-48fa-9746-8ae2271cbf54" />
