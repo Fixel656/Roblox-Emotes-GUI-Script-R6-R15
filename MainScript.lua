@@ -4640,7 +4640,7 @@ local function CreateGui()
 
 	if DebugInfoEnabled then
 		for index, id in ipairs(ToolActionAnimsList) do
-			print("Номер: " .. index .. " | ID анимации: " .. id)
+			print("Position: " .. index .. " | Id: " .. id)
 		end
 	end
 
