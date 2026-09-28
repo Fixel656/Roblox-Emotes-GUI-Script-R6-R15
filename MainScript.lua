@@ -2,8 +2,8 @@
 DO NOT COPY AND CLAIM AS YOUR OWN, if you are using some of the script for your own, 
 credit is highly appreciated!]]
 
-local ScriptVersion = 5.5
-local LastUsedVersion = 5.5 --Unused for now
+local ScriptVersion = 5.51
+local LastUsedVersion = 5.51 --Unused for now
 local GuiActive = true
 local GuiEmoter = nil
 local AnimationHandler = "Animate"
@@ -335,7 +335,7 @@ local CustomAnimFrame
 local CustomAnimButton
 local IdBox
 local CustomAnimBackButton
-local PlayAnimButton
+local AddTempAnimButton
 local DefaultSection
 local SpecGameSection
 local EmoteWheel
@@ -440,7 +440,7 @@ local function CreateGui()
 	CustomAnimButton = Instance.new("ImageButton")
 	IdBox = Instance.new("TextBox")
 	CustomAnimBackButton = Instance.new("ImageButton")
-	PlayAnimButton = Instance.new("ImageButton")
+	AddTempAnimButton = Instance.new("ImageButton")
 
 	DefaultSection = Instance.new("TextButton") --Sections in case when you have specific game anims
 	SpecGameSection = Instance.new("TextButton")
@@ -2066,22 +2066,20 @@ local function CreateGui()
 	CustomAnimButton.Size = UDim2.new(0, 30, 1, 0)
 	CustomAnimButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	CustomAnimButton.LayoutOrder = 2
-	CustomAnimButton.Position = UDim2.new(1.4484849, 0, 0.9714286, 0)
 	CustomAnimButton.BorderSizePixel = 0
 	CustomAnimButton.BackgroundColor3 = BgColor
 	CustomAnimButton.ScaleType = Enum.ScaleType.Fit
-	CustomAnimButton.Image = "rbxassetid://74724767412656"
+	CustomAnimButton.Image = "rbxassetid://119465590963527"
 	CustomAnimButton.ImageColor3 = UiButColor
 	CustomAnimButton.Parent = CustomAnimFrame
-	AddHoverText(CustomAnimButton, "Play animation with Id")
+	AddHoverText(CustomAnimButton, "Add a temporary animation with Id (Adds to Default section and disappears after reset)")
 
 	IdBox.Name = "IdBox"
 	IdBox.ZIndex = 0
 	IdBox.Visible = false
 	IdBox.AnchorPoint = Vector2.new(0.5, 0)
-	IdBox.Size = UDim2.new(0, 140, 0, 29)
+	IdBox.Size = UDim2.new(0, 139, 0, 29)
 	IdBox.LayoutOrder = 1
-	IdBox.Position = UDim2.new(0.469697, 0, 0.075, 0)
 	IdBox.BackgroundColor3 = TextBgColor
 	IdBox.TextWrapped = true
 	IdBox.TextColor3 = UiButColor
@@ -2100,7 +2098,6 @@ local function CreateGui()
 	CustomAnimBackButton.AnchorPoint = Vector2.new(1, 0)
 	CustomAnimBackButton.Size = UDim2.new(0, 19, 1, 0)
 	CustomAnimBackButton.BorderSizePixel = 0
-	CustomAnimBackButton.Position = UDim2.new(0.1212121, 0, 0, 0)
 	CustomAnimBackButton.BackgroundColor3 = BgColor
 	CustomAnimBackButton.ScaleType = Enum.ScaleType.Crop
 	CustomAnimBackButton.ImageColor3 = UiButColor
@@ -2116,21 +2113,21 @@ local function CreateGui()
 	CAFUIListLayout.Padding = UDim.new(0, 1)
 	CAFUIListLayout.Parent = CustomAnimFrame
 
-	PlayAnimButton.Name = "PlayAnimButton"
-	PlayAnimButton.ZIndex = 0
-	PlayAnimButton.Visible = false
-	PlayAnimButton.AnchorPoint = Vector2.new(1, 0)
-	PlayAnimButton.Size = UDim2.new(0.0103627, 30, 1, 0)
-	PlayAnimButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	PlayAnimButton.LayoutOrder = 3
-	PlayAnimButton.Position = UDim2.new(1, 0, 0, 0)
-	PlayAnimButton.BorderSizePixel = 0
-	PlayAnimButton.BackgroundColor3 = ButtonCol
-	PlayAnimButton.ScaleType = Enum.ScaleType.Fit
-	PlayAnimButton.ImageColor3 = UiButColor
-	PlayAnimButton.Image = "rbxassetid://15081504003"
-	PlayAnimButton.Parent = CustomAnimFrame
-	AddHoverText(PlayAnimButton, "Add animation (On start of Gui)")
+	AddTempAnimButton.Name = "PlayAnimButton"
+	AddTempAnimButton.ZIndex = 0
+	AddTempAnimButton.Visible = false
+	AddTempAnimButton.AnchorPoint = Vector2.new(1, 0)
+	AddTempAnimButton.Size = UDim2.new(0, 32, 1, 0)
+	AddTempAnimButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	AddTempAnimButton.LayoutOrder = 3
+	AddTempAnimButton.Position = UDim2.new(1, 0, 0, 0)
+	AddTempAnimButton.BorderSizePixel = 0
+	AddTempAnimButton.BackgroundColor3 = ButtonCol
+	AddTempAnimButton.ScaleType = Enum.ScaleType.Fit
+	AddTempAnimButton.ImageColor3 = UiButColor
+	AddTempAnimButton.Image = "rbxassetid://15081504003"
+	AddTempAnimButton.Parent = CustomAnimFrame
+	AddHoverText(AddTempAnimButton, "Add animation (On start of animations frame)")
 
 
 	--Choose ScrollingFrame Buttons
@@ -3039,7 +3036,7 @@ local function CreateGui()
 			CustomAnimButton.Visible = false
 			CustomAnimBackButton.Visible = true
 			IdBox.Visible = true
-			PlayAnimButton.Visible = true
+			AddTempAnimButton.Visible = true
 			CAFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
 			game.TweenService:Create(CustomAnimFrame, TweenInfo.new(.3, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {Position = UDim2.new(1, 194, 0, 73)}):Play()
 			wait(.3)
@@ -3055,12 +3052,12 @@ local function CreateGui()
 			CustomAnimButton.Visible = true
 			CustomAnimBackButton.Visible = false
 			IdBox.Visible = false
-			PlayAnimButton.Visible = false
+			AddTempAnimButton.Visible = false
 			CustomAnimButtonClick = true
 		end
 	end)
 
-	PlayAnimButton.MouseButton1Click:Connect(function()
+	AddTempAnimButton.MouseButton1Click:Connect(function()
 		if IdBox.Text == "" or string.match(IdBox.Text, "%a") then
 			game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Error", Text = "Anim Id is empty or has letters", Duration = 3})
 			return end
@@ -3096,7 +3093,7 @@ local function CreateGui()
 		CustomAnimButton.Visible = false
 		CustomAnimBackButton.Visible = true
 		IdBox.Visible = true
-		PlayAnimButton.Visible = true
+		AddTempAnimButton.Visible = true
 		CAFUIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
 		CustomAnimFrame.Position = UDim2.new(1, 194, 0, 73)
 	end
