@@ -1,3 +1,7 @@
+### V5.51:
+- Changed AddAnimation button: now it has a "+" sign in corner instead of pen
+- Made hints for AddAnimation button more clear
+
 ### V5.5:
 - Fixed Id for animations: FloatChillSit, FortniteDance and TakeTheL. Along with it any animation that can't be loaded will be marked by red
 - Added Ability to play non-Running/non-Idle animations as Running or Idle (RightAlt+Click for Running and RightControl+Click for Idle). Priority Change hotkey now works only for LeftAlt
