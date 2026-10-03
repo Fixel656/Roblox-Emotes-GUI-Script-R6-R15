@@ -31,7 +31,7 @@ Dance without any problems and restrictions!<br>
 - Play FE animations (**43** R6 animations AND more than **100** R15 animations)
 - Highly configurable Button and animation functions
 - Abibily to change animation speed
-- All animations have Action3 or Action4 priority so it wont be replaced or conflicting with default animations
+- All animations have Action3 or Action4 priority so it wont be replaced or conflict with default animations
 - You can loop unlooped anims by clicking RMB on them
 - Preview animation by hovering on it's anim button
 - Cool options: Pausing all animations, stopping all default animations, pausing default "Animate" script, falling and reversing animations
@@ -47,6 +47,7 @@ I will add it manually and type available ones in README. Also you can add files
 ### To do:
 - Animation Bundles
 - Favorite animations
+- Choosing color by it's HEX or RGB code
 - More R15 animations
 - More Options (maybe)
 - More<br/>
