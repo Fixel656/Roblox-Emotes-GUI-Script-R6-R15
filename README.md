@@ -2,6 +2,11 @@
  <img width="250" height="140" alt="EmoterLogo4" src="https://github.com/user-attachments/assets/310058f6-c9ed-4321-84ed-853f696ba468" />
 </p>
 
+<div align="center">
+ 
+**(5k+ of new users! Thank you for using my script!)**
+</div>
+
 - [FAQ](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/blob/main/Documentations%20%26%20Changelogs/FAQ.md)
 - [Wiki](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/wiki)
 - [SGA Wiki](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/wiki/SpecificGameAnimations-and-how-to-make-your-own-SGA)
@@ -37,10 +42,11 @@ I will add it manually and type available ones in README. Also you can add files
 (You can add your SGA in [Discussions](https://github.com/Fixel656/Roblox-Emotes-GUI-Script-R6-R15/discussions/categories/your-sga-specific-game-animations) so i can add it to Github)<br/>
 - "Running" and "Idle" types for animations. "Running" type will change AnimationSpeed depending on the character's speed and stop when character isn't moving (staying). "Idle" type will play whed you're staying. It has a lot of configurations, so check more info on how to use it in my Wiki
 - Emote wheel (Activate by <kbd>,</kbd> button. You can't edit emotes for it in Gui itself (at least for now), You'll need to edit files in EmoterData folder.
+- Hotkeys with Double hotkey support
 
 ### To do:
-- Double Hotkey
-- Make size changing setting
+- Animation Bundles
+- Favorite animations
 - More R15 animations
 - More Options (maybe)
 - More<br/>
